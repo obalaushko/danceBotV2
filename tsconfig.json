@@ -16,8 +16,8 @@
         "lib": ["ES2022", "dom", "es6", "es5"],
         "types": [
             "node",
-            "@wdio/globals/types",
-            "@wdio/devtools-service",
+            // "@wdio/globals/types",
+            // "@wdio/devtools-service",
             "jest"
         ]
     },
