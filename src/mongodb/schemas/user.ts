@@ -1,11 +1,13 @@
 import  { Document, Schema, Model, model } from 'mongoose';
 import { ROLES } from '../../constants';
+import { ISubscription } from './subscription';
 
 export interface IUser extends Document {
   userId: string;
   role: typeof ROLES[keyof typeof ROLES]
   username?: string;
   firstName?: string;
+  subscription: ISubscription | null; 
   userData: {
     fullName: string;
     approved: boolean;

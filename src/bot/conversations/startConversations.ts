@@ -1,5 +1,6 @@
 import { BotContext, ConverstaionContext } from '../types';
 import { LOGGER } from '../../logger';
+import startMenu from '../menu';
 
 const startConversation = async (
     conversation: ConverstaionContext,
@@ -11,11 +12,17 @@ const startConversation = async (
 
     if (user.is_bot) return;
 
-    const {role, approved} = ctx.session;
+    const { role, approved } = ctx.session;
 
     LOGGER.info('[startConversation]', { metadata: user });
 
-    ctx.reply(`Welcome ${user.first_name}, your role: ${role}, approved status: ${approved}`);
+    ctx.reply(
+        `Welcome ${user.first_name}, your role: ${role}, approved status: ${approved}`,
+        { reply_markup: startMenu }
+    );
+
+
+    
 };
 
 export { startConversation };

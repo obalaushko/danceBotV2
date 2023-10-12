@@ -14,6 +14,7 @@ import { LOGGER } from '../logger';
 import { startConversation } from './conversations';
 import UserModel from '../mongodb/schemas/user';
 import { ROLES } from '../constants';
+import startMenu from './menu';
 
 dotenv.config();
 
@@ -37,12 +38,14 @@ bot.use(hydrateReply);
 // bot.api.config.use(throttler);
 //bot.api.config.use(parseMode('')); // Sets default parse_mode for ctx.reply
 
+// Session
 bot.use(
     session({
         initial: () => ({}),
     })
 );
 
+// Create user in MongoDB
 bot.use(async (ctx, next) => {
     const {
         user: { id, first_name, username },
@@ -70,6 +73,7 @@ bot.use(async (ctx, next) => {
     await next();
 });
 
+// Limit
 bot.use(
     limit({
         // Allow only 3 messages to be handled every 2 seconds.
@@ -87,6 +91,9 @@ bot.use(
         },
     })
 );
+
+// Menu
+bot.use(startMenu)
 
 //Inject conversations
 bot.use(conversations());
