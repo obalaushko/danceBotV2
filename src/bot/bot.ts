@@ -11,8 +11,9 @@ import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
-import SessionModel from '../mongodb/schemas/sessions';
 import { startConversation } from './conversations';
+import UserModel from '../mongodb/schemas/user';
+import { ROLES } from '../constants';
 
 dotenv.config();
 
@@ -43,25 +44,30 @@ bot.use(
 );
 
 bot.use(async (ctx, next) => {
-    const userId = ctx.from?.id;
+    const {
+        user: { id, first_name, username },
+    } = await ctx.getAuthor();
 
-    if (userId) {
-        const session = await SessionModel.findOne({ userId });
+    if (id) {
+        const existingUser = await UserModel.findOne({ userId: id.toString() });
 
-        if (session) {
-            ctx.session = session.data;
+        if (!existingUser) {
+            ctx.session.role = ROLES.Guest;
+            ctx.session.approved = false;
+            const newUser = new UserModel({
+                userId: id.toString(),
+                username: username || '',
+                firstName: first_name || '',
+            });
+
+            await newUser.save();
+        } else {
+            ctx.session.role = existingUser.role;
+            ctx.session.approved = existingUser.userData?.approved!;
         }
     }
 
     await next();
-
-    if (ctx.session && userId) {
-        await SessionModel.findOneAndUpdate(
-            { userId },
-            { data: ctx.session },
-            { upsert: true }
-        );
-    }
 });
 
 bot.use(

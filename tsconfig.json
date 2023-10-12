@@ -21,8 +21,8 @@
             "jest"
         ]
     },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"],
+    "include": ["**/*.*"],
+    "exclude": ["node_modules", "dist"],
     "ts-node": {
         "esm": true,
         "experimentalSpecifierResolution": "node"
