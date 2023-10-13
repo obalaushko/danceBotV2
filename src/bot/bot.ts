@@ -66,7 +66,7 @@ bot.use(async (ctx, next) => {
             await newUser.save();
         } else {
             ctx.session.role = existingUser.role;
-            ctx.session.approved = existingUser.userData?.approved!;
+            ctx.session.approved = existingUser.approved;
         }
     }
 

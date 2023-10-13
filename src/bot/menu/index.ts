@@ -1,6 +1,5 @@
 import { Menu } from '@grammyjs/menu';
 import UserModel from '../../mongodb/schemas/user';
-import { BotContext } from '../types';
 
 const startMenu = new Menu('start')
     .text('Start', (ctx) => ctx.reply('You press Start'))
