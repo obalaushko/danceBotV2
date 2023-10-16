@@ -6,15 +6,14 @@ import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types';
-import { COMMANDS } from './commands';
+import { COMMANDS, startCommand } from './commands';
 import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
 import { startConversation } from './conversations';
-import UserModel from '../mongodb/schemas/user';
-import { ROLES } from '../constants';
 import startMenu from './menu';
+import { addUser } from '../mongodb/operations';
 
 dotenv.config();
 
@@ -52,22 +51,11 @@ bot.use(async (ctx, next) => {
     } = await ctx.getAuthor();
 
     if (id) {
-        const existingUser = await UserModel.findOne({ userId: id.toString() });
-
-        if (!existingUser) {
-            ctx.session.role = ROLES.Guest;
-            ctx.session.approved = false;
-            const newUser = new UserModel({
-                userId: id.toString(),
-                username: username || '',
-                firstName: first_name || '',
-            });
-
-            await newUser.save();
-        } else {
-            ctx.session.role = existingUser.role;
-            ctx.session.approved = existingUser.approved;
-        }
+        await addUser({
+            userId: id,
+            username: username || '',
+            firstName: first_name || '',
+        });
     }
 
     await next();
@@ -93,7 +81,7 @@ bot.use(
 );
 
 // Menu
-bot.use(startMenu)
+bot.use(startMenu);
 
 //Inject conversations
 bot.use(conversations());
@@ -101,7 +89,8 @@ bot.use(createConversation(startConversation));
 
 //START COMMAND
 bot.command('start', async (ctx) => {
-    await ctx.conversation.enter('startConversation');
+    // await ctx.conversation.enter('startConversation');
+    startCommand(ctx);
 });
 
 // Always exit any conversation upon /cancel

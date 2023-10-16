@@ -3,19 +3,19 @@ import { ROLES } from '../../constants';
 import { ISubscription } from './subscription';
 
 export interface IUser extends Document {
-    userId: string;
-    role: (typeof ROLES)[keyof typeof ROLES];
+    userId: number;
+    role?: (typeof ROLES)[keyof typeof ROLES];
     username?: string;
     firstName?: string;
-    subscription: ISubscription | null;
+    subscription?: ISubscription | null;
     fullName?: string;
-    approved: boolean;
+    approved?: boolean;
     notifications?: boolean;
 }
 
-const userSchema: Schema = new Schema<IUser>({
+export const userSchema: Schema = new Schema<IUser>({
     userId: {
-        type: String,
+        type: Number,
         required: true,
         unique: true,
     },
@@ -51,6 +51,4 @@ const userSchema: Schema = new Schema<IUser>({
     },
 });
 
-const UserModel: Model<IUser> = model<IUser>('User', userSchema);
-
-export default UserModel;
+export const UserModel: Model<IUser> = model<IUser>('User', userSchema);

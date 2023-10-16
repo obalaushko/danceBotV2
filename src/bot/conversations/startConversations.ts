@@ -12,17 +12,11 @@ const startConversation = async (
 
     if (user.is_bot) return;
 
-    const { role, approved } = ctx.session;
-
     LOGGER.info('[startConversation]', { metadata: user });
 
-    ctx.reply(
-        `Welcome ${user.first_name}, your role: ${role}, approved status: ${approved}`,
-        { reply_markup: startMenu }
-    );
-
-
-    
+    ctx.reply(`Welcome ${user.first_name}, your id: ${user.id}`, {
+        reply_markup: startMenu,
+    });
 };
 
 export { startConversation };
