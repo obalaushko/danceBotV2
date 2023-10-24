@@ -1,8 +1,8 @@
 import { Context } from "grammy";
 import { LOGGER } from "../../logger";
-import startMenu from "../menu";
 import { getUserById } from "../../mongodb/operations";
 import { Menu } from "@grammyjs/menu";
+import { startMenu } from "../menu";
 
 export const startCommand = async (ctx: Context) => {
     

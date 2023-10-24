@@ -6,14 +6,20 @@ import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types';
-import { COMMANDS, startCommand } from './commands';
+import { COMMANDS } from './commands';
 import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
-import { startConversation } from './conversations';
-import startMenu from './menu';
-import { addUser } from '../mongodb/operations';
+import {
+    adminConversations,
+    developerConversations,
+    guestConversations,
+    registerConversations,
+    userConversations,
+} from './conversations';
+import { getUserById } from '../mongodb/operations';
+import { ROLES } from '../constants';
 
 dotenv.config();
 
@@ -44,23 +50,6 @@ bot.use(
     })
 );
 
-// Create user in MongoDB
-bot.use(async (ctx, next) => {
-    const {
-        user: { id, first_name, username },
-    } = await ctx.getAuthor();
-
-    if (id) {
-        await addUser({
-            userId: id,
-            username: username || '',
-            firstName: first_name || '',
-        });
-    }
-
-    await next();
-});
-
 // Limit
 bot.use(
     limit({
@@ -80,17 +69,34 @@ bot.use(
     })
 );
 
-// Menu
-bot.use(startMenu);
-
 //Inject conversations
 bot.use(conversations());
-bot.use(createConversation(startConversation));
+bot.use(createConversation(registerConversations));
+bot.use(createConversation(guestConversations));
+bot.use(createConversation(userConversations));
+bot.use(createConversation(adminConversations));
+bot.use(createConversation(developerConversations));
 
 //START COMMAND
 bot.command('start', async (ctx) => {
-    // await ctx.conversation.enter('startConversation');
-    startCommand(ctx);
+    const {
+        user: { is_bot, id },
+    } = await ctx.getAuthor();
+
+    if (is_bot) return;
+    const userExists = await getUserById(id);
+
+    if (!userExists) {
+        await ctx.conversation.enter('registerConversations');
+    } else if (userExists?.role === ROLES.Guest) {
+        await ctx.conversation.enter('guestConversations');
+    } else if (userExists?.role === ROLES.User) {
+        await ctx.conversation.enter('userConversations');
+    } else if (userExists?.role === ROLES.Admin) {
+        await ctx.conversation.enter('adminConversations');
+    } else if (userExists?.role === ROLES.Developer) {
+        await ctx.conversation.enter('developerConversations');
+    }
 });
 
 // Always exit any conversation upon /cancel
