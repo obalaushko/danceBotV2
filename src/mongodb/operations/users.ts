@@ -42,7 +42,7 @@ export const addUser = async ({
         const savedUser = await newUser.save();
 
         if (savedUser?.id) {
-            LOGGER.info('[addUser][success]', { metadata: {} });
+            LOGGER.info('[addUser][success]', { metadata: {savedUser} });
         } else {
             LOGGER.error('[addUser][error]', {
                 metadata: { error: 'User not saved' },
