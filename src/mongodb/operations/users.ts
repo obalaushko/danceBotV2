@@ -42,7 +42,7 @@ export const addUser = async ({
         const savedUser = await newUser.save();
 
         if (savedUser?.id) {
-            LOGGER.info('[addUser][success]', { metadata: {savedUser} });
+            LOGGER.info('[addUser][success]', { metadata: { savedUser } });
         } else {
             LOGGER.error('[addUser][error]', {
                 metadata: { error: 'User not saved' },
@@ -84,6 +84,45 @@ export const updateUserById = async (
         return null;
     } catch (error: any) {
         LOGGER.error('[updateUserById][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const getAllUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const users = await UserModel.find().exec();
+
+        return users;
+    } catch (error: any) {
+        LOGGER.error('[getAllUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const getAllGuestUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const guestUsers = await UserModel.find({ role: ROLES.Guest }).exec();
+
+        return guestUsers;
+    } catch (error: any) {
+        LOGGER.error('[getAllGuestUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const getAllUserUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const userUsers = await UserModel.find({ role: ROLES.User }).exec();
+
+        return userUsers;
+    } catch (error: any) {
+        LOGGER.error('[getAllUserUsers][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;

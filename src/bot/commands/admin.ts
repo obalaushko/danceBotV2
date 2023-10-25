@@ -4,14 +4,14 @@ import { getUserById } from "../../mongodb/operations";
 import { Menu } from "@grammyjs/menu";
 import { startMenu } from "../menu";
 
-export const startCommand = async (ctx: Context) => {
+export const adminDialogue = async (ctx: Context) => {
     
     if (ctx.from === undefined) return;
 
     const { user } = await ctx.getAuthor();
 
     if (user.is_bot) return;
-    LOGGER.info('[startCommand]', { metadata: user });
+    LOGGER.info('[adminDialogue]', { metadata: user });
 
 
     ctx.reply(`Welcome ${user.first_name}, your id: ${user.id}`, {

@@ -115,12 +115,12 @@ bot.catch((err) => {
     const e = err.error;
 
     if (e instanceof GrammyError) {
-        LOGGER.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
+        LOGGER.error(`[bot-catch][GrammyError][Error in request ${ctx.update.update_id}]`, {
             metadata: e.message,
             stack: e.stack,
         });
     } else if (e instanceof HttpError) {
-        LOGGER.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
+        LOGGER.error(`[bot-catch][HttpError][Error in request ${ctx.update.update_id}]`, {
             metadata: e.error,
             stack: e.stack,
         });

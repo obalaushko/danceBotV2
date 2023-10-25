@@ -7,8 +7,6 @@ import {
 interface SessionData {
     itemLevel: string;
     isDEGANft: boolean;
-    role: string;
-    approved: boolean;
 }
 export type SessionContext = Context & SessionFlavor<SessionData>;
 export type BotContext = SessionContext & ConversationFlavor;

@@ -1,14 +1,8 @@
 import { BotContext, ConverstaionContext } from '../types';
 
 import { LOGGER } from '../../logger';
-import { MSG, ROLES } from '../../constants';
-import { addUser, updateUserById } from '../../mongodb/operations';
-import { InlineKeyboard } from 'grammy';
-import {
-    activeteSubscription,
-    addSubscription,
-    deactivateSubscription,
-} from '../../mongodb/operations/subscriptions';
+import { MSG } from '../../constants';
+import { addUser, addSubscription } from '../../mongodb/operations';
 
 export const registerConversations = async (
     conversation: ConverstaionContext,
@@ -65,35 +59,8 @@ export const registerConversations = async (
     if (newUser) {
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 
-        // Перенести до окремої команди адміну
-        // const inlineKeyboard = new InlineKeyboard()
-        //     .text(MSG.buttons.approve, 'click-approve-user')
-        //     .text(MSG.buttons.cancel, 'click-cancel-user');
-
-        // await ctx.api.sendMessage(324131584, MSG.approveUser(newUser), {
-        //     reply_markup: inlineKeyboard,
-        // });
-
-        // const approveUser =
-        //     await conversation.waitForCallbackQuery('click-approve-user');
-
-        // if (approveUser) {
-        //     // const updateUser = await conversation.external(
-        //     //     async () =>
-        //     //         await updateUserById(newUser.userId, {
-        //     //             role: ROLES.User,
-        //     //         })
-        //     // );
-        //     await ctx.reply(MSG.approved(newUser));
-        // }
-
-        // const cancelUser =
-        //     await conversation.waitForCallbackQuery('click-cancel-user');
-
-        // if (cancelUser) {
-        //     await ctx.reply(MSG.backToWait(newUser));
-        // }
-
-        return;
+        await ctx.api.sendMessage(324131584, MSG.approveUser(newUser)); // replace id to ENV.ADMIN_ID
     }
+
+    return;
 };
