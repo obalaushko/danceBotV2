@@ -4,6 +4,11 @@ import { LOGGER } from '../../logger';
 import { MSG, ROLES } from '../../constants';
 import { addUser, updateUserById } from '../../mongodb/operations';
 import { InlineKeyboard } from 'grammy';
+import {
+    activeteSubscription,
+    addSubscription,
+    deactivateSubscription,
+} from '../../mongodb/operations/subscriptions';
 
 export const registerConversations = async (
     conversation: ConverstaionContext,
@@ -37,6 +42,15 @@ export const registerConversations = async (
 
     LOGGER.info(`[registerConversations] Ім'я та Прізвище: ${fullName}`);
 
+    const newSubscriptions = await conversation.external(
+        async () =>
+            await addSubscription({
+                userId: user.id,
+                totalLessons: 8,
+                usedLessons: 0,
+            })
+    );
+
     const newUser = await conversation.external(
         async () =>
             await addUser({
@@ -44,9 +58,10 @@ export const registerConversations = async (
                 username: user.username || '',
                 firstName: user.first_name || '',
                 fullName,
+                subscription: newSubscriptions,
             })
     );
-    
+
     if (newUser) {
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 

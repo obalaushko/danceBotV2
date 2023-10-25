@@ -4,6 +4,7 @@ export interface ISubscription extends Document {
     userId: number;
     totalLessons: number;
     usedLessons: number;
+    active?: boolean;
 }
 
 const subscriptionSchema: Schema = new Schema<ISubscription>({
@@ -18,6 +19,10 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     usedLessons: {
         type: Number,
         default: 0,
+    },
+    active: {
+        type: Boolean,
+        default: false,
     },
 });
 
