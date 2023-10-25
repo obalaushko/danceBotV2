@@ -105,6 +105,10 @@ bot.command('cancel', async (ctx) => {
     await ctx.reply('Leaving...');
 });
 
+bot.command('changename', async (ctx) => {
+    
+})
+
 //CRASH HANDLER
 bot.catch((err) => {
     const ctx = err.ctx;

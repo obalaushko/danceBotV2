@@ -16,8 +16,11 @@ export const MSG = {
             `Привіт ${user.first_name}, ви маєте можливість переглянути запити нових учнів та оновлювати дані вже існуючих`,
         developer: (user: ITGUser) => `Привіт ${user.first_name}, вибери роль`,
     },
+    updateFullName: "Вкажіть нове Ім'я та Прізвище",
+    updatedFullName: (user: ITGUser) =>
+        `Ви оновили свої дані на *${user.fullName}*`,
     waitAssigned:
-        'Будь ласка, зачекайте поки адміністратор схвалить ваш запит на реєстрацію',
+        "Будь ласка, зачекайте поки адміністратор схвалить ваш запит на реєстрацію\nЯкщо ви хочете змінити Ім'я та Прізвище скористайтеся командою /changename",
     wrongRegister:
         'Будь ласка, введіть ім\'я та прізвище у форматі "Ім\'я Прізвище"',
     approveUser: (user: ITGUser) =>
@@ -28,8 +31,8 @@ export const MSG = {
         `Користувач "${user.fullName}" отримав нову роль, та доступ до групи.`,
     nowNewUsers: 'Наразі немає нових користувачів',
     showGuestUsers: (users: IUser[]) => {
-        if (!users.length) { 
-            return MSG.nowNewUsers
+        if (!users.length) {
+            return MSG.nowNewUsers;
         }
         let userList = 'Це список усіх користувачів які очікують схвалення:\n';
 
@@ -45,7 +48,7 @@ export const MSG = {
     },
     buttons: {
         admin: {
-            approveUser: "Переглянути запити",
+            approveUser: 'Переглянути запити',
             showAllUser: 'Показати усіх учнів',
             updateUser: 'Оновини дані учнів',
             markUser: 'Відмітити учнів',
