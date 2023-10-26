@@ -128,6 +128,26 @@ bot.command('changename', async (ctx) => {
     }
 });
 
+bot.command('about', async (ctx) => {
+    const {
+        user: { is_bot },
+    } = await ctx.getAuthor();
+
+    if (is_bot) return;
+
+    await ctx.reply(MSG.about);
+});
+
+bot.command('help', async (ctx) => {
+    const {
+        user: { is_bot },
+    } = await ctx.getAuthor();
+
+    if (is_bot) return;
+
+    await ctx.reply(MSG.help, { parse_mode: 'HTML' });
+});
+
 //CRASH HANDLER
 bot.catch((err) => {
     const ctx = err.ctx;
