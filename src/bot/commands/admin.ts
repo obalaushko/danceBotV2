@@ -19,47 +19,39 @@ const createMenu = (menuName: string): void => {
     createdMenus[menuName] = true;
 };
 
-const approveUserMenu = new Menu('approveUserMenu');
-const handleApproveUser = async (ctx: Context) => {
-    console.log('handleApproveUser');
-    try {
+const approveUserMenu = new Menu('approveUserMenu', {
+    onMenuOutdated: MSG.onMenuOutdated,
+});
+
+approveUserMenu
+    .dynamic(async (ctx) => {
         const guestUsers = await getAllGuestUsers();
-        if (guestUsers?.length) {
-            await ctx.editMessageText(
-                'Виберіть користувачів яких хочете додати до групи'
-            );
-            approveUserMenu
-                .dynamic(() => {
-                    const range = new MenuRange();
+        // console.log(ctx)
+        // await ctx.editMessageText(
+        //     'Виберіть користувачів яких хочете додати до групи'
+        // );
+        const range = new MenuRange();
+        guestUsers!.map((user) => {
+            range
+                .text(
+                    {
+                        text: user.fullName!,
+                        payload: user.userId.toString(),
+                    },
+                    (ctx) => {
+                        console.log(ctx.match);
+                    }
+                )
+                .row();
+        });
 
-                    guestUsers.map((user) => {
-                        range
-                            .text(
-                                {
-                                    text: user.fullName!,
-                                    payload: user.userId.toString(),
-                                },
-                                (ctx) => {
-                                    console.log(ctx.match);
-                                }
-                            )
-                            .row();
-                    });
-
-                    return range;
-                })
-                .text(MSG.buttons.backToMain, async (ctx) => {
-                    const { user } = await ctx.getAuthor();
-                    ctx.menu.back();
-                    await ctx.editMessageText(MSG.welcome.admin(user));
-                });
-        } else {
-            await ctx.editMessageText('Нових користувачів немає');
-        }
-    } catch (err) {
-        console.log(err);
-    }
-};
+        return range;
+    })
+    .text(MSG.buttons.backToMain, async (ctx) => {
+        const { user } = await ctx.getAuthor();
+        ctx.menu.back();
+        await ctx.editMessageText(MSG.welcome.admin(user));
+    });
 
 export const adminDialogue = async (ctx: BotContext) => {
     const { user } = await ctx.getAuthor();
@@ -88,19 +80,12 @@ export const adminDialogue = async (ctx: BotContext) => {
 };
 
 export const adminMenu = new Menu('admin')
-    .text(MSG.buttons.admin.approveUser, async (ctx) => {
-        
-        if (!isMenuCreated('approveUserMenu')) {
-            await handleApproveUser(ctx);
-            createMenu('approveUserMenu');
-            adminMenu.register(approveUserMenu);
-        }
-
-        ctx.menu.nav('approveUserMenu');
-    })
+    .submenu(MSG.buttons.admin.approveUser, 'approveUserMenu')
     .submenu(MSG.buttons.admin.markUser, 'markUserMenu')
     .row()
     .submenu(MSG.buttons.admin.showAllUser, 'showUserMenu')
     .submenu(MSG.buttons.admin.updateUser, 'updateUserMenu')
     .row()
     .submenu(MSG.buttons.admin.removeUser, 'removeUserMenu');
+
+adminMenu.register(approveUserMenu);
