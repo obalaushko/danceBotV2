@@ -2,7 +2,7 @@ import { BotContext, ConverstaionContext } from '../types';
 
 import { LOGGER } from '../../logger';
 import { InlineKeyboard } from 'grammy';
-import { MSG, ROLES } from '../../constants';
+import { MSG } from '../../constants';
 import { getAllGuestUsers } from '../../mongodb/operations';
 
 //! Don't use conversations if you want to use complicated menu

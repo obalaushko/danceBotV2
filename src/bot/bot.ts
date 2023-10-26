@@ -6,13 +6,12 @@ import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types';
-import { COMMANDS } from './commands';
+import { COMMANDS, adminDialogue, adminMenu } from './commands';
 import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
 import {
-    adminConversations,
     changeNameConversations,
     developerConversations,
     guestConversations,
@@ -71,12 +70,14 @@ bot.use(
     })
 );
 
+bot.use(adminMenu);
+
 //Inject conversations
 bot.use(conversations());
 bot.use(createConversation(registerConversations));
 bot.use(createConversation(guestConversations));
 bot.use(createConversation(userConversations));
-bot.use(createConversation(adminConversations));
+// bot.use(createConversation(adminConversations));
 bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
@@ -96,7 +97,7 @@ bot.command('start', async (ctx) => {
     } else if (userExists?.role === ROLES.User) {
         await ctx.conversation.enter('userConversations');
     } else if (userExists?.role === ROLES.Admin) {
-        await ctx.conversation.enter('adminConversations');
+        await adminDialogue(ctx);
     } else if (userExists?.role === ROLES.Developer) {
         await ctx.conversation.enter('developerConversations');
     }
@@ -105,6 +106,7 @@ bot.command('start', async (ctx) => {
 // Always exit any conversation upon /cancel
 bot.command('cancel', async (ctx) => {
     const stats = await ctx.conversation.active();
+
     if (isObjectEmpty(stats)) {
         await ctx.reply(MSG.overLeaveConversation);
     } else {
