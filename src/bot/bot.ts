@@ -13,13 +13,15 @@ import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
 import {
     adminConversations,
+    changeNameConversations,
     developerConversations,
     guestConversations,
     registerConversations,
     userConversations,
 } from './conversations';
 import { getUserById } from '../mongodb/operations';
-import { ROLES } from '../constants';
+import { MSG, ROLES } from '../constants';
+import { isObjectEmpty } from '../utils/utils';
 
 dotenv.config();
 
@@ -76,6 +78,7 @@ bot.use(createConversation(guestConversations));
 bot.use(createConversation(userConversations));
 bot.use(createConversation(adminConversations));
 bot.use(createConversation(developerConversations));
+bot.use(createConversation(changeNameConversations));
 
 //START COMMAND
 bot.command('start', async (ctx) => {
@@ -101,13 +104,29 @@ bot.command('start', async (ctx) => {
 
 // Always exit any conversation upon /cancel
 bot.command('cancel', async (ctx) => {
-    await ctx.conversation.exit();
-    await ctx.reply('Leaving...');
+    const stats = await ctx.conversation.active();
+    if (isObjectEmpty(stats)) {
+        await ctx.reply(MSG.overLeaveConversation);
+    } else {
+        await ctx.conversation.exit();
+        await ctx.reply(MSG.leaveConversation);
+        LOGGER.info(`[guestConversations] Leave the conversation`);
+    }
 });
 
 bot.command('changename', async (ctx) => {
-    
-})
+    const {
+        user: { is_bot, id },
+    } = await ctx.getAuthor();
+
+    if (is_bot) return;
+    const userExists = await getUserById(id);
+    if (!userExists) {
+        await ctx.reply(MSG.commandDisabled);
+    } else {
+        await ctx.conversation.enter('changeNameConversations');
+    }
+});
 
 //CRASH HANDLER
 bot.catch((err) => {
@@ -119,15 +138,21 @@ bot.catch((err) => {
     const e = err.error;
 
     if (e instanceof GrammyError) {
-        LOGGER.error(`[bot-catch][GrammyError][Error in request ${ctx.update.update_id}]`, {
-            metadata: e.message,
-            stack: e.stack,
-        });
+        LOGGER.error(
+            `[bot-catch][GrammyError][Error in request ${ctx.update.update_id}]`,
+            {
+                metadata: e.message,
+                stack: e.stack,
+            }
+        );
     } else if (e instanceof HttpError) {
-        LOGGER.error(`[bot-catch][HttpError][Error in request ${ctx.update.update_id}]`, {
-            metadata: e.error,
-            stack: e.stack,
-        });
+        LOGGER.error(
+            `[bot-catch][HttpError][Error in request ${ctx.update.update_id}]`,
+            {
+                metadata: e.error,
+                stack: e.stack,
+            }
+        );
     } else {
         LOGGER.error(`[bot-catch][Error in request ${ctx.update.update_id}]`, {
             metadata: e,

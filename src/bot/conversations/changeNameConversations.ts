@@ -2,17 +2,17 @@ import { BotContext, ConverstaionContext } from '../types';
 
 import { LOGGER } from '../../logger';
 import { MSG } from '../../constants';
-import { addUser, addSubscription } from '../../mongodb/operations';
+import { updateUserById } from '../../mongodb/operations';
 import { isCancel } from '../../utils/utils';
 
-export const registerConversations = async (
+export const changeNameConversations = async (
     conversation: ConverstaionContext,
     ctx: BotContext
 ) => {
     const { user } = await ctx.getAuthor();
-    LOGGER.info('[registerConversations]', { metadata: user });
+    LOGGER.info('[changeNameConversations]', { metadata: user });
 
-    await ctx.reply(MSG.welcome.notRegistered);
+    await ctx.reply(MSG.updateFullName);
 
     let isValidFormat = false;
     let fullName = '';
@@ -24,7 +24,7 @@ export const registerConversations = async (
         if (isCancel(messageText || '')) {
             await ctx.reply(MSG.leaveConversation);
             await ctx.conversation.exit();
-            LOGGER.info(`[registerConversations] Leave the conversation`);
+            LOGGER.info(`[changeNameConversations] Leave the conversation`);
             return;
         }
 
@@ -42,32 +42,20 @@ export const registerConversations = async (
         }
     }
 
-    LOGGER.info(`[registerConversations] Ім'я та Прізвище: ${fullName}`);
+    LOGGER.info(`[changeNameConversations] Ім'я та Прізвище: ${fullName}`);
 
-    const newSubscriptions = await conversation.external(
+    const updateFullName = await conversation.external(
         async () =>
-            await addSubscription({
-                userId: user.id,
-                totalLessons: 8,
-                usedLessons: 0,
-            })
-    );
-
-    const newUser = await conversation.external(
-        async () =>
-            await addUser({
-                userId: user.id,
-                username: user.username || '',
-                firstName: user.first_name || '',
+            await updateUserById(user.id, {
                 fullName,
-                subscription: newSubscriptions,
             })
     );
-
-    if (newUser) {
-        await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
-
-        await ctx.api.sendMessage(324131584, MSG.approveUser(newUser)); // replace id to ENV.ADMIN_ID
+    if (updateFullName) {
+        await ctx.reply(MSG.updatedFullName(updateFullName), {
+            parse_mode: 'MarkdownV2',
+        });
+    } else {
+        LOGGER.error(`[changeNameConversations] updatedFullName failed`);
     }
 
     return;

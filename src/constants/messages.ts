@@ -16,7 +16,8 @@ export const MSG = {
             `Привіт ${user.first_name}, ви маєте можливість переглянути запити нових учнів та оновлювати дані вже існуючих`,
         developer: (user: ITGUser) => `Привіт ${user.first_name}, вибери роль`,
     },
-    updateFullName: "Вкажіть нове Ім'я та Прізвище",
+    updateFullName:
+        "Вкажіть нове Ім'я та Прізвище\nЩоб скасувати введення використайте команду /cancel",
     updatedFullName: (user: ITGUser) =>
         `Ви оновили свої дані на *${user.fullName}*`,
     waitAssigned:
@@ -58,4 +59,11 @@ export const MSG = {
         approve: 'Прийняти',
         cancel: 'Скасувати',
     },
+    leaveConversation: 'Розмову завершено',
+    overLeaveConversation:
+        'У вас немає активних розмов з ботом, щоб розпочати нову скористайтеся командою /start',
+    accessIsDenied: 'У доступі відмовлено',
+    inappropriateRole: 'Ваша роль немає відповідних прав',
+    commandDisabled: 'Ця команда вам недоступна',
+    registerFirst: 'Щоб скористатися командою спочатку зареєструйтеся'
 };
