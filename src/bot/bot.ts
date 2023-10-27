@@ -1,12 +1,12 @@
 import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
-import { hydrateReply } from '@grammyjs/parse-mode';
+import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types';
-import { COMMANDS, adminDialogue, adminMenu } from './commands';
+import { COMMANDS } from './commands';
 import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
@@ -21,6 +21,8 @@ import {
 import { getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
 import { isObjectEmpty } from '../utils/utils';
+import { adminMenu } from './menu';
+import { dailyCheck } from '../helpers';
 
 dotenv.config();
 
@@ -42,7 +44,7 @@ const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
 bot.api.setMyCommands(COMMANDS);
 bot.use(hydrateReply);
 // bot.api.config.use(throttler);
-//bot.api.config.use(parseMode('')); // Sets default parse_mode for ctx.reply
+bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
 
 // Session
 bot.use(
@@ -81,14 +83,15 @@ bot.use(createConversation(userConversations));
 bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
+
+dailyCheck();
+
 //START COMMAND
 bot.command('start', async (ctx) => {
-    const {
-        user: { is_bot, id },
-    } = await ctx.getAuthor();
+    const { user } = await ctx.getAuthor();
 
-    if (is_bot) return;
-    const userExists = await getUserById(id);
+    if (user.is_bot) return;
+    const userExists = await getUserById(user.id);
 
     if (!userExists) {
         await ctx.conversation.enter('registerConversations');
@@ -97,7 +100,10 @@ bot.command('start', async (ctx) => {
     } else if (userExists?.role === ROLES.User) {
         await ctx.conversation.enter('userConversations');
     } else if (userExists?.role === ROLES.Admin) {
-        await adminDialogue(ctx);
+        LOGGER.info('[adminDialogue]', { metadata: user });
+        await ctx.reply(MSG.welcome.admin(user), {
+            reply_markup: adminMenu,
+        });
     } else if (userExists?.role === ROLES.Developer) {
         await ctx.conversation.enter('developerConversations');
     }
@@ -149,6 +155,34 @@ bot.command('help', async (ctx) => {
 
     await ctx.reply(MSG.help, { parse_mode: 'HTML' });
 });
+
+// bot.command('add', async (ctx) => {
+//     const {
+//         user: { is_bot },
+//     } = await ctx.getAuthor();
+
+//     if (is_bot) return;
+
+//     function generateRandomNumericId() {
+//         const min = 10000000; // Мінімальне 8-цифрове число
+//         const max = 99999999; // Максимальне 8-цифрове число
+//         return Math.floor(Math.random() * (max - min + 1)) + min;
+//     }
+
+//     // Приклад використання
+//     const randomId = generateRandomNumericId();
+//     const subscription = await addSubscription({
+//         userId: randomId,
+//     });
+
+//     const user = await addUser({
+//         userId: randomId,
+//         username: 'testuser2',
+//         firstName: 'testuser2',
+//         fullName: 'Test User2',
+//         subscription: subscription,
+//     });
+// });
 
 //CRASH HANDLER
 bot.catch((err) => {

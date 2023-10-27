@@ -48,8 +48,6 @@ export const registerConversations = async (
         async () =>
             await addSubscription({
                 userId: user.id,
-                totalLessons: 8,
-                usedLessons: 0,
             })
     );
 

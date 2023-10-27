@@ -66,7 +66,11 @@ export const activeteSubscription = async (
 
         if (!subscription) return null;
 
-        Object.assign(subscription, { active: true });
+        Object.assign(subscription, {
+            active: true,
+            usedLessons: 0,
+            remainedLessons: 0,
+        });
         await subscription.save();
 
         return subscription;
@@ -92,6 +96,33 @@ export const deactivateSubscription = async (
         return subscription;
     } catch (error: any) {
         LOGGER.error('[deactivateSubscription][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const markLessonAsUsed = async (
+    userId: number
+): Promise<ISubscription | null> => {
+    try {
+        const subscription = await SubscriptionModel.findOne({
+            userId: userId,
+        });
+
+        if (subscription) {
+            if (subscription.usedLessons! < subscription.totalLessons!) {
+                subscription.usedLessons! += 1;
+                if (subscription.usedLessons! >= subscription.totalLessons!) {
+                    subscription.active = false;
+                }
+                await subscription.save();
+            }
+        }
+
+        return subscription;
+    } catch (error: any) {
+        LOGGER.error('[markLessonAsUsed][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;

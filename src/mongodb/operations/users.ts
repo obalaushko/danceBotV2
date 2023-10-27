@@ -128,3 +128,56 @@ export const getAllUserUsers = async (): Promise<IUser[] | null> => {
         return null;
     }
 };
+
+export const approveUsers = async (
+    userIds: number[]
+): Promise<IUser[] | null> => {
+    try {
+        const updatedUsers: IUser[] = [];
+
+        for (const userId of userIds) {
+            const user = await UserModel.findOne({ userId }).exec();
+
+            if (user) {
+                user.approved = true;
+                user.role = ROLES.User;
+
+                await user.save();
+
+                updatedUsers.push(user);
+            }
+        }
+
+        if (!updatedUsers.length) return null;
+
+        return updatedUsers;
+    } catch (error: any) {
+        LOGGER.error('[approveUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const getAllActiveUserUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const activeUserUsers = await UserModel.find({ role: ROLES.User })
+            .populate({
+                path: 'subscription',
+                match: { active: true },
+                select: '-_id',
+            })
+            .exec();
+
+        const usersWithActiveSubscriptions = activeUserUsers.filter((user) => {
+            return user.subscription !== null;
+        });
+
+        return usersWithActiveSubscriptions;
+    } catch (error: any) {
+        LOGGER.error('[getAllActiveUserUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};

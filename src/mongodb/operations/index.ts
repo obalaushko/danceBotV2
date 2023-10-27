@@ -1,2 +1,17 @@
-export { addUser, getUserById, updateUserById, getAllUsers, getAllGuestUsers, getAllUserUsers } from './users';
-export { addSubscription, activeteSubscription, deactivateSubscription, getSubscriptionById } from './subscriptions';
+export {
+    addUser,
+    getUserById,
+    updateUserById,
+    getAllUsers,
+    getAllGuestUsers,
+    getAllUserUsers,
+    approveUsers,
+    getAllActiveUserUsers,
+} from './users';
+export {
+    addSubscription,
+    activeteSubscription,
+    deactivateSubscription,
+    getSubscriptionById,
+    markLessonAsUsed
+} from './subscriptions';

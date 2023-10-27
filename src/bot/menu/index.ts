@@ -1,2 +1,1 @@
-export { startMenu } from './menus';
-export { inlineKeyboard } from './inlineMenu';
+export { adminMenu } from './admin';
