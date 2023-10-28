@@ -70,8 +70,10 @@ export const MSG = {
             deactivate: 'Деактивувати'
         },
         backToMain: 'Назад до меню',
+        back: 'Назад',
         approve: 'Прийняти',
         add: 'Додати',
+        update: 'Оновити',
         cancel: 'Скасувати',
     },
     errors: {

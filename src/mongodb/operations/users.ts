@@ -181,3 +181,26 @@ export const getAllActiveUserUsers = async (): Promise<IUser[] | null> => {
         return null;
     }
 };
+
+export const getAllDeactiveUserUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const deactiveUserUsers = await UserModel.find({ role: ROLES.User })
+            .populate({
+                path: 'subscription',
+                match: { active: false },
+                select: '-_id',
+            })
+            .exec();
+
+        const usersWithDeactiveSubscriptions = deactiveUserUsers.filter((user) => {
+            return user.subscription !== null;
+        });
+
+        return usersWithDeactiveSubscriptions;
+    } catch (error: any) {
+        LOGGER.error('[getAllDeactiveUserUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};

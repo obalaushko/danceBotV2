@@ -58,43 +58,62 @@ export const getSubscriptionById = async (
     }
 };
 
-export const activeteSubscription = async (
-    id: number
-): Promise<ISubscription | null> => {
+export const activateSubscriptions = async (
+    userId: number | number[]
+): Promise<ISubscription[] | null> => {
+    const userIds = Array.isArray(userId) ? userId : [userId];
+
     try {
-        const subscription = await getSubscriptionById(id);
-
-        if (!subscription) return null;
-
-        Object.assign(subscription, {
-            active: true,
-            usedLessons: 0,
+        const subscriptions: ISubscription[] = await SubscriptionModel.find({
+            userId: { $in: userIds },
         });
-        await subscription.save();
 
-        return subscription;
+        if (subscriptions.length === 0) {
+            return null;
+        }
+
+        const updatedSubscriptions: ISubscription[] = [];
+
+        for (const subscription of subscriptions) {
+            subscription.active = true;
+            await subscription.save();
+            updatedSubscriptions.push(subscription);
+        }
+
+        return updatedSubscriptions;
     } catch (error: any) {
-        LOGGER.error('[activeteSubscription][error]', {
+        LOGGER.error('[activateSubscriptions][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;
     }
 };
 
-export const deactivateSubscription = async (
-    id: number
-): Promise<ISubscription | null> => {
+export const deactivateSubscriptions = async (
+    userId: number | number[]
+): Promise<ISubscription[] | null> => {
+    const userIds = Array.isArray(userId) ? userId : [userId];
+
     try {
-        const subscription = await getSubscriptionById(id);
+        const subscriptions: ISubscription[] = await SubscriptionModel.find({
+            userId: { $in: userIds },
+        });
 
-        if (!subscription) return null;
+        if (subscriptions.length === 0) {
+            return null;
+        }
 
-        Object.assign(subscription, { active: false });
-        await subscription.save();
+        const updatedSubscriptions: ISubscription[] = [];
 
-        return subscription;
+        for (const subscription of subscriptions) {
+            subscription.active = false;
+            await subscription.save();
+            updatedSubscriptions.push(subscription);
+        }
+
+        return updatedSubscriptions;
     } catch (error: any) {
-        LOGGER.error('[deactivateSubscription][error]', {
+        LOGGER.error('[deactivateSubscriptions][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;

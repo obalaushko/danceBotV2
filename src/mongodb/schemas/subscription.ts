@@ -69,6 +69,7 @@ subscriptionSchema.pre('save', async function (next) {
     if (this.isModified('active')) {
         if (this.active) {
             this.setExpirationDate();
+            this.usedLessons = 0;
         } else if (!this.active) {
             this.dataExpired = undefined;
             this.usedLessons = 0;

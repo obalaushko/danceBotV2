@@ -9,11 +9,12 @@ export {
     getAllUserUsers,
     approveUsers,
     getAllActiveUserUsers,
+    getAllDeactiveUserUsers
 } from './users';
 export {
     addSubscription,
-    activeteSubscription,
-    deactivateSubscription,
+    activateSubscriptions,
+    deactivateSubscriptions,
     getSubscriptionById,
     markLessonAsUsed,
 } from './subscriptions';
