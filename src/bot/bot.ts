@@ -18,7 +18,7 @@ import {
     registerConversations,
     userConversations,
 } from './conversations';
-import { getUserById } from '../mongodb/operations';
+import { addSubscription, addUser, getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
 import { isObjectEmpty } from '../utils/utils';
 import { adminMenu } from './menu';
@@ -156,33 +156,33 @@ bot.command('help', async (ctx) => {
     await ctx.reply(MSG.help, { parse_mode: 'HTML' });
 });
 
-// bot.command('add', async (ctx) => {
-//     const {
-//         user: { is_bot },
-//     } = await ctx.getAuthor();
+bot.command('add', async (ctx) => {
+    const {
+        user: { is_bot },
+    } = await ctx.getAuthor();
 
-//     if (is_bot) return;
+    if (is_bot) return;
 
-//     function generateRandomNumericId() {
-//         const min = 10000000; // Мінімальне 8-цифрове число
-//         const max = 99999999; // Максимальне 8-цифрове число
-//         return Math.floor(Math.random() * (max - min + 1)) + min;
-//     }
+    function generateRandomNumericId() {
+        const min = 10000000; // Мінімальне 8-цифрове число
+        const max = 99999999; // Максимальне 8-цифрове число
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-//     // Приклад використання
-//     const randomId = generateRandomNumericId();
-//     const subscription = await addSubscription({
-//         userId: randomId,
-//     });
+    // Приклад використання
+    const randomId = generateRandomNumericId();
+    const subscription = await addSubscription({
+        userId: randomId,
+    });
 
-//     const user = await addUser({
-//         userId: randomId,
-//         username: 'testuser2',
-//         firstName: 'testuser2',
-//         fullName: 'Test User2',
-//         subscription: subscription,
-//     });
-// });
+    const user = await addUser({
+        userId: randomId,
+        username: `testuser${randomId}`,
+        firstName: `testuser${randomId}`,
+        fullName: `Test User${randomId}`,
+        subscription: subscription,
+    });
+});
 
 //CRASH HANDLER
 bot.catch((err) => {

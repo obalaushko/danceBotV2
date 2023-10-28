@@ -1,6 +1,6 @@
-import { Menu, MenuRange } from "@grammyjs/menu";
-import { MSG } from "../../../constants";
-import { approveUsers, getAllGuestUsers } from "../../../mongodb/operations";
+import { Menu, MenuRange } from '@grammyjs/menu';
+import { MSG } from '../../../constants';
+import { approveUsers, getAllGuestUsers } from '../../../mongodb/operations';
 
 const checked = new Set<number>();
 
@@ -48,6 +48,7 @@ approveUserMenu
                     );
 
                     await ctx.editMessageText(updateText);
+                    checked.clear();
                 } else {
                     await ctx.reply(MSG.errors.failedToUpdate);
                 }

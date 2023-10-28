@@ -59,12 +59,12 @@ subscriptionSchema.methods.setChangeLog = async (
     await logSubscriptionChange(userId, subscriptionId, changeType);
 };
 
-subscriptionSchema.pre('save', async function (next) {
+subscriptionSchema.pre('save', function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
     }
-    let changeType: string = '';
-    let subscriptionId: string = '';
+    let changeType: string = 'create';
+    const subscriptionId: string = this._id ? this._id.toString() : '';
 
     if (this.isModified('active')) {
         if (this.active) {
@@ -76,12 +76,8 @@ subscriptionSchema.pre('save', async function (next) {
         }
 
         changeType = this.active ? 'activation' : 'deactivation';
-
-        subscriptionId = this._id ? this._id.toString() : '';
     } else if (this.isModified('usedLessons')) {
         changeType = 'markUser';
-
-        subscriptionId = this._id ? this._id.toString() : '';
     }
 
     this.setChangeLog(this.userId, subscriptionId, changeType);

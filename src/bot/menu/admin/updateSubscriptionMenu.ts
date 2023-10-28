@@ -60,6 +60,7 @@ activateSubscriptionMenu
                 const updateSubscriptions =
                     await activateSubscriptions(userIds);
 
+                checkedActive.clear();
                 if (updateSubscriptions?.length) {
                     ctx.menu.update();
                 } else {
@@ -104,6 +105,7 @@ deactivateSubscriptionMenu
                 const updateSubscriptions =
                     await deactivateSubscriptions(userIds);
 
+                checkedDeactive.clear();
                 if (updateSubscriptions?.length) {
                     ctx.menu.update();
                 } else {
