@@ -1,13 +1,13 @@
 import { LOGGER } from '../logger';
-import SubscriptionModel, {
-    ISubscription,
+import {
+    ISubscription, SubscriptionModel,
 } from '../mongodb/schemas/subscription';
 import { IUser, UserModel } from '../mongodb/schemas/user';
 
 export const dailyCheck = () => {
-    // Функція для перевірки та деактивації підписки
+    // Function for checking and deactivating subscriptions
     const checkAndDeactivateSubscriptions = async () => {
-        const users: IUser[] = await UserModel.find(); // Отримуємо всіх користувачів
+        const users: IUser[] = await UserModel.find(); // Get all users
         for (const user of users) {
             if (user.subscription) {
                 const subscription: ISubscription | null =
@@ -15,8 +15,8 @@ export const dailyCheck = () => {
                 if (subscription && subscription.dataExpired) {
                     const currentDate: Date = new Date();
                     if (currentDate > subscription.dataExpired) {
-                        subscription.active = false; // Деактивуємо підписку, якщо дата закінчення вже минула
-                        await subscription.save(); // Зберігаємо оновлену підписку
+                        subscription.active = false; // Deactivate the subscription if the expiration date has passed
+                        await subscription.save(); // Save the updated subscription
                         LOGGER.info(
                             `[checkAndDeactivateSubscriptions] Subscription expired for ${user.userId}, ${user.fullName}`
                         );
@@ -26,6 +26,6 @@ export const dailyCheck = () => {
         }
     };
 
-    // Викликаємо функцію перевірки та деактивації підписок, наприклад, кожну добу
-    setInterval(checkAndDeactivateSubscriptions, 24 * 60 * 60 * 1000); // 24 години
+    // Call the function to check and deactivate subscriptions, for example, every day
+    setInterval(checkAndDeactivateSubscriptions, 24 * 60 * 60 * 1000); // 24 hours
 };

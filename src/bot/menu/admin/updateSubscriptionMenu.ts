@@ -1,17 +1,18 @@
 import { Menu } from "@grammyjs/menu";
 import { MSG } from "../../../constants";
-import { getAllActiveUserUsers } from "../../../mongodb/operations";
 
-export const markUserMenu = new Menu('markUserMenu', {
+export const updateSubscriptionMenu = new Menu('updateSubscriptionMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
 
-markUserMenu
-.dynamic(async () => {
-    const students = await getAllActiveUserUsers();
-
-    console.log(students)
+updateSubscriptionMenu
+.text(MSG.buttons.updateSubscription.activate, async (ctx) => {
+    
 })
+.text(MSG.buttons.updateSubscription.deactivate, async (ctx) => {
+
+})
+.row()
 .text(MSG.buttons.backToMain, async (ctx) => {
     const { user } = await ctx.getAuthor();
     ctx.menu.back();

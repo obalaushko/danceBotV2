@@ -1,5 +1,5 @@
 import { LOGGER } from '../../logger';
-import SubscriptionModel, { ISubscription } from '../schemas/subscription';
+import { ISubscription, SubscriptionModel } from '../schemas/subscription';
 
 export const addSubscription = async ({
     userId,
@@ -69,7 +69,6 @@ export const activeteSubscription = async (
         Object.assign(subscription, {
             active: true,
             usedLessons: 0,
-            remainedLessons: 0,
         });
         await subscription.save();
 
@@ -113,9 +112,6 @@ export const markLessonAsUsed = async (
         if (subscription) {
             if (subscription.usedLessons! < subscription.totalLessons!) {
                 subscription.usedLessons! += 1;
-                if (subscription.usedLessons! >= subscription.totalLessons!) {
-                    subscription.active = false;
-                }
                 await subscription.save();
             }
         }

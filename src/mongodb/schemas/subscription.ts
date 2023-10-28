@@ -1,4 +1,5 @@
-import { Document, Schema, Model, model } from 'mongoose';
+import { Document, Schema, Model, model, Types } from 'mongoose';
+import { logSubscriptionChange } from '../operations';
 
 export interface ISubscription extends Document {
     userId: number;
@@ -23,7 +24,8 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
         type: Number,
         default: 0,
     },
-    remainedLessons: { // dynamic
+    remainedLessons: {
+        // dynamic
         type: Number,
     },
     active: {
@@ -37,12 +39,33 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
 
 subscriptionSchema.methods.setExpirationDate = function () {
     const today = new Date();
-    const expirationDate = new Date(today);
-    expirationDate.setMonth(today.getMonth() + 3);
+    const expirationDate = new Date(
+        today.getUTCFullYear(),
+        today.getUTCMonth(),
+        today.getUTCDate(),
+        today.getUTCHours(),
+        today.getUTCMinutes(),
+        today.getUTCSeconds()
+    );
+    expirationDate.setUTCMonth(expirationDate.getUTCMonth() + 3);
     this.dataExpired = expirationDate;
 };
 
-subscriptionSchema.pre('save', function (next) {
+subscriptionSchema.methods.setChangeLog = async (
+    userId: number,
+    subscriptionId: Types.ObjectId,
+    changeType: string
+) => {
+    await logSubscriptionChange(userId, subscriptionId, changeType);
+};
+
+subscriptionSchema.pre('save', async function (next) {
+    if (this.usedLessons >= this.totalLessons) {
+        this.active = false;
+    }
+    let changeType: string = '';
+    let subscriptionId: string = '';
+
     if (this.isModified('active')) {
         if (this.active) {
             this.setExpirationDate();
@@ -50,20 +73,24 @@ subscriptionSchema.pre('save', function (next) {
             this.dataExpired = undefined;
             this.usedLessons = 0;
         }
+
+        changeType = this.active ? 'activation' : 'deactivation';
+
+        subscriptionId = this._id ? this._id.toString() : '';
+    } else if (this.isModified('usedLessons')) {
+        changeType = 'markUser';
+
+        subscriptionId = this._id ? this._id.toString() : '';
     }
+
+    this.setChangeLog(this.userId, subscriptionId, changeType);
 
     this.remainedLessons = this.totalLessons - this.usedLessons;
-
-    if (this.usedLessons >= this.totalLessons) {
-        this.active = false;
-    }
 
     next();
 });
 
-const SubscriptionModel: Model<ISubscription> = model<ISubscription>(
+export const SubscriptionModel: Model<ISubscription> = model<ISubscription>(
     'Subscription',
     subscriptionSchema
 );
-
-export default SubscriptionModel;

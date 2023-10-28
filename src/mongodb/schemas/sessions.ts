@@ -10,6 +10,5 @@ const sessionSchema: Schema = new Schema({
   data: { type: Object, default: {} },
 });
 
-const SessionModel: Model<ISession> = mongoose.model<ISession>('Session', sessionSchema);
+export const SessionModel: Model<ISession> = mongoose.model<ISession>('Session', sessionSchema);
 
-export default SessionModel;

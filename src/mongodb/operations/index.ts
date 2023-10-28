@@ -1,3 +1,5 @@
+export { logSubscriptionChange } from './changeLog';
+
 export {
     addUser,
     getUserById,
@@ -13,5 +15,5 @@ export {
     activeteSubscription,
     deactivateSubscription,
     getSubscriptionById,
-    markLessonAsUsed
+    markLessonAsUsed,
 } from './subscriptions';
