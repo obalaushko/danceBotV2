@@ -72,7 +72,7 @@ export const MSG = {
         admin: {
             approveUser: '📝 Запити',
             showAllUser: '👥 Показати учнів',
-            updateUser: '🔄 Оновити дані',
+            settings: '⚙️ Налаштування',
             markUser: '✅ Відмітити',
             updateSubscription: '🎫 Абонементи',
             updatePaymentDetails: '💳 Реквізити',

@@ -3,6 +3,10 @@ import { MSG } from '../../../constants';
 import { approveUserMenu } from './approveUserMenu';
 import { markUserMenu } from './markUserMenu';
 import { updateSubscriptionMenu } from './updateSubscriptionMenu';
+import { showUserMenu } from './showUserMenu';
+import { updatePaymentDetailsMenu } from './updatePaymentDetailsMenu';
+import { settingsMenu } from './settingsMenu';
+import { removeUserMenu } from './removeUserMenu';
 
 export const adminMenu = new Menu('admin')
     .text(MSG.buttons.admin.approveUser, async (ctx) => {
@@ -18,13 +22,25 @@ export const adminMenu = new Menu('admin')
         ctx.menu.nav('updateSubscriptionMenu');
         await ctx.editMessageText(MSG.chooseSubscriptionsActions);
     })
-    .submenu(MSG.buttons.admin.updateUser, 'updateUserMenu')
+    .text(MSG.buttons.admin.showAllUser, async (ctx) => {
+        ctx.menu.nav('showUserMenu');
+    })
     .row()
-    .submenu(MSG.buttons.admin.updatePaymentDetails, 'updatePaymentDetailsMenu')
-    .submenu(MSG.buttons.admin.showAllUser, 'showUserMenu')
+    .text(MSG.buttons.admin.updatePaymentDetails, async (ctx) => {
+        ctx.menu.nav('updatePaymentDetailsMenu');
+    })
+    .text(MSG.buttons.admin.settings, async (ctx) => {
+        ctx.menu.nav('settingsMenu');
+    })
     .row()
-    .submenu(MSG.buttons.admin.removeUser, 'removeUserMenu');
+    .text(MSG.buttons.admin.removeUser, async (ctx) => {
+        ctx.menu.nav('removeUserMenu');
+    });
 
 adminMenu.register(approveUserMenu);
 adminMenu.register(markUserMenu);
 adminMenu.register(updateSubscriptionMenu);
+adminMenu.register(showUserMenu);
+adminMenu.register(updatePaymentDetailsMenu);
+adminMenu.register(settingsMenu);
+adminMenu.register(removeUserMenu);
