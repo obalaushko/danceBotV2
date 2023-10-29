@@ -1,6 +1,7 @@
 import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants';
 import { approveUsers, getAllGuestUsers } from '../../../mongodb/operations';
+import { LOGGER } from '../../../logger';
 
 const checked = new Set<number>();
 
@@ -49,7 +50,14 @@ approveUserMenu
 
                     await ctx.editMessageText(updateText);
                     checked.clear();
+
+                    LOGGER.info('[approveUsers]', {
+                        metadata: updateUsers,
+                    });
                 } else {
+                    LOGGER.error('[approveUsers]', {
+                        metadata: updateUsers,
+                    });
                     await ctx.reply(MSG.errors.failedToUpdate);
                 }
             });

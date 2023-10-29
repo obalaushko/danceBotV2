@@ -6,6 +6,7 @@ import {
     getAllActiveUserUsers,
     getAllDeactiveUserUsers,
 } from '../../../mongodb/operations';
+import { LOGGER } from '../../../logger';
 
 export const updateSubscriptionMenu = new Menu('updateSubscriptionMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
@@ -62,8 +63,14 @@ activateSubscriptionMenu
 
                 checkedActive.clear();
                 if (updateSubscriptions?.length) {
+                    LOGGER.info('[activateSubscriptions]', {
+                        metadata: updateSubscriptions,
+                    });
                     ctx.menu.update();
                 } else {
+                    LOGGER.error('[activateSubscriptions]', {
+                        metadata: updateSubscriptions,
+                    });
                     await ctx.reply(MSG.errors.failedToUpdate);
                 }
             });
@@ -107,8 +114,14 @@ deactivateSubscriptionMenu
 
                 checkedDeactive.clear();
                 if (updateSubscriptions?.length) {
+                    LOGGER.info('[deactivateSubscriptions]', {
+                        metadata: updateSubscriptions,
+                    });
                     ctx.menu.update();
                 } else {
+                    LOGGER.error('[deactivateSubscriptions]', {
+                        metadata: updateSubscriptions,
+                    });
                     await ctx.reply(MSG.errors.failedToUpdate);
                 }
             });
