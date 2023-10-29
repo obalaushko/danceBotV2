@@ -121,21 +121,29 @@ export const deactivateSubscriptions = async (
 };
 
 export const markLessonAsUsed = async (
-    userId: number
-): Promise<ISubscription | null> => {
+    userId: number | number[]
+): Promise<ISubscription[] | null> => {
+    const userIds = Array.isArray(userId) ? userId : [userId];
     try {
-        const subscription = await SubscriptionModel.findOne({
-            userId: userId,
+        const subscriptions: ISubscription[] = await SubscriptionModel.find({
+            userId: { $in: userIds },
         });
 
-        if (subscription) {
+        if (subscriptions.length === 0) {
+            return null;
+        }
+
+        const updatedSubscriptions: ISubscription[] = [];
+
+        for (const subscription of subscriptions) {
             if (subscription.usedLessons! < subscription.totalLessons!) {
                 subscription.usedLessons! += 1;
                 await subscription.save();
+                updatedSubscriptions.push(subscription);
             }
         }
 
-        return subscription;
+        return updatedSubscriptions;
     } catch (error: any) {
         LOGGER.error('[markLessonAsUsed][error]', {
             metadata: { error: error, stack: error.stack.toString() },

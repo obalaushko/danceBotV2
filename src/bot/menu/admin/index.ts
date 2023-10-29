@@ -11,7 +11,7 @@ export const adminMenu = new Menu('admin')
     })
     .text(MSG.buttons.admin.markUser, async (ctx) => {
         ctx.menu.nav('markUserMenu');
-        await ctx.editMessageText(MSG.chooseUserToMark);
+        await ctx.editMessageText(MSG.chooseUserToMark(null));
     })
     .row()
     .text(MSG.buttons.admin.updateSubscription, async (ctx) => {

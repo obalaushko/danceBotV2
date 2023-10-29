@@ -35,10 +35,23 @@ export const MSG = {
         `Користувач "${user.fullName}" отримав доступ до групи.`,
     nowNewUsers: 'Наразі немає нових користувачів.',
     chooseUserToApprove: 'Виберіть користувачів яких хочете додати до групи.',
-    chooseUserToMark: 'Виберіть учнів яких потрібно відмітити.',
-    chooseSubscriptionsActions: 'Ви можете активувати чи деактивувати абонементи для учнів.',
-    chooseUserToActivatedSubscription: 'Виберіть учнів яким хочете активувати абонемент.',
-    chooseUserToDeactivatedSubscription: 'Виберіть учнів яким хочете деактивувати абонемент.',
+    chooseUserToMark: (users: IUser[] | null) => {
+        let userList = 'Виберіть учнів яких потрібно відмітити.';
+
+        users && users.forEach((user) => {
+            const remainedLessons = user?.subscription?.remainedLessons;
+            const userFullName = user.fullName;
+            userList += `\nАбонемент <b>${userFullName}</b> оновлено. Уроків залишилося <i>${remainedLessons! - 1}</i>.`;
+        });
+
+        return userList;
+    },
+    chooseSubscriptionsActions:
+        'Ви можете активувати чи деактивувати абонементи для учнів.',
+    chooseUserToActivatedSubscription:
+        'Виберіть учнів яким хочете активувати абонемент.',
+    chooseUserToDeactivatedSubscription:
+        'Виберіть учнів яким хочете деактивувати абонемент.',
     showGuestUsers: (users: IUser[]) => {
         if (!users.length) {
             return MSG.nowNewUsers;
@@ -67,7 +80,7 @@ export const MSG = {
         },
         updateSubscription: {
             activate: 'Активувати',
-            deactivate: 'Деактивувати'
+            deactivate: 'Деактивувати',
         },
         backToMain: 'Назад до меню',
         back: 'Назад',
@@ -88,5 +101,5 @@ export const MSG = {
     inappropriateRole: 'Ваша роль не надає вам відповідних прав.',
     commandDisabled: 'На жаль, ця команда вам недоступна.',
     registerFirst: 'Щоб скористатися цією командою, спочатку зареєструйтеся.',
-    onMenuOutdated: 'Оновлено, спробуйте зараз.'
+    onMenuOutdated: 'Оновлено, спробуйте зараз.',
 };

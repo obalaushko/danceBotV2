@@ -1,7 +1,5 @@
 import { LOGGER } from '../logger';
-import {
-    ISubscription, SubscriptionModel,
-} from '../mongodb/schemas/subscription';
+import { ISubscription, SubscriptionModel } from '../mongodb/schemas/subscription';
 import { IUser, UserModel } from '../mongodb/schemas/user';
 
 export const dailyCheck = () => {
@@ -14,7 +12,8 @@ export const dailyCheck = () => {
                     await SubscriptionModel.findById(user.subscription);
                 if (subscription && subscription.dataExpired) {
                     const currentDate: Date = new Date();
-                    if (currentDate > subscription.dataExpired) {
+                    const currentUtcDate: Date = new Date(currentDate.toISOString());
+                    if (currentUtcDate > subscription.dataExpired) {
                         subscription.active = false; // Deactivate the subscription if the expiration date has passed
                         await subscription.save(); // Save the updated subscription
                         LOGGER.info(
