@@ -6,6 +6,7 @@ import {
 } from './../../../mongodb/operations/users';
 import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants';
+import { backToMain } from './backToMainMenu';
 
 export const showUserMenu = new Menu('showUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
@@ -13,22 +14,26 @@ export const showUserMenu = new Menu('showUserMenu', {
     .text(MSG.buttons.showUsers.activeUsers, async (ctx) => {
         const activeUsers = await getAllActiveUserUsers();
 
-        await ctx.reply(MSG.showUsers.active(activeUsers));
+        ctx.menu.nav('backToMain');
+        await ctx.editMessageText(MSG.showUsers.active(activeUsers));
     })
     .text(MSG.buttons.showUsers.notActiveUsers, async (ctx) => {
         const notActiveUsers = await getAllDeactiveUserUsers();
 
-        await ctx.reply(MSG.showUsers.notActive(notActiveUsers));
+        ctx.menu.nav('backToMain');
+        await ctx.editMessageText(MSG.showUsers.notActive(notActiveUsers));
     })
     .text(MSG.buttons.showUsers.waitToApproveUsers, async (ctx) => {
         const waitToApproveUsers = await getAllGuestUsers();
 
-        await ctx.reply(MSG.showUsers.waitToApprove(waitToApproveUsers));
+        ctx.menu.nav('backToMain');
+        await ctx.editMessageText(MSG.showUsers.waitToApprove(waitToApproveUsers));
     })
     .text(MSG.buttons.showUsers.allUsers, async (ctx) => {
         const allUsers = await getAllUsers();
 
-        await ctx.reply(MSG.showUsers.all(allUsers));
+        ctx.menu.nav('backToMain');
+        await ctx.editMessageText(MSG.showUsers.all(allUsers));
     })
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
@@ -36,3 +41,5 @@ export const showUserMenu = new Menu('showUserMenu', {
         ctx.menu.back();
         await ctx.editMessageText(MSG.welcome.admin(user));
     });
+
+showUserMenu.register(backToMain);
