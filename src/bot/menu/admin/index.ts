@@ -29,6 +29,7 @@ export const adminMenu = new Menu('admin')
     .row()
     .text(MSG.buttons.admin.updatePaymentDetails, async (ctx) => {
         ctx.menu.nav('updatePaymentDetailsMenu');
+        await ctx.editMessageText(MSG.payments.main(null))
     })
     .text(MSG.buttons.admin.settings, async (ctx) => {
         ctx.menu.nav('settingsMenu');

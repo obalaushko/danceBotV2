@@ -213,57 +213,26 @@ export const getAllDeactiveUserUsers = async (): Promise<IUser[] | null> => {
     }
 };
 
-export const getPaymentDetails = async (
+export const getUserWithPaymentDetails = async (
     userId: number
-): Promise<IUser[] | null> => {
+): Promise<IUser | null> => {
     try {
-        const paymentsDetails = await UserModel.find({ userId })
+        const paymentsDetails = await UserModel.findOne({ userId })
             .populate({
                 path: 'paymentDetails',
                 select: '-_id',
             })
             .exec();
 
-        const usersWithPaymentDetails = paymentsDetails.filter((user) => {
-            return user.paymentDetails !== null;
-        });
-
-        console.log(usersWithPaymentDetails);
-
-        if (usersWithPaymentDetails.length > 0) {
-            return usersWithPaymentDetails;
+        if (paymentsDetails) {
+            return paymentsDetails;
         } else {
             return null;
         }
     } catch (error: any) {
-        LOGGER.error('[getPaymentDetails][error]', {
+        LOGGER.error('[getUserWithPaymentDetails][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;
     }
-};
-
-export const addPaymentDetails = async ({
-    userId,
-    bank,
-    card,
-}: Pick<IBank, 'userId' | 'bank' | 'card'>): Promise<IBank | null> => {
-    const newPaymentDetails = new PaymentDetailsModel({
-        userId,
-        bank,
-        card,
-    });
-    const savedPaymentDetails = await newPaymentDetails.save();
-
-    const user = await UserModel.findOne({ userId }).exec();
-
-    if (user) {
-        
-        user.paymentDetails = savedPaymentDetails;
-        await user.save();
-        console.log(user)
-    }
-
-    console.log(savedPaymentDetails);
-    return savedPaymentDetails;
 };

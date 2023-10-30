@@ -1,3 +1,5 @@
+export { addPaymentDetails } from './payments';
+
 export { logSubscriptionChange } from './changeLog';
 
 export {
@@ -9,7 +11,8 @@ export {
     getAllUserUsers,
     approveUsers,
     getAllActiveUserUsers,
-    getAllDeactiveUserUsers
+    getAllDeactiveUserUsers,
+    getUserWithPaymentDetails,
 } from './users';
 export {
     addSubscription,

@@ -1,3 +1,4 @@
+import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
 import { convertDate } from '../utils/utils';
 
@@ -141,7 +142,11 @@ export const MSG = {
         },
     },
     payments: {
-        main: ''
+        main: (paymentDetails: IBank | null) => {
+            let details = 'Ви можете оновити реквізити'
+
+            return details;
+        }
     },
     buttons: {
         admin: {
