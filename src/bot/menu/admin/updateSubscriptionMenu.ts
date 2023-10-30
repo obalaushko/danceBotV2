@@ -78,9 +78,15 @@ activateSubscriptionMenu
 
         return range;
     })
+    .row()
     .text(MSG.buttons.back, async (ctx) => {
         ctx.menu.back();
         await ctx.editMessageText(MSG.chooseSubscriptionsActions);
+    })
+    .text(MSG.buttons.backToMain, async (ctx) => {
+        const { user } = await ctx.getAuthor();
+        ctx.menu.nav('admin');
+        await ctx.editMessageText(MSG.welcome.admin(user));
     });
 
 deactivateSubscriptionMenu
@@ -129,9 +135,15 @@ deactivateSubscriptionMenu
 
         return range;
     })
+    .row()
     .text(MSG.buttons.back, async (ctx) => {
         ctx.menu.back();
         await ctx.editMessageText(MSG.chooseSubscriptionsActions);
+    })
+    .text(MSG.buttons.backToMain, async (ctx) => {
+        const { user } = await ctx.getAuthor();
+        ctx.menu.nav('admin');
+        await ctx.editMessageText(MSG.welcome.admin(user));
     });
 
 updateSubscriptionMenu

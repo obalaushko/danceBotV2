@@ -24,6 +24,7 @@ export const adminMenu = new Menu('admin')
     })
     .text(MSG.buttons.admin.showAllUser, async (ctx) => {
         ctx.menu.nav('showUserMenu');
+        await ctx.editMessageText(MSG.showUsers.main);
     })
     .row()
     .text(MSG.buttons.admin.updatePaymentDetails, async (ctx) => {

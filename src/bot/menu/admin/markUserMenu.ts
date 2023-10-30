@@ -55,9 +55,11 @@ markUserMenu
                             (updateUser) => updateUser.userId === user.userId
                         )
                     );
-                    
+
                     ctx.menu.update();
-                    await ctx.editMessageText(MSG.chooseUserToMark(updatedUsers));
+                    await ctx.editMessageText(
+                        MSG.chooseUserToMark(updatedUsers)
+                    );
                 } else {
                     LOGGER.error('[markUser]', {
                         metadata: updateSubscriptions,

@@ -92,7 +92,12 @@ export const updateUserById = async (
 
 export const getAllUsers = async (): Promise<IUser[] | null> => {
     try {
-        const users = await UserModel.find().exec();
+        const users = await UserModel.find()
+        .populate({
+            path: 'subscription',
+            select: '-_id',
+        })
+        .exec();
 
         return users;
     } catch (error: any) {

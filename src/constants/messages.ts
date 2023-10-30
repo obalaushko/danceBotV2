@@ -1,4 +1,5 @@
 import { IUser } from '../mongodb/schemas/user';
+import { convertDate } from '../utils/utils';
 
 interface ITGUser {
     first_name?: string;
@@ -38,11 +39,14 @@ export const MSG = {
     chooseUserToMark: (users: IUser[] | null) => {
         let userList = 'Виберіть учнів яких потрібно відмітити.';
 
-        users && users.forEach((user) => {
-            const remainedLessons = user?.subscription?.remainedLessons;
-            const userFullName = user.fullName;
-            userList += `\nАбонемент <b>${userFullName}</b> оновлено. Уроків залишилося <i>${remainedLessons! - 1}</i>.`;
-        });
+        users &&
+            users.forEach((user) => {
+                const remainedLessons = user?.subscription?.remainedLessons;
+                const userFullName = user.fullName;
+                userList += `\nАбонемент <b>${userFullName}</b> оновлено. Уроків залишилося <i>${
+                    remainedLessons! - 1
+                }</i>.`;
+            });
 
         return userList;
     },
@@ -68,6 +72,73 @@ export const MSG = {
 
         return userList;
     },
+    showUsers: {
+        main: 'Ви можете вивести список користувачів які:\n🟢 Мають активний абонемент;\n🔴 Не мають активного абонементу;\n🟡 Чекають вашого схвалення на додання до групи;\n🔵 Знаходяться в базі даних не залежно від ролі та статусу;',
+        active: (users: IUser[] | null) => {
+            let userList = 'Користувачі з активним абонементом:\n';
+
+            if (users?.length) {
+                users.forEach((user) => {
+                    const firstName = user.firstName;
+                    const userFullName = user.fullName;
+                    const remainedLessons = user.subscription?.remainedLessons;
+                    const dataExpired = user.subscription?.dataExpired!;
+                    const formattedDate = convertDate(dataExpired);
+                    userList += `- <b>${userFullName}</b> (${firstName}), залишилося занять: <b>${remainedLessons}</b>, абонемент закінчується ${formattedDate};\n`;
+                });
+            } else {
+                userList = 'Не знайдено користувачів з активним абонементом.';
+            }
+            return userList;
+        },
+        notActive: (users: IUser[] | null) => {
+            let userList = 'Користувачі з не активним абонементом:\n';
+
+            if (users?.length) {
+                users.forEach((user) => {
+                    const firstName = user.firstName;
+                    const userFullName = user.fullName;
+                    userList += `- <b>${userFullName}</b> (${firstName})\n`;
+                });
+            } else {
+                userList =
+                    'Не знайдено користувачів з не активним абонементом.';
+            }
+            return userList;
+        },
+        waitToApprove: (users: IUser[] | null) => {
+            let userList = 'Користувачі які чекають схвалення:\n';
+
+            if (users?.length) {
+                users.forEach((user) => {
+                    const firstName = user.firstName;
+                    const userFullName = user.fullName;
+                    userList += `- <b>${userFullName}</b> (${firstName})\n`;
+                });
+            } else {
+                userList = 'Не знайдено користувачів які чекають схвалення.';
+            }
+            return userList;
+        },
+        all: (users: IUser[] | null) => {
+            let userList = 'Усі користувачі:\n';
+
+            if (users?.length) {
+                users.forEach((user) => {
+                    const firstName = user.firstName;
+                    const userFullName = user.fullName;
+                    const username = user.username;
+                    const role = user.role;
+                    const subscription = user.subscription?.active ? 'Так' : 'Ні';
+                    const approved = user.approved ? 'Так' : 'Ні';
+                    userList += `- <b>${userFullName}</b> (${firstName}), @${username}\nРоль: <b>${role}</b>\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
+                });
+            } else {
+                userList = 'Такого не може бути, але не знайдено жодного.';
+            }
+            return userList;
+        },
+    },
     buttons: {
         admin: {
             approveUser: '📝 Запити',
@@ -82,12 +153,18 @@ export const MSG = {
             activate: 'Активувати',
             deactivate: 'Деактивувати',
         },
-        backToMain: 'Назад до меню',
-        back: 'Назад',
-        approve: 'Прийняти',
-        add: 'Додати',
-        update: 'Оновити',
-        cancel: 'Скасувати',
+        showUsers: {
+            activeUsers: '🟢',
+            notActiveUsers: '🔴',
+            waitToApproveUsers: '🟡',
+            allUsers: '🔵',
+        },
+        backToMain: 'До головного меню',
+        back: '<< Назад',
+        approve: '✅ Прийняти',
+        add: '✅ Додати',
+        update: '🔄 Оновити',
+        cancel: '🚫 Скасувати',
     },
     errors: {
         failedToCreate: 'Виникла помилка створення. Спробуйте ще раз!',
