@@ -36,7 +36,8 @@ approveUserMenu
                     )
                     .row();
             });
-            range.text(MSG.buttons.add, async (ctx) => {
+            
+            checked.size && range.text(MSG.buttons.add, async (ctx) => {
                 const users = [...checked];
 
                 const updateUsers = await approveUsers(users);
@@ -69,4 +70,5 @@ approveUserMenu
         const { user } = await ctx.getAuthor();
         ctx.menu.back();
         await ctx.editMessageText(MSG.welcome.admin(user));
+        checked.clear();
     });

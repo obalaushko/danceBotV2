@@ -39,7 +39,7 @@ markUserMenu
                     )
                     .row();
             });
-            range.text(MSG.buttons.update, async (ctx) => {
+            checked.size && range.text(MSG.buttons.update, async (ctx) => {
                 const userIds = [...checked];
 
                 const updateSubscriptions = await markLessonAsUsed(userIds);
@@ -75,4 +75,5 @@ markUserMenu
         const { user } = await ctx.getAuthor();
         ctx.menu.back();
         await ctx.editMessageText(MSG.welcome.admin(user));
+        checked.clear();
     });

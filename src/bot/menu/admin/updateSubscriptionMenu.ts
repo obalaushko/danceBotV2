@@ -55,7 +55,7 @@ activateSubscriptionMenu
                     )
                     .row();
             });
-            range.text(MSG.buttons.update, async (ctx) => {
+            checkedActive.size && range.text(MSG.buttons.update, async (ctx) => {
                 const userIds = [...checkedActive];
 
                 const updateSubscriptions =
@@ -82,11 +82,13 @@ activateSubscriptionMenu
     .text(MSG.buttons.back, async (ctx) => {
         ctx.menu.back();
         await ctx.editMessageText(MSG.chooseSubscriptionsActions);
+        checkedActive.clear();
     })
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();
         ctx.menu.nav('admin');
         await ctx.editMessageText(MSG.welcome.admin(user));
+        checkedActive.clear();
     });
 
 deactivateSubscriptionMenu
@@ -112,7 +114,8 @@ deactivateSubscriptionMenu
                     )
                     .row();
             });
-            range.text(MSG.buttons.update, async (ctx) => {
+
+            checkedDeactive.size && range.text(MSG.buttons.update, async (ctx) => {
                 const userIds = [...checkedDeactive];
 
                 const updateSubscriptions =
@@ -139,11 +142,13 @@ deactivateSubscriptionMenu
     .text(MSG.buttons.back, async (ctx) => {
         ctx.menu.back();
         await ctx.editMessageText(MSG.chooseSubscriptionsActions);
+        checkedDeactive.clear();
     })
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();
         ctx.menu.nav('admin');
         await ctx.editMessageText(MSG.welcome.admin(user));
+        checkedDeactive.clear();
     });
 
 updateSubscriptionMenu
