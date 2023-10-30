@@ -8,6 +8,7 @@ interface ITGUser {
 }
 
 export const MSG = {
+    myDescriptions: 'Привіт, я допоможу вам потрапити до танцювальної групи.',
     welcome: {
         notRegistered: `Привіт! Щоб продовжити, будь ласка, зареєструйся, вказавши своє ім'я та прізвище.`,
         noRoleAssigned: (user: ITGUser) =>
@@ -131,13 +132,16 @@ export const MSG = {
                     const role = user.role;
                     const subscription = user.subscription?.active ? 'Так' : 'Ні';
                     const approved = user.approved ? 'Так' : 'Ні';
-                    userList += `- <b>${userFullName}</b> (${firstName}), @${username}\nРоль: <b>${role}</b>\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
+                    userList += `- <b>${userFullName}</b> (${firstName})${username && `, @${username}` }\nРоль: <code>${role}</code>\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
                 });
             } else {
                 userList = 'Такого не може бути, але не знайдено жодного.';
             }
             return userList;
         },
+    },
+    payments: {
+        main: ''
     },
     buttons: {
         admin: {

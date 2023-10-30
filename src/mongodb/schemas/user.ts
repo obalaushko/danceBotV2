@@ -1,6 +1,7 @@
 import { Document, Schema, Model, model, SchemaTypes } from 'mongoose';
 import { ROLES } from '../../constants';
 import { ISubscription } from './subscription';
+import { IBank } from './payment';
 
 export interface IUser extends Document {
     userId: number;
@@ -11,6 +12,7 @@ export interface IUser extends Document {
     fullName?: string;
     approved?: boolean;
     notifications?: boolean;
+    paymentDetails?: IBank | null
 }
 
 export const userSchema: Schema = new Schema<IUser>({
@@ -49,6 +51,10 @@ export const userSchema: Schema = new Schema<IUser>({
         type: Boolean,
         default: false,
     },
+    paymentDetails: {
+        type: SchemaTypes.ObjectId,
+        ref: 'PaymentDetails'
+    }
 });
 
 export const UserModel: Model<IUser> = model<IUser>('User', userSchema);

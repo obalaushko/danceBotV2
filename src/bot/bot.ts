@@ -42,6 +42,8 @@ const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
 // });
 
 bot.api.setMyCommands(COMMANDS);
+bot.api.setMyDescription(MSG.myDescriptions);
+
 bot.use(hydrateReply);
 // bot.api.config.use(throttler);
 bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
@@ -82,7 +84,6 @@ bot.use(createConversation(userConversations));
 // bot.use(createConversation(adminConversations));
 bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
-
 
 dailyCheck();
 
@@ -156,12 +157,15 @@ bot.command('help', async (ctx) => {
     await ctx.reply(MSG.help, { parse_mode: 'HTML' });
 });
 
+// ! Only DEV
 bot.command('add', async (ctx) => {
-    const {
-        user: { is_bot },
-    } = await ctx.getAuthor();
+    if (mode === 'production') return;
 
-    if (is_bot) return;
+    const { user } = await ctx.getAuthor();
+
+    if (user.is_bot) return;
+
+    LOGGER.info('[addNewUser][DEV]', { metadata: user });
 
     function generateRandomNumericId() {
         const min = 10000000; // Мінімальне 8-цифрове число
@@ -175,10 +179,10 @@ bot.command('add', async (ctx) => {
         userId: randomId,
     });
 
-    const user = await addUser({
+    await addUser({
         userId: randomId,
-        username: `testuser${randomId}`,
-        firstName: `testuser${randomId}`,
+        username: `user${randomId}`,
+        firstName: `user${randomId}`,
         fullName: `Test User${randomId}`,
         subscription: subscription,
     });

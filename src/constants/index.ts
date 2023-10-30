@@ -5,4 +5,10 @@ export const ROLES = {
     Admin: 'admin',
     User: 'user',
     Guest: 'guest',
+    Removed: 'removed'
 };
+
+export const BANKS = {
+    PrivatBank: 'privatbank',
+    MonoBank: 'monobank'
+}
