@@ -1,14 +1,3 @@
+export { BANKS, ROLES } from './global';
+
 export { MSG } from './messages';
-
-export const ROLES = {
-    Developer: 'developer',
-    Admin: 'admin',
-    User: 'user',
-    Guest: 'guest',
-    Removed: 'removed'
-};
-
-export const BANKS = {
-    PrivatBank: 'privatbank',
-    MonoBank: 'monobank'
-}

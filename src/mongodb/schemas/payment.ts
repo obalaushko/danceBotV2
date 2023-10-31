@@ -3,8 +3,12 @@ import { BANKS } from '../../constants';
 
 export interface IBank extends Document {
     userId: number;
-    bank: (typeof BANKS)[keyof typeof BANKS];
-    card: number;
+    details: [
+        banks: {
+            name: (typeof BANKS)[keyof typeof BANKS];
+            card: number;
+        }
+    ];
 }
 
 export const bankSchema: Schema = new Schema<IBank>({
@@ -12,15 +16,22 @@ export const bankSchema: Schema = new Schema<IBank>({
         type: Number,
         required: true,
     },
-    bank: {
-        type: String,
-        enum: Object.values(BANKS),
-        required: true,
-    },
-    card: {
-        type: Number,
-        required: true,
-    },
+    details: [
+        {
+          name: {
+            type: String,
+            enum: Object.values(BANKS),
+            required: true,
+          },
+          card: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
 });
 
-export const PaymentDetailsModel: Model<IBank> = model<IBank>('PaymentDetails', bankSchema);
+export const PaymentDetailsModel: Model<IBank> = model<IBank>(
+    'PaymentDetails',
+    bankSchema
+);

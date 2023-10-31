@@ -13,10 +13,9 @@ import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger';
 import {
     changeNameConversations,
-    developerConversations,
     guestConversations,
+    paymentDetailsConversations,
     registerConversations,
-    userConversations,
 } from './conversations';
 import { addSubscription, addUser, getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
@@ -80,9 +79,9 @@ bot.use(adminMenu);
 bot.use(conversations());
 bot.use(createConversation(registerConversations));
 bot.use(createConversation(guestConversations));
-bot.use(createConversation(userConversations));
-// bot.use(createConversation(adminConversations));
-bot.use(createConversation(developerConversations));
+// bot.use(createConversation(userConversations));
+bot.use(createConversation(paymentDetailsConversations));
+// bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
 dailyCheck();
@@ -107,6 +106,20 @@ bot.command('start', async (ctx) => {
         });
     } else if (userExists?.role === ROLES.Developer) {
         await ctx.conversation.enter('developerConversations');
+    }
+});
+
+bot.command('updatePaymentDetails', async (ctx) => {
+    const { user } = await ctx.getAuthor();
+    if (user.is_bot) return;
+
+    const userExists = await getUserById(user.id);
+
+    if (
+        userExists?.role === ROLES.Admin ||
+        userExists?.role === ROLES.Developer
+    ) {
+        await ctx.conversation.enter('paymentDetailsConversations');
     }
 });
 

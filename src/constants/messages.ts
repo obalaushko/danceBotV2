@@ -1,3 +1,5 @@
+import { BANKS } from './index';
+
 import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
 import { convertDate } from '../utils/utils';
@@ -131,9 +133,13 @@ export const MSG = {
                     const userFullName = user.fullName;
                     const username = user.username;
                     const role = user.role;
-                    const subscription = user.subscription?.active ? 'Так' : 'Ні';
+                    const subscription = user.subscription?.active
+                        ? 'Так'
+                        : 'Ні';
                     const approved = user.approved ? 'Так' : 'Ні';
-                    userList += `- <b>${userFullName}</b> (${firstName})${username && `, @${username}` }\nРоль: <code>${role}</code>\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
+                    userList += `- <b>${userFullName}</b> (${firstName})${
+                        username && `, @${username}`
+                    }\nРоль: <code>${role}</code>\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
                 });
             } else {
                 userList = 'Такого не може бути, але не знайдено жодного.';
@@ -143,10 +149,22 @@ export const MSG = {
     },
     payments: {
         main: (paymentDetails: IBank | null) => {
-            let details = 'Ви можете оновити реквізити'
+            let text = 'Ви можете оновити реквізити\n';
 
-            return details;
-        }
+            if (paymentDetails?.details) {
+                paymentDetails?.details.forEach((banks) => {
+                    text += `Ваші реквізити:\nБанк: <b>${banks.name}</b> - <code>${banks.card}</code>`;
+                });
+            } else {
+                text =
+                    'У вас немає банківських реквізитів, щоб створити використайте команду /updatePaymentDetails.';
+            }
+            return text;
+        },
+        createBank: `Щоб створити реквізити введіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,
+        createCard: `Щоб створити реквізити введіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
+        wrongEnterBank: `Ведіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,
+        wrongEnterCard: `Ведіть номер карти у форматі: <code>4444 4444 4444 4444</code>`
     },
     buttons: {
         admin: {
@@ -167,6 +185,9 @@ export const MSG = {
             notActiveUsers: '🔴',
             waitToApproveUsers: '🟡',
             allUsers: '🔵',
+        },
+        paymentDetails: {
+            update: 'Оновити реквізити',
         },
         backToMain: 'До головного меню',
         back: '<< Назад',

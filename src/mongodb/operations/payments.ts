@@ -1,41 +1,89 @@
 import { LOGGER } from '../../logger';
 import { IBank, PaymentDetailsModel } from '../schemas/payment';
-import { UserModel } from '../schemas/user';
-import { getUserWithPaymentDetails } from './users';
+import { getUserById, getUserWithPaymentDetails } from './users';
 
-export const addPaymentDetails = async ({
-    userId,
-    bank,
-    card,
-}: Pick<IBank, 'userId' | 'bank' | 'card'>): Promise<IBank | null> => {
+// export const checkPaymentDetails = async ({
+//     userId,
+//     bank,
+//     card,
+// }: Pick<IBank, 'userId' | 'bank' | 'card'>): Promise<IBank | null> => {
+//     try {
+//         const userWithPayment = await getUserWithPaymentDetails(userId);
+
+//         if (!userWithPayment?.paymentDetails) {
+//             const user = await UserModel.findOne({ userId });
+
+//             const newPaymentDetails = new PaymentDetailsModel({
+//                 userId,
+//                 bank,
+//                 card,
+//             });
+
+//             const savedPaymentDetails = await newPaymentDetails.save();
+
+//             if (user) {
+//                 user.paymentDetails = savedPaymentDetails;
+//                 await user.save();
+//             }
+//             return savedPaymentDetails;
+//         } else if (userWithPayment?.paymentDetails) {
+//             return userWithPayment?.paymentDetails;
+//         } else {
+//             return null;
+//         }
+//     } catch (error: any) {
+//         LOGGER.error('[getUserWithPaymentDetails][error]', {
+//             metadata: { error: error, stack: error.stack.toString() },
+//         });
+//         return null;
+//     }
+// };
+
+export const getPaymentDetailsExist = async (
+    userId: number
+): Promise<IBank | null> => {
     try {
         const userWithPayment = await getUserWithPaymentDetails(userId);
-
-        if (!userWithPayment) {
-            const user = await UserModel.findOne({ userId });
-    
-            const newPaymentDetails = new PaymentDetailsModel({
-                userId,
-                bank,
-                card,
-            });
-    
-            const savedPaymentDetails = await newPaymentDetails.save();
-    
-            if (user) {
-                user.paymentDetails = savedPaymentDetails;
-                await user.save();
-            }
-    
-            return savedPaymentDetails;
+        if (userWithPayment?.paymentDetails) {
+            return userWithPayment?.paymentDetails;
         } else {
             return null;
         }
-    }  catch (error: any) {
-        LOGGER.error('[getUserWithPaymentDetails][error]', {
+    } catch (error: any) {
+        LOGGER.error('[getPaymentDetailsExist][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;
     }
-    
+};
+
+export const createPaymentDetails = async ({
+    userId,
+    details,
+}: Pick<IBank, 'userId' | 'details'>): Promise<IBank | null> => {
+    try {
+        const user = await getUserById(userId);
+
+        if (user) {
+            const newPaymentDetails = new PaymentDetailsModel({
+                userId,
+                details,
+            });
+
+            const savedPaymentDetails = await newPaymentDetails.save();
+
+            user.paymentDetails = savedPaymentDetails;
+            await user.save();
+
+            return savedPaymentDetails;
+        } else {
+            LOGGER.error(`[createPaymentDetails][error] User with id-${userId} dosn't exist`)
+            return null;
+        }
+    } catch (error: any) {
+        LOGGER.error('[createPaymentDetails][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
 };

@@ -1,4 +1,4 @@
-export { addPaymentDetails } from './payments';
+export { createPaymentDetails, getPaymentDetailsExist } from './payments';
 
 export { logSubscriptionChange } from './changeLog';
 

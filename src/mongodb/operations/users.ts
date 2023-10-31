@@ -61,8 +61,12 @@ export const addUser = async ({
 
 export const getUserById = async (id: number): Promise<IUser | null> => {
     try {
-        const user = await UserModel.findOne({ userId: id });
-        return user;
+        const user = await UserModel.findOne({ userId: id }).exec();
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
     } catch (error: any) {
         LOGGER.error('[getUserById][error]', {
             metadata: { error: error, stack: error.stack.toString() },
@@ -217,15 +221,15 @@ export const getUserWithPaymentDetails = async (
     userId: number
 ): Promise<IUser | null> => {
     try {
-        const paymentsDetails = await UserModel.findOne({ userId })
+        const user = await UserModel.findOne({ userId })
             .populate({
                 path: 'paymentDetails',
                 select: '-_id',
             })
             .exec();
 
-        if (paymentsDetails) {
-            return paymentsDetails;
+        if (user) {
+            return user;
         } else {
             return null;
         }
