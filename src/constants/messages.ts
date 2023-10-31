@@ -148,6 +148,7 @@ export const MSG = {
         },
     },
     payments: {
+        static: 'Реквізити для оплати:\nПриватБанк: <code>4444 4444 4444 4444</code>',
         main: (paymentDetails: IBank | null) => {
             let text = 'Ви можете оновити реквізити\n';
 

@@ -7,7 +7,6 @@ import { showUserMenu } from './showUserMenu';
 import { updatePaymentDetailsMenu } from './updatePaymentDetailsMenu';
 import { settingsMenu } from './settingsMenu';
 import { removeUserMenu } from './removeUserMenu';
-import { getPaymentDetailsExist } from '../../../mongodb/operations';
 
 export const adminMenu = new Menu('admin')
     .text(MSG.buttons.admin.approveUser, async (ctx) => {
@@ -29,11 +28,8 @@ export const adminMenu = new Menu('admin')
     })
     .row()
     .text(MSG.buttons.admin.updatePaymentDetails, async (ctx) => {
-        const { user } = await ctx.getAuthor();
-        const userWithPayment = await getPaymentDetailsExist(user.id);
-
-        console.log(userWithPayment);
-        await ctx.reply(MSG.payments.main(userWithPayment));
+        await ctx.reply(MSG.commandDisabled);
+        await ctx.reply(MSG.payments.static);
     })
     .text(MSG.buttons.admin.settings, async (ctx) => {
         ctx.menu.nav('settingsMenu');
