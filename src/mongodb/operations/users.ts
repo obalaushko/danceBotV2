@@ -1,4 +1,4 @@
-import { BANKS, ROLES } from '../../constants';
+import { BANKS, MSG, ROLES } from '../../constants';
 import { LOGGER } from '../../logger';
 import { IBank, PaymentDetailsModel } from '../schemas/payment';
 import { IUser, UserModel } from '../schemas/user';
@@ -112,7 +112,7 @@ export const updateUserById = async (
 export const getAllUsers = async (): Promise<IUser[] | null> => {
     try {
         const users = await UserModel.find({
-            role: { $nin: [ROLES.Developer] },
+            role: { $nin: [ROLES.Admin, ROLES.Developer] },
         })
             .populate({
                 path: 'subscription',
@@ -322,9 +322,14 @@ export const updateUsersToInactive = async (
 };
 
 export const deleteUsers = async (
-    userId: number | number[]
+    userId: number | number[],
+    adminId: number
 ): Promise<boolean> => {
     try {
+        const admin = await getUserById(adminId);
+        if (admin?.role !== ROLES.Admin || admin?.role !== ROLES.Developer)
+            throw new Error(MSG.inappropriateRole);
+
         const userIdArray = Array.isArray(userId) ? userId : [userId];
 
         const deleteResult = await UserModel.deleteMany({

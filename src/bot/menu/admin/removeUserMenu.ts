@@ -27,8 +27,9 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
 })
     .text(MSG.buttons.removed.remove, async (ctx) => {
         const userIds = [...checkedRemove];
+        const { user } = await ctx.getAuthor();
 
-        const removedUsers = await deleteUsers(userIds);
+        const removedUsers = await deleteUsers(userIds, user.id);
 
         if (removedUsers) {
             LOGGER.info('[Removed]', {
@@ -38,7 +39,6 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
 
             await deleteSubscription(userIds);
 
-            const { user } = await ctx.getAuthor();
             ctx.menu.nav('admin');
             await ctx.editMessageText(MSG.welcome.admin(user));
         } else {
