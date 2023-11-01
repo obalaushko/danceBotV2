@@ -75,7 +75,9 @@ export const getUserById = async (id: number): Promise<IUser | null> => {
     }
 };
 
-export const getUsersByUserIds = async (userIds: number[]): Promise<IUser[] | null> => {
+export const getUsersByUserIds = async (
+    userIds: number[]
+): Promise<IUser[] | null> => {
     try {
         const users = await UserModel.find({ userId: { $in: userIds } });
         return users;
@@ -109,7 +111,9 @@ export const updateUserById = async (
 
 export const getAllUsers = async (): Promise<IUser[] | null> => {
     try {
-        const users = await UserModel.find()
+        const users = await UserModel.find({
+            role: { $nin: [ROLES.Developer] },
+        })
             .populate({
                 path: 'subscription',
                 select: '-_id',
@@ -296,12 +300,14 @@ export const updateUsersToInactive = async (
             {
                 approved: false,
                 role: ROLES.Inactive,
-                notifications: false
+                notifications: false,
             }
         );
 
         if (updatedUsers.modifiedCount > 0) {
-            const users = await UserModel.find({ userId: { $in: userIdArray } });
+            const users = await UserModel.find({
+                userId: { $in: userIdArray },
+            });
 
             return users;
         }
@@ -321,8 +327,10 @@ export const deleteUsers = async (
     try {
         const userIdArray = Array.isArray(userId) ? userId : [userId];
 
-        const deleteResult = await UserModel.deleteMany({ userId: { $in: userIdArray } });
-        
+        const deleteResult = await UserModel.deleteMany({
+            userId: { $in: userIdArray },
+        });
+
         if (deleteResult.deletedCount > 0) {
             return true;
         } else {
