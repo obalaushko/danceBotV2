@@ -75,6 +75,18 @@ export const getUserById = async (id: number): Promise<IUser | null> => {
     }
 };
 
+export const getUsersByUserIds = async (userIds: number[]): Promise<IUser[] | null> => {
+    try {
+        const users = await UserModel.find({ userId: { $in: userIds } });
+        return users;
+    } catch (error: any) {
+        LOGGER.error('[getUsersByUserIds][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
 export const updateUserById = async (
     userId: number,
     update: Partial<IUser>
@@ -238,5 +250,88 @@ export const getUserWithPaymentDetails = async (
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;
+    }
+};
+
+export const getAllCanBeSetIncactiveUsers = async (): Promise<
+    IUser[] | null
+> => {
+    try {
+        const users = await UserModel.find({
+            role: { $nin: [ROLES.Admin, ROLES.Developer, ROLES.Inactive] },
+        }).exec();
+
+        return users;
+    } catch (error: any) {
+        LOGGER.error('[getAllCanBeSetIncactiveUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const getAllCanBeDeletedUsers = async (): Promise<IUser[] | null> => {
+    try {
+        const users = await UserModel.find({
+            role: { $nin: [ROLES.Admin, ROLES.Developer] },
+        }).exec();
+
+        return users;
+    } catch (error: any) {
+        LOGGER.error('[getAllCanBeDeletedUsers][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const updateUsersToInactive = async (
+    userIds: number | number[]
+): Promise<IUser[] | null> => {
+    try {
+        const userIdArray = Array.isArray(userIds) ? userIds : [userIds];
+
+        const updatedUsers = await UserModel.updateMany(
+            { userId: { $in: userIdArray } },
+            {
+                approved: false,
+                role: ROLES.Inactive,
+                notifications: false
+            }
+        );
+
+        if (updatedUsers.modifiedCount > 0) {
+            const users = await UserModel.find({ userId: { $in: userIdArray } });
+
+            return users;
+        }
+
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[updateUsersToInactive][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const deleteUsers = async (
+    userId: number | number[]
+): Promise<boolean> => {
+    try {
+        const userIdArray = Array.isArray(userId) ? userId : [userId];
+
+        const deleteResult = await UserModel.deleteMany({ userId: { $in: userIdArray } });
+        
+        if (deleteResult.deletedCount > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error: any) {
+        LOGGER.error('[deleteUser][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return false;
     }
 };

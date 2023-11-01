@@ -151,3 +151,24 @@ export const markLessonAsUsed = async (
         return null;
     }
 };
+
+export const deleteSubscription = async (
+    userId: number | number[]
+): Promise<boolean> => {
+    try {
+        const subscriptionIdArray = Array.isArray(userId) ? userId : [userId];
+
+        const deleteResult = await SubscriptionModel.deleteMany({ userId: { $in: subscriptionIdArray } });
+
+        if (deleteResult.deletedCount > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error: any) {
+        LOGGER.error('[deleteSubscription][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return false;
+    }
+};

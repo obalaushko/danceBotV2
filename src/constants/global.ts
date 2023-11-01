@@ -3,7 +3,7 @@ export const ROLES = {
     Admin: 'admin',
     User: 'user',
     Guest: 'guest',
-    Removed: 'removed'
+    Inactive: 'inactive'
 };
 
 export const BANKS = {

@@ -13,6 +13,11 @@ export {
     getAllActiveUserUsers,
     getAllDeactiveUserUsers,
     getUserWithPaymentDetails,
+    getAllCanBeDeletedUsers,
+    getAllCanBeSetIncactiveUsers,
+    updateUsersToInactive,
+    deleteUsers,
+    getUsersByUserIds,
 } from './users';
 export {
     addSubscription,
@@ -20,4 +25,5 @@ export {
     deactivateSubscriptions,
     getSubscriptionById,
     markLessonAsUsed,
+    deleteSubscription,
 } from './subscriptions';

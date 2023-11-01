@@ -1,4 +1,4 @@
-import { BANKS } from './index';
+import { BANKS, ROLES } from './index';
 
 import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
@@ -165,7 +165,49 @@ export const MSG = {
         createBank: `Щоб створити реквізити введіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,
         createCard: `Щоб створити реквізити введіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
         wrongEnterBank: `Ведіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,
-        wrongEnterCard: `Ведіть номер карти у форматі: <code>4444 4444 4444 4444</code>`
+        wrongEnterCard: `Ведіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
+    },
+    settings: {
+        main: 'Забув що у цьому меню хотів зробити.',
+    },
+    remove: {
+        main: 'Ви можете видалити користувачів або призупити їхню взаємодію з ботом.',
+        inactive: (users: IUser[] | null) => {
+            let userList =
+                'Виберіть користувачів яким хочете призупити взаємодію з ботом.\n';
+
+            users &&
+                users.forEach((user) => {
+                    const userFullName = user.fullName;
+                    userList += `Користувача: <b>${userFullName}</b>, деактивовано.\n`;
+                });
+
+            return userList;
+        },
+        permanentlyRemove: (users: IUser[] | null) => {
+            let userList =
+                'Виберіть користувачів яких хочете видалити назавжди.\n';
+
+            users &&
+                users.forEach((user) => {
+                    const userFullName = user.fullName;
+                    userList += `Користувача: <b>${userFullName}</b>, видалено назавжди.\n`;
+                });
+
+            return userList;
+        },
+        confirmRemoved: (users: IUser[] | null) => {
+            let userList =
+                'Ви впевнені що хочете видалити цих користувачів назавжди. Ця дія невідворотна!\n';
+
+            users &&
+                users.forEach((user) => {
+                    const userFullName = user.fullName;
+                    userList += `Користувача: <b>${userFullName}</b>\n`;
+                });
+
+            return userList;
+        },
     },
     buttons: {
         admin: {
@@ -189,6 +231,11 @@ export const MSG = {
         },
         paymentDetails: {
             update: 'Оновити реквізити',
+        },
+        settings: {},
+        removed: {
+            inactive: '⚠️ Призупинити',
+            remove: '❌ Видалити',
         },
         backToMain: 'До головного меню',
         back: '<< Назад',
