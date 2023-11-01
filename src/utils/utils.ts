@@ -15,3 +15,13 @@ export const convertDate = (date: Date) => {
     const year = date.getUTCFullYear();
     return `${day}.${month}.${year}`;
 };
+
+export const pluralizeWord = (number: number) => {
+    if (number === 1) {
+        return 'заняття'; // Відмінюємо для числа 1
+    } else if (number >= 2 && number <= 4) {
+        return 'заняття'; // Відмінюємо для чисел 2-4
+    } else {
+        return 'занять'; // Відмінюємо для інших чисел
+    }
+};

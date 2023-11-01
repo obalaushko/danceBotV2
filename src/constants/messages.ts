@@ -2,7 +2,7 @@ import { BANKS, ROLES } from './index';
 
 import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
-import { convertDate } from '../utils/utils';
+import { convertDate, pluralizeWord } from '../utils/utils';
 
 interface ITGUser {
     first_name?: string;
@@ -16,7 +16,10 @@ export const MSG = {
         notRegistered: `Привіт! Щоб продовжити, будь ласка, зареєструйся, вказавши своє ім'я та прізвище.`,
         noRoleAssigned: (user: ITGUser) =>
             `Привіт, ${user.fullName}! Ваш запит на реєстрацію залишається на розгляді адміністратора. Зачекайте, будь ласка.`,
-        user: (user: ITGUser) => `Привіт ${user.first_name || user.fullName}`,
+        user: (user: ITGUser) =>
+            `Привіт ${
+                user.first_name || user.fullName
+            }!\nВи маєте можливість переглядати стан свого абонементу та отримувати сповіщення коли він закінчується.`,
         admin: (user: ITGUser) =>
             `Привіт, ${user.first_name}!\nВи можете додавати нових учнів, слідкувати за відвідувальністю, оновлювати їм абонементи та персональні дані, видаляти учнів.`,
         developer: (user: ITGUser) =>
@@ -148,7 +151,7 @@ export const MSG = {
         },
     },
     payments: {
-        static: 'Реквізити для оплати:\nПриватБанк: <code>4444 4444 4444 4444</code>',
+        static: 'Реквізити для оплати:\n🏦 ПриватБанк <i>(Антонюк Дарія)</i>\n💳<code>4444 4444 4444 4444</code>',
         main: (paymentDetails: IBank | null) => {
             let text = 'Ви можете оновити реквізити\n';
 
@@ -209,6 +212,35 @@ export const MSG = {
             return userList;
         },
     },
+    user: {
+        subscription: (user: IUser) => {
+            let result = '';
+            const isActive = user.subscription?.active;
+
+            if (isActive) {
+                const totalLessons = user.subscription?.totalLessons!;
+                const remainedLessons = user.subscription?.remainedLessons!;
+                const date = user.subscription?.dataExpired!;
+                const lessons =
+                    user.subscription?.usedLessons === 0
+                        ? 'ви ще не використали жодного заняття'
+                        : `у вашому абонементі залишилося ${remainedLessons} ${pluralizeWord(
+                              remainedLessons
+                          )}`;
+                result = `${
+                    user.fullName
+                }, ваш 🎫 абонемента налічує <b>${totalLessons}</b> ${pluralizeWord(
+                    totalLessons
+                )}, ${lessons}\nТермін дії абонементу закінчується <i>${convertDate(
+                    date
+                )}</i>`;
+            } else {
+                result =
+                    'Ваш абонемент більше не діє або заняття в ньому вже закінчилися!';
+            }
+            return result;
+        },
+    },
     buttons: {
         admin: {
             approveUser: '📝 Запити',
@@ -237,6 +269,11 @@ export const MSG = {
             inactive: '⚠️ Призупинити',
             remove: '❌ Видалити',
         },
+        user: {
+            showSubscription: '🎫 Мій абонемент',
+            paymentDetails: '💳 Отримати реквізити',
+            notifications: '🔔 Сповіщення',
+        },
         backToMain: 'До головного меню',
         back: '<< Назад',
         approve: '✅ Прийняти',
@@ -248,6 +285,7 @@ export const MSG = {
         failedToCreate: 'Виникла помилка створення. Спробуйте ще раз!',
         failedToUpdate: 'Виникла помилка оновлення. Спробуйте ще раз!',
         failedToRemove: 'Виникла помилка видалення. Спробуйте ще раз!',
+        unknownError: 'Виникла невідома помилка. Спробуйте ще раз!',
     },
     leaveConversation: 'Розмову завершено.',
     overLeaveConversation:

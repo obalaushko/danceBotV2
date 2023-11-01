@@ -20,7 +20,7 @@ import {
 import { addSubscription, addUser, getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
 import { isObjectEmpty } from '../utils/utils';
-import { adminMenu } from './menu';
+import { adminMenu, userMenu } from './menu';
 import { dailyCheck } from '../helpers';
 
 dotenv.config();
@@ -74,6 +74,7 @@ bot.use(
 );
 
 bot.use(adminMenu);
+bot.use(userMenu);
 
 //Inject conversations
 bot.use(conversations());
@@ -98,7 +99,10 @@ bot.command('start', async (ctx) => {
     } else if (userExists?.role === ROLES.Guest) {
         await ctx.conversation.enter('guestConversations');
     } else if (userExists?.role === ROLES.User) {
-        await ctx.conversation.enter('userConversations');
+        LOGGER.info('[userDialogue]', { metadata: user });
+        await ctx.reply(MSG.welcome.user(user), {
+            reply_markup: userMenu,
+        });
     } else if (userExists?.role === ROLES.Admin) {
         LOGGER.info('[adminDialogue]', { metadata: user });
         await ctx.reply(MSG.welcome.admin(user), {
