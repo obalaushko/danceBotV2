@@ -74,6 +74,28 @@ export const getUserById = async (id: number): Promise<IUser | null> => {
         return null;
     }
 };
+export const getUserWithSubscriptionById = async (
+    id: number
+): Promise<IUser | null> => {
+    try {
+        const user = await UserModel.findOne({ userId: id })
+            .populate({
+                path: 'subscription',
+                select: '-_id',
+            })
+            .exec();
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error: any) {
+        LOGGER.error('[getUserWithSubscriptionById][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
 
 export const getUsersByUserIds = async (
     userIds: number[]

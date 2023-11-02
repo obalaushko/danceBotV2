@@ -7,6 +7,7 @@ export interface ISubscription extends Document {
     usedLessons?: number;
     remainedLessons?: number;
     active?: boolean;
+    firstActivation?: boolean;
     dataExpired?: Date;
 }
 
@@ -31,6 +32,10 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     active: {
         type: Boolean,
         default: false,
+    },
+    firstActivation: {
+        type: Boolean,
+        default: false
     },
     dataExpired: {
         type: Date,

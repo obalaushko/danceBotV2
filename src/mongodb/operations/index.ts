@@ -18,6 +18,7 @@ export {
     updateUsersToInactive,
     deleteUsers,
     getUsersByUserIds,
+    getUserWithSubscriptionById,
 } from './users';
 export {
     addSubscription,

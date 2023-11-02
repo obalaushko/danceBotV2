@@ -65,7 +65,7 @@ export const registerConversations = async (
     if (newUser) {
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 
-        await ctx.api.sendMessage(324131584, MSG.approveUser(newUser)); // replace id to ENV.ADMIN_ID
+        await ctx.api.sendMessage(383923128, MSG.approveUser(newUser)); // replace id to ENV.ADMIN_ID
     }
 
     return;

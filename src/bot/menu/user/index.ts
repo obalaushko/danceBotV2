@@ -1,13 +1,13 @@
 import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants';
 import { backToUserMain } from './backToMainMenu';
-import { getUserById } from '../../../mongodb/operations';
+import { getUserWithSubscriptionById } from '../../../mongodb/operations';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
         const { user: {id} } = await ctx.getAuthor();
 
-        const user = await getUserById(id);
+        const user = await getUserWithSubscriptionById(id);
 
         if (user) {
             ctx.menu.nav('backToUserMain');

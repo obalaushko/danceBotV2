@@ -224,7 +224,7 @@ export const MSG = {
                 const lessons =
                     user.subscription?.usedLessons === 0
                         ? 'ви ще не використали жодного заняття'
-                        : `у вашому абонементі залишилося ${remainedLessons} ${pluralizeWord(
+                        : `залишилося ${remainedLessons} ${pluralizeWord(
                               remainedLessons
                           )}`;
                 result = `${
@@ -235,8 +235,12 @@ export const MSG = {
                     date
                 )}</i>`;
             } else {
-                result =
-                    'Ваш абонемент більше не діє або заняття в ньому вже закінчилися!';
+                const firstActivation = user.subscription?.firstActivation;
+                result = `${
+                    firstActivation
+                        ? 'Ваш абонемент більше не діє або заняття в ньому вже закінчилися!'
+                        : 'Щоб активувати абонемент оплатіть та повідомте викладача.'
+                }`;
             }
             return result;
         },

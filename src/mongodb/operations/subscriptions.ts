@@ -76,6 +76,9 @@ export const activateSubscriptions = async (
 
         for (const subscription of subscriptions) {
             subscription.active = true;
+            if (!subscription.firstActivation)
+                subscription.firstActivation = true;
+
             await subscription.save();
             updatedSubscriptions.push(subscription);
         }
@@ -158,7 +161,9 @@ export const deleteSubscription = async (
     try {
         const subscriptionIdArray = Array.isArray(userId) ? userId : [userId];
 
-        const deleteResult = await SubscriptionModel.deleteMany({ userId: { $in: subscriptionIdArray } });
+        const deleteResult = await SubscriptionModel.deleteMany({
+            userId: { $in: subscriptionIdArray },
+        });
 
         if (deleteResult.deletedCount > 0) {
             return true;
