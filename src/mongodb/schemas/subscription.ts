@@ -1,5 +1,8 @@
 import { Document, Schema, Model, model, Types } from 'mongoose';
-import { logSubscriptionChange } from '../operations';
+import { getUserById, logSubscriptionChange } from '../operations';
+import { bot } from '../../bot/bot';
+import { IUser } from './user';
+import { MSG } from '../../constants';
 
 export interface ISubscription extends Document {
     userId: number;
@@ -35,7 +38,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     },
     firstActivation: {
         type: Boolean,
-        default: false
+        default: false,
     },
     dataExpired: {
         type: Date,
@@ -64,9 +67,22 @@ subscriptionSchema.methods.setChangeLog = async (
     await logSubscriptionChange(userId, subscriptionId, changeType);
 };
 
-subscriptionSchema.pre('save', function (next) {
+const getOwnerSubscription = async (
+    userId: number
+): Promise<IUser | null> => {
+    const user = await getUserById(userId);
+
+    return user;
+};
+
+subscriptionSchema.pre('save', async function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
+
+        const owner = await getOwnerSubscription(this.userId);
+        if (owner && owner.notifications) {
+            await bot.api.sendMessage(this.userId, MSG.user.notification.remained0Lessons);
+        }
     }
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
@@ -88,6 +104,13 @@ subscriptionSchema.pre('save', function (next) {
     this.setChangeLog(this.userId, subscriptionId, changeType);
 
     this.remainedLessons = this.totalLessons - this.usedLessons;
+
+    if (this.remainedLessons === 2) {
+        const owner = await getOwnerSubscription(this.userId);
+        if (owner && owner.notifications) {
+            await bot.api.sendMessage(this.userId, MSG.user.notification.remained2Lessons);
+        }
+    }
 
     next();
 });
