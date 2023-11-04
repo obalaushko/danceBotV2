@@ -52,7 +52,7 @@ subscriptionSchema.methods.setExpirationDate = function () {
         today.getUTCMinutes(),
         today.getUTCSeconds()
     );
-    expirationDate.setUTCMonth(expirationDate.getUTCMonth() + 3);
+    expirationDate.setUTCMonth(expirationDate.getUTCMonth() + 2);
     this.dataExpired = expirationDate;
 };
 
