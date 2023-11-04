@@ -67,9 +67,7 @@ subscriptionSchema.methods.setChangeLog = async (
     await logSubscriptionChange(userId, subscriptionId, changeType);
 };
 
-const getOwnerSubscription = async (
-    userId: number
-): Promise<IUser | null> => {
+const getOwnerSubscription = async (userId: number): Promise<IUser | null> => {
     const user = await getUserById(userId);
 
     return user;
@@ -78,11 +76,6 @@ const getOwnerSubscription = async (
 subscriptionSchema.pre('save', async function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
-
-        const owner = await getOwnerSubscription(this.userId);
-        if (owner && owner.notifications) {
-            await bot.api.sendMessage(this.userId, MSG.user.notification.remained0Lessons);
-        }
     }
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
@@ -94,6 +87,14 @@ subscriptionSchema.pre('save', async function (next) {
         } else if (!this.active) {
             this.dataExpired = undefined;
             this.usedLessons = 0;
+
+            const owner = await getOwnerSubscription(this.userId); // ! refactoring
+            if (owner && owner.notifications) {
+                await bot.api.sendMessage(
+                    this.userId,
+                    MSG.user.notification.remained0Lessons
+                );
+            }
         }
 
         changeType = this.active ? 'activation' : 'deactivation';
@@ -108,7 +109,10 @@ subscriptionSchema.pre('save', async function (next) {
     if (this.remainedLessons === 2) {
         const owner = await getOwnerSubscription(this.userId);
         if (owner && owner.notifications) {
-            await bot.api.sendMessage(this.userId, MSG.user.notification.remained2Lessons);
+            await bot.api.sendMessage(
+                this.userId,
+                MSG.user.notification.remained2Lessons
+            );
         }
     }
 
