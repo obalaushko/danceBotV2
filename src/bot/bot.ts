@@ -85,6 +85,12 @@ bot.use(createConversation(paymentDetailsConversations));
 // bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
+bot.use((ctx, next) => { // only private chat
+    if (ctx?.chat?.type === 'private') {
+        return next();
+    }
+});
+
 dailyCheck();
 
 //START COMMAND

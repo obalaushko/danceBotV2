@@ -1,8 +1,7 @@
 import { Document, Schema, Model, model, Types } from 'mongoose';
-import { getUserById, logSubscriptionChange } from '../operations';
-import { bot } from '../../bot/bot';
-import { IUser } from './user';
+import { logSubscriptionChange } from '../operations';
 import { MSG } from '../../constants';
+import { sendUserNotification } from '../../helpers';
 
 export interface ISubscription extends Document {
     userId: number;
@@ -67,15 +66,14 @@ subscriptionSchema.methods.setChangeLog = async (
     await logSubscriptionChange(userId, subscriptionId, changeType);
 };
 
-const getOwnerSubscription = async (userId: number): Promise<IUser | null> => {
-    const user = await getUserById(userId);
-
-    return user;
-};
-
-subscriptionSchema.pre('save', async function (next) {
+subscriptionSchema.pre('save', function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
+
+        sendUserNotification(
+            this.userId,
+            MSG.user.notification.remained0Lessons
+        );
     }
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
@@ -87,14 +85,6 @@ subscriptionSchema.pre('save', async function (next) {
         } else if (!this.active) {
             this.dataExpired = undefined;
             this.usedLessons = 0;
-
-            const owner = await getOwnerSubscription(this.userId); // ! refactoring
-            if (owner && owner.notifications) {
-                await bot.api.sendMessage(
-                    this.userId,
-                    MSG.user.notification.remained0Lessons
-                );
-            }
         }
 
         changeType = this.active ? 'activation' : 'deactivation';
@@ -107,13 +97,10 @@ subscriptionSchema.pre('save', async function (next) {
     this.remainedLessons = this.totalLessons - this.usedLessons;
 
     if (this.remainedLessons === 2) {
-        const owner = await getOwnerSubscription(this.userId);
-        if (owner && owner.notifications) {
-            await bot.api.sendMessage(
-                this.userId,
-                MSG.user.notification.remained2Lessons
-            );
-        }
+        sendUserNotification(
+            this.userId,
+            MSG.user.notification.remained2Lessons
+        );
     }
 
     next();
