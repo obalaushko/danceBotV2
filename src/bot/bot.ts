@@ -1,5 +1,5 @@
 import { BOT_RIGHTS } from './../constants/global';
-import { Bot, GrammyError, HttpError, session } from 'grammy';
+import { Bot, Context, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
@@ -92,10 +92,10 @@ bot.use(createConversation(changeNameConversations));
 dailyCheck();
 
 const privateChat = bot.chatType('private');
-// const groupChat = bot.chatType('group');
+const groupChat = bot.chatType('group');
 const superGroupChat = bot.chatType('supergroup');
 
-superGroupChat.on('chat_join_request', async (ctx) => {
+const handleChatJoinRequest = async (ctx: any) => {
     try {
         const { user_chat_id, from } = ctx.chatJoinRequest;
 
@@ -129,7 +129,10 @@ superGroupChat.on('chat_join_request', async (ctx) => {
     } catch (err) {
         LOGGER.error('[chat_join_request]', { metadata: err });
     }
-});
+}
+groupChat.on('chat_join_request', handleChatJoinRequest);
+superGroupChat.on('chat_join_request', handleChatJoinRequest);
+
 
 //START COMMAND
 privateChat.command('start', async (ctx) => {
