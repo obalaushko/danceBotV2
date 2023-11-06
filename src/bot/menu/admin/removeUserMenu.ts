@@ -50,7 +50,7 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
     })
     .text(MSG.buttons.back, async (ctx) => {
         ctx.menu.back();
-        await ctx.editMessageText(MSG.remove.main);
+        await ctx.editMessageText(MSG.remove.permanentlyRemove(null));
         checkedInactive.clear();
     });
 

@@ -5,6 +5,12 @@ import { MSG } from '../../constants';
 import { addUser, addSubscription } from '../../mongodb/operations';
 import { isCancel } from '../../utils/utils';
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+const ENVS = process.env;
+const ADMIN_ID = ENVS.ADMIN_ID || ''
+
 export const registerConversations = async (
     conversation: ConverstaionContext,
     ctx: BotContext
@@ -65,7 +71,7 @@ export const registerConversations = async (
     if (newUser) {
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 
-        await ctx.api.sendMessage(383923128, MSG.approveUser(newUser)); // replace id to ENV.ADMIN_ID
+        await ctx.api.sendMessage(ADMIN_ID, MSG.approveUser(newUser));
     }
 
     return;

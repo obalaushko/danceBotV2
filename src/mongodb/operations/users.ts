@@ -349,19 +349,20 @@ export const deleteUsers = async (
 ): Promise<boolean> => {
     try {
         const admin = await getUserById(adminId);
-        if (admin?.role !== ROLES.Admin || admin?.role !== ROLES.Developer)
-            throw new Error(MSG.inappropriateRole);
+        if (admin?.role == ROLES.Admin || admin?.role == ROLES.Developer) {
+            const userIdArray = Array.isArray(userId) ? userId : [userId];
 
-        const userIdArray = Array.isArray(userId) ? userId : [userId];
+            const deleteResult = await UserModel.deleteMany({
+                userId: { $in: userIdArray },
+            });
 
-        const deleteResult = await UserModel.deleteMany({
-            userId: { $in: userIdArray },
-        });
-
-        if (deleteResult.deletedCount > 0) {
-            return true;
+            if (deleteResult.deletedCount > 0) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            throw new Error(MSG.inappropriateRole);
         }
     } catch (error: any) {
         LOGGER.error('[deleteUser][error]', {

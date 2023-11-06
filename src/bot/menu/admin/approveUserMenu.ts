@@ -2,6 +2,7 @@ import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants';
 import { approveUsers, getAllGuestUsers } from '../../../mongodb/operations';
 import { LOGGER } from '../../../logger';
+import { sendInviteToGroup } from '../../../helpers';
 
 const checked = new Set<number>();
 
@@ -36,32 +37,35 @@ approveUserMenu
                     )
                     .row();
             });
-            
-            checked.size && range.text(MSG.buttons.add, async (ctx) => {
-                const users = [...checked];
 
-                const updateUsers = await approveUsers(users);
+            checked.size &&
+                range.text(MSG.buttons.add, async (ctx) => {
+                    const users = [...checked];
 
-                if (updateUsers?.length) {
-                    let updateText = '';
+                    const updateUsers = await approveUsers(users);
 
-                    updateUsers.forEach(
-                        (item) => (updateText += MSG.approved(item) + '\n')
-                    );
+                    if (updateUsers?.length) {
+                        let updateText = '';
 
-                    await ctx.editMessageText(updateText);
-                    checked.clear();
+                        updateUsers.forEach(
+                            (item) => (updateText += MSG.approved(item) + '\n')
+                        );
 
-                    LOGGER.info('[approveUsers]', {
-                        metadata: updateUsers,
-                    });
-                } else {
-                    LOGGER.error('[approveUsers]', {
-                        metadata: updateUsers,
-                    });
-                    await ctx.reply(MSG.errors.failedToUpdate);
-                }
-            });
+                        await ctx.editMessageText(updateText);
+                        checked.clear();
+
+                        await sendInviteToGroup(updateUsers);
+
+                        LOGGER.info('[approveUsers]', {
+                            metadata: updateUsers,
+                        });
+                    } else {
+                        LOGGER.error('[approveUsers]', {
+                            metadata: updateUsers,
+                        });
+                        await ctx.reply(MSG.errors.failedToUpdate);
+                    }
+                });
         }
 
         return range;

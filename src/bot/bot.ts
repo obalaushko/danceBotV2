@@ -1,3 +1,4 @@
+import { BOT_RIGHTS } from './../constants/global';
 import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
@@ -14,7 +15,6 @@ import { LOGGER } from '../logger';
 import {
     changeNameConversations,
     guestConversations,
-    paymentDetailsConversations,
     registerConversations,
 } from './conversations';
 import { addSubscription, addUser, getUserById } from '../mongodb/operations';
@@ -42,6 +42,10 @@ const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
 
 bot.api.setMyCommands(COMMANDS);
 bot.api.setMyDescription(MSG.myDescriptions);
+bot.api.setMyDefaultAdministratorRights({
+    // https://core.telegram.org/bots/api#chatadministratorrights
+    rights: BOT_RIGHTS,
+});
 
 bot.use(hydrateReply);
 // bot.api.config.use(throttler);
@@ -81,20 +85,47 @@ bot.use(conversations());
 bot.use(createConversation(registerConversations));
 bot.use(createConversation(guestConversations));
 // bot.use(createConversation(userConversations));
-bot.use(createConversation(paymentDetailsConversations));
+// bot.use(createConversation(paymentDetailsConversations));
 // bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
-bot.use((ctx, next) => { // only private chat
-    if (ctx?.chat?.type === 'private') {
-        return next();
+dailyCheck();
+
+const privateChat = bot.chatType('private');
+// const groupChat = bot.chatType('group');
+const superGroupChat = bot.chatType('supergroup');
+
+superGroupChat.on('chat_join_request', async (ctx) => {
+    try {
+        const { user_chat_id, from } = ctx.chatJoinRequest;
+
+        const user = await getUserById(user_chat_id);
+
+        if (user?.approved) {
+            const approved = await ctx.approveChatJoinRequest(user_chat_id);
+            LOGGER.info('[approveChatJoinRequest] Approve user', {
+                metadata: user,
+            });
+
+            if (approved) {
+                LOGGER.info('[userDialogue]', { metadata: user });
+                await ctx.api.sendMessage(user.userId, MSG.welcome.user(user), {
+                    reply_markup: userMenu,
+                });
+            }
+        } else {
+            await ctx.declineChatJoinRequest(user_chat_id);
+            LOGGER.error('[declineChatJoinRequest] Decline user', {
+                metadata: from,
+            });
+        }
+    } catch (err) {
+        LOGGER.error('[chat_join_request]', { metadata: err });
     }
 });
 
-dailyCheck();
-
 //START COMMAND
-bot.command('start', async (ctx) => {
+privateChat.command('start', async (ctx) => {
     const { user } = await ctx.getAuthor();
 
     if (user.is_bot) return;
@@ -119,22 +150,22 @@ bot.command('start', async (ctx) => {
     }
 });
 
-bot.command('updatePaymentDetails', async (ctx) => {
-    const { user } = await ctx.getAuthor();
-    if (user.is_bot) return;
+// privateChat.command('updatePaymentDetails', async (ctx) => {
+//     const { user } = await ctx.getAuthor();
+//     if (user.is_bot) return;
 
-    const userExists = await getUserById(user.id);
+//     const userExists = await getUserById(user.id);
 
-    if (
-        userExists?.role === ROLES.Admin ||
-        userExists?.role === ROLES.Developer
-    ) {
-        await ctx.conversation.enter('paymentDetailsConversations');
-    }
-});
+//     if (
+//         userExists?.role === ROLES.Admin ||
+//         userExists?.role === ROLES.Developer
+//     ) {
+//         await ctx.conversation.enter('paymentDetailsConversations');
+//     }
+// });
 
 // Always exit any conversation upon /cancel
-bot.command('cancel', async (ctx) => {
+privateChat.command('cancel', async (ctx) => {
     const stats = await ctx.conversation.active();
 
     if (isObjectEmpty(stats)) {
@@ -146,7 +177,7 @@ bot.command('cancel', async (ctx) => {
     }
 });
 
-bot.command('changename', async (ctx) => {
+privateChat.command('changename', async (ctx) => {
     const {
         user: { is_bot, id },
     } = await ctx.getAuthor();
@@ -160,7 +191,7 @@ bot.command('changename', async (ctx) => {
     }
 });
 
-bot.command('about', async (ctx) => {
+privateChat.command('about', async (ctx) => {
     const {
         user: { is_bot },
     } = await ctx.getAuthor();
@@ -170,7 +201,7 @@ bot.command('about', async (ctx) => {
     await ctx.reply(MSG.about);
 });
 
-bot.command('help', async (ctx) => {
+privateChat.command('help', async (ctx) => {
     const {
         user: { is_bot },
     } = await ctx.getAuthor();
@@ -181,7 +212,7 @@ bot.command('help', async (ctx) => {
 });
 
 // ! Only DEV
-bot.command('add', async (ctx) => {
+privateChat.command('add', async (ctx) => {
     if (mode === 'production') return;
 
     const { user } = await ctx.getAuthor();

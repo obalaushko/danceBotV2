@@ -13,8 +13,12 @@ export const validateEnvs = (ENVS: NodeJS.ProcessEnv) => {
         throw new Error('DEVELOPMENT_BOT_TOKEN is required');
     }
     
-    if (!ENVS.ADMIN_IDS) {
-        throw new Error('ADMIN_IDS is required');
+    if (!ENVS.ADMIN_ID) {
+        throw new Error('ADMIN_ID is required');
+    }
+
+    if (!ENVS.GROUP_ID) {
+        throw new Error('GROUP_ID is required');
     }
 
     if (!ENVS.APPLICATION_NAME) {
