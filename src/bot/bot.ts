@@ -112,6 +112,13 @@ superGroupChat.on('chat_join_request', async (ctx) => {
                 await ctx.api.sendMessage(user.userId, MSG.welcome.user(user), {
                     reply_markup: userMenu,
                 });
+            } else {
+                LOGGER.error(
+                    '[approveChatJoinRequest] Something wrong with approve user',
+                    {
+                        metadata: ctx.chatJoinRequest,
+                    }
+                );
             }
         } else {
             await ctx.declineChatJoinRequest(user_chat_id);
