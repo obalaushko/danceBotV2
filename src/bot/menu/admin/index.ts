@@ -28,7 +28,6 @@ export const adminMenu = new Menu('admin')
     })
     .row()
     .text(MSG.buttons.admin.updatePaymentDetails, async (ctx) => {
-        await ctx.reply(MSG.commandDisabled);
         await ctx.reply(MSG.payments.static);
     })
     .text(MSG.buttons.admin.settings, async (ctx) => {

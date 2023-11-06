@@ -41,7 +41,7 @@ export const userSchema: Schema = new Schema<IUser>({
     },
     fullName: {
         type: String,
-        required: false,
+        required: true,
     },
     approved: {
         type: Boolean,
@@ -49,7 +49,7 @@ export const userSchema: Schema = new Schema<IUser>({
     },
     notifications: {
         type: Boolean,
-        default: false,
+        default: true,
     },
     paymentDetails: {
         type: SchemaTypes.ObjectId,

@@ -5,6 +5,7 @@ import {
     deactivateSubscriptions,
     deleteSubscription,
     deleteUsers,
+    getAllCanBeDeletedUsers,
     getAllCanBeSetIncactiveUsers,
     getUsersByUserIds,
     updateUsersToInactive,
@@ -124,7 +125,7 @@ const removeMenu = new Menu('removeMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
     .dynamic(async () => {
-        const users = await getAllCanBeSetIncactiveUsers();
+        const users = await getAllCanBeDeletedUsers();
 
         const range = new MenuRange();
         if (users?.length) {

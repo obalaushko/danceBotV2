@@ -1,5 +1,5 @@
 import { BOT_RIGHTS } from './../constants/global';
-import { Bot, Context, GrammyError, HttpError, session } from 'grammy';
+import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
@@ -17,11 +17,11 @@ import {
     guestConversations,
     registerConversations,
 } from './conversations';
-import { addSubscription, addUser, getUserById } from '../mongodb/operations';
+import { getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
 import { isObjectEmpty } from '../utils/utils';
 import { adminMenu, userMenu } from './menu';
-import { dailyCheck } from '../helpers';
+import { dailyCheck, handleChatJoinRequest } from '../helpers';
 
 dotenv.config();
 
@@ -95,44 +95,8 @@ const privateChat = bot.chatType('private');
 const groupChat = bot.chatType('group');
 const superGroupChat = bot.chatType('supergroup');
 
-const handleChatJoinRequest = async (ctx: any) => {
-    try {
-        const { user_chat_id, from } = ctx.chatJoinRequest;
-
-        const user = await getUserById(user_chat_id);
-
-        if (user?.approved) {
-            const approved = await ctx.approveChatJoinRequest(user_chat_id);
-            LOGGER.info('[approveChatJoinRequest] Approve user', {
-                metadata: user,
-            });
-
-            if (approved) {
-                LOGGER.info('[userDialogue]', { metadata: user });
-                await ctx.api.sendMessage(user.userId, MSG.welcome.user(user), {
-                    reply_markup: userMenu,
-                });
-            } else {
-                LOGGER.error(
-                    '[approveChatJoinRequest] Something wrong with approve user',
-                    {
-                        metadata: ctx.chatJoinRequest,
-                    }
-                );
-            }
-        } else {
-            await ctx.declineChatJoinRequest(user_chat_id);
-            LOGGER.error('[declineChatJoinRequest] Decline user', {
-                metadata: from,
-            });
-        }
-    } catch (err) {
-        LOGGER.error('[chat_join_request]', { metadata: err });
-    }
-}
 groupChat.on('chat_join_request', handleChatJoinRequest);
 superGroupChat.on('chat_join_request', handleChatJoinRequest);
-
 
 //START COMMAND
 privateChat.command('start', async (ctx) => {
@@ -157,6 +121,8 @@ privateChat.command('start', async (ctx) => {
         });
     } else if (userExists?.role === ROLES.Developer) {
         await ctx.conversation.enter('developerConversations');
+    } else if (userExists?.role == ROLES.Inactive) {
+        await ctx.reply(MSG.deactivateDAccount);
     }
 });
 
@@ -194,10 +160,11 @@ privateChat.command('changename', async (ctx) => {
 
     if (is_bot) return;
     const userExists = await getUserById(id);
-    if (!userExists) {
-        await ctx.reply(MSG.commandDisabled);
-    } else {
+
+    if (userExists && userExists.role !== ROLES.Inactive) {
         await ctx.conversation.enter('changeNameConversations');
+    } else {
+        await ctx.reply(MSG.commandDisabled);
     }
 });
 
@@ -218,38 +185,7 @@ privateChat.command('help', async (ctx) => {
 
     if (is_bot) return;
 
-    await ctx.reply(MSG.help, { parse_mode: 'HTML' });
-});
-
-// ! Only DEV
-privateChat.command('add', async (ctx) => {
-    if (mode === 'production') return;
-
-    const { user } = await ctx.getAuthor();
-
-    if (user.is_bot) return;
-
-    LOGGER.info('[addNewUser][DEV]', { metadata: user });
-
-    function generateRandomNumericId() {
-        const min = 10000000; // Мінімальне 8-цифрове число
-        const max = 99999999; // Максимальне 8-цифрове число
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    // Приклад використання
-    const randomId = generateRandomNumericId();
-    const subscription = await addSubscription({
-        userId: randomId,
-    });
-
-    await addUser({
-        userId: randomId,
-        username: `user${randomId}`,
-        firstName: `user${randomId}`,
-        fullName: `Test User${randomId}`,
-        subscription: subscription,
-    });
+    await ctx.reply(MSG.help);
 });
 
 //CRASH HANDLER

@@ -5,6 +5,7 @@ import { getUserById } from '../mongodb/operations';
 import { MSG } from '../constants';
 
 import * as dotenv from 'dotenv';
+import { userMenu } from '../bot/menu';
 dotenv.config();
 
 const ENVS = process.env;
@@ -30,10 +31,19 @@ export const sendInviteToGroup = async (users: IUser[]) => {
             creates_join_request: true,
         });
         for (const user of users) {
-            await bot.api.sendMessage(
-                user.userId,
-                MSG.inviteToGroup(inviteLink.invite_link)
-            );
+            const member = await bot.api.getChatMember(GROUP_ID, user.userId);
+            
+            if (member.status === 'member') {
+                await bot.api.sendMessage(
+                    user.userId,
+                    MSG.alreadyExistsInGroup
+                );
+            } else {
+                await bot.api.sendMessage(
+                    user.userId,
+                    MSG.inviteToGroup(inviteLink.invite_link)
+                );
+            }
         }
     } catch (err) {
         LOGGER.error(`[sendInviteToGroup] Failed to write to user.`, {

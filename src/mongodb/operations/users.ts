@@ -1,17 +1,16 @@
-import { BANKS, MSG, ROLES } from '../../constants';
+import { MSG, ROLES } from '../../constants';
 import { LOGGER } from '../../logger';
-import { IBank, PaymentDetailsModel } from '../schemas/payment';
 import { IUser, UserModel } from '../schemas/user';
 
 export const addUser = async ({
     userId,
-    username = '',
-    role = ROLES.Guest,
-    firstName = '',
-    subscription = null,
-    fullName = '',
-    approved = false,
-    notifications = false,
+    username,
+    role,
+    firstName,
+    subscription,
+    fullName,
+    approved,
+    notifications,
 }: Pick<
     IUser,
     | 'userId'

@@ -1,4 +1,4 @@
-import { BANKS, ROLES } from './index';
+import { BANKS } from './index';
 
 import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
@@ -15,7 +15,7 @@ export const MSG = {
     welcome: {
         notRegistered: `Привіт! Щоб продовжити, будь ласка, зареєструйся, вказавши своє ім'я та прізвище.`,
         noRoleAssigned: (user: ITGUser) =>
-            `Привіт, ${user.fullName}! Ваш запит на реєстрацію залишається на розгляді адміністратора. Зачекайте, будь ласка.`,
+            `${user.fullName}, ваш запит на реєстрацію залишається на розгляді адміністратора. Зачекайте, будь ласка.`,
         user: (user: ITGUser) =>
             `Привіт ${
                 user.first_name || user.fullName
@@ -43,6 +43,7 @@ export const MSG = {
         `Користувач "${user.fullName}" отримав доступ до групи.`,
     nowNewUsers: 'Наразі немає нових користувачів.',
     chooseUserToApprove: 'Виберіть користувачів яких хочете додати до групи.',
+    alreadyExistsInGroup: 'Ви уже маєте доступ до групи, тому просто скористайтеся командою\n/start.',
     inviteToGroup: (inviteLink: string) =>
         `Ваш запит схвалено!\nЧекаємо вас у нашій групі.\n${
             inviteLink ? inviteLink : ''
@@ -325,5 +326,6 @@ export const MSG = {
     inappropriateRole: 'Ваша роль не надає вам відповідних прав.',
     commandDisabled: 'На жаль, ця команда вам недоступна.',
     registerFirst: 'Щоб скористатися цією командою, спочатку зареєструйтеся.',
+    deactivateDAccount: 'Ваш акаунт деактивовано.',
     onMenuOutdated: 'Оновлено, спробуйте зараз.',
 };
