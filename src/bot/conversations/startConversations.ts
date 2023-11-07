@@ -24,7 +24,6 @@ const startConversation = async (
         async () => await getUserById(user.id)
     );
 
-
     // await ctx.reply(`Welcome ${user.first_name}, your id: ${user.id}`, {
     //     reply_markup: inlineKeyboard,
     // });

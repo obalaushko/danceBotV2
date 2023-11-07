@@ -27,7 +27,9 @@ export const showUserMenu = new Menu('showUserMenu', {
         const waitToApproveUsers = await getAllGuestUsers();
 
         ctx.menu.nav('backToMain');
-        await ctx.editMessageText(MSG.showUsers.waitToApprove(waitToApproveUsers));
+        await ctx.editMessageText(
+            MSG.showUsers.waitToApprove(waitToApproveUsers)
+        );
     })
     .text(MSG.buttons.showUsers.allUsers, async (ctx) => {
         const allUsers = await getAllUsers();

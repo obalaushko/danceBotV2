@@ -50,7 +50,7 @@ export const paymentDetailsConversations = async (
             if (messageText) {
                 const inputRegex = /^(privatbank|monobank)$/;
                 const match = inputRegex.exec(messageText);
-        
+
                 if (match) {
                     bankName = messageText;
                     isValidFormatBank = true;
@@ -78,7 +78,7 @@ export const paymentDetailsConversations = async (
             if (messageText) {
                 const inputRegex = /^(\d{16}|\d{4} \d{4} \d{4} \d{4})$/;
                 const match = inputRegex.exec(messageText);
-        
+
                 if (match) {
                     cardNumber = messageText.replace(/ /g, '');
                     isValidFormatCard = true;
@@ -89,7 +89,9 @@ export const paymentDetailsConversations = async (
         }
 
         if (isValidFormatBank && isValidFormatCard) {
-            LOGGER.info(`[paymentDetailsConversations] Bank & Card: ${bankName} ${cardNumber}`);
+            LOGGER.info(
+                `[paymentDetailsConversations] Bank & Card: ${bankName} ${cardNumber}`
+            );
         }
     }
 

@@ -58,8 +58,8 @@ export const userSchema: Schema = new Schema<IUser>({
     },
     inviteLink: {
         type: String,
-        default: null
-    }
+        default: null,
+    },
 });
 
 export const UserModel: Model<IUser> = model<IUser>('User', userSchema);

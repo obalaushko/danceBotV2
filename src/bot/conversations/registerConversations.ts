@@ -9,7 +9,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const ENVS = process.env;
-const ADMIN_ID = ENVS.ADMIN_ID || ''
+const ADMIN_ID = ENVS.ADMIN_ID || '';
 
 export const registerConversations = async (
     conversation: ConverstaionContext,

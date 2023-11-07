@@ -10,7 +10,7 @@ export const notificationsMenu = new Menu('notificationsMenu', {
             user: { id },
         } = await ctx.getAuthor();
 
-        const user = await getUserById(id)
+        const user = await getUserById(id);
 
         if (user?.notifications) return;
 
@@ -25,7 +25,7 @@ export const notificationsMenu = new Menu('notificationsMenu', {
             user: { id },
         } = await ctx.getAuthor();
 
-        const user = await getUserById(id)
+        const user = await getUserById(id);
 
         if (!user?.notifications) return;
 

@@ -55,25 +55,26 @@ activateSubscriptionMenu
                     )
                     .row();
             });
-            checkedActive.size && range.text(MSG.buttons.update, async (ctx) => {
-                const userIds = [...checkedActive];
+            checkedActive.size &&
+                range.text(MSG.buttons.update, async (ctx) => {
+                    const userIds = [...checkedActive];
 
-                const updateSubscriptions =
-                    await activateSubscriptions(userIds);
+                    const updateSubscriptions =
+                        await activateSubscriptions(userIds);
 
-                checkedActive.clear();
-                if (updateSubscriptions?.length) {
-                    LOGGER.info('[activateSubscriptions]', {
-                        metadata: updateSubscriptions,
-                    });
-                    ctx.menu.update();
-                } else {
-                    LOGGER.error('[activateSubscriptions]', {
-                        metadata: updateSubscriptions,
-                    });
-                    await ctx.reply(MSG.errors.failedToUpdate);
-                }
-            });
+                    checkedActive.clear();
+                    if (updateSubscriptions?.length) {
+                        LOGGER.info('[activateSubscriptions]', {
+                            metadata: updateSubscriptions,
+                        });
+                        ctx.menu.update();
+                    } else {
+                        LOGGER.error('[activateSubscriptions]', {
+                            metadata: updateSubscriptions,
+                        });
+                        await ctx.reply(MSG.errors.failedToUpdate);
+                    }
+                });
         }
 
         return range;
@@ -115,25 +116,26 @@ deactivateSubscriptionMenu
                     .row();
             });
 
-            checkedDeactive.size && range.text(MSG.buttons.update, async (ctx) => {
-                const userIds = [...checkedDeactive];
+            checkedDeactive.size &&
+                range.text(MSG.buttons.update, async (ctx) => {
+                    const userIds = [...checkedDeactive];
 
-                const updateSubscriptions =
-                    await deactivateSubscriptions(userIds);
+                    const updateSubscriptions =
+                        await deactivateSubscriptions(userIds);
 
-                checkedDeactive.clear();
-                if (updateSubscriptions?.length) {
-                    LOGGER.info('[deactivateSubscriptions]', {
-                        metadata: updateSubscriptions,
-                    });
-                    ctx.menu.update();
-                } else {
-                    LOGGER.error('[deactivateSubscriptions]', {
-                        metadata: updateSubscriptions,
-                    });
-                    await ctx.reply(MSG.errors.failedToUpdate);
-                }
-            });
+                    checkedDeactive.clear();
+                    if (updateSubscriptions?.length) {
+                        LOGGER.info('[deactivateSubscriptions]', {
+                            metadata: updateSubscriptions,
+                        });
+                        ctx.menu.update();
+                    } else {
+                        LOGGER.error('[deactivateSubscriptions]', {
+                            metadata: updateSubscriptions,
+                        });
+                        await ctx.reply(MSG.errors.failedToUpdate);
+                    }
+                });
         }
 
         return range;

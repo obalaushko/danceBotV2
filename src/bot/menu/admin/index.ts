@@ -32,12 +32,12 @@ export const adminMenu = new Menu('admin')
     })
     .text(MSG.buttons.admin.settings, async (ctx) => {
         ctx.menu.nav('settingsMenu');
-        await ctx.editMessageText(MSG.settings.main)
+        await ctx.editMessageText(MSG.settings.main);
     })
     .row()
     .text(MSG.buttons.admin.removeUser, async (ctx) => {
         ctx.menu.nav('removeUserMenu');
-        await ctx.editMessageText(MSG.remove.main)
+        await ctx.editMessageText(MSG.remove.main);
     });
 
 adminMenu.register(approveUserMenu);

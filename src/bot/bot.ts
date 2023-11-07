@@ -109,10 +109,7 @@ groupChat.on('chat_join_request', async (ctx) => {
         const revokeLink = async () => {
             try {
                 inviteLink &&
-                    (await ctx.api.revokeChatInviteLink(
-                        id,
-                        inviteLink
-                    ));
+                    (await ctx.api.revokeChatInviteLink(id, inviteLink));
                 if (user?.inviteLink) {
                     user.inviteLink = null;
                     await user.save();

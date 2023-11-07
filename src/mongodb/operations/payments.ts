@@ -77,7 +77,9 @@ export const createPaymentDetails = async ({
 
             return savedPaymentDetails;
         } else {
-            LOGGER.error(`[createPaymentDetails][error] User with id-${userId} dosn't exist`)
+            LOGGER.error(
+                `[createPaymentDetails][error] User with id-${userId} dosn't exist`
+            );
             return null;
         }
     } catch (error: any) {

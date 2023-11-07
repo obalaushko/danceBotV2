@@ -7,7 +7,7 @@ export interface IBank extends Document {
         banks: {
             name: (typeof BANKS)[keyof typeof BANKS];
             card: number;
-        }
+        },
     ];
 }
 
@@ -18,17 +18,17 @@ export const bankSchema: Schema = new Schema<IBank>({
     },
     details: [
         {
-          name: {
-            type: String,
-            enum: Object.values(BANKS),
-            required: true,
-          },
-          card: {
-            type: Number,
-            required: true,
-          },
+            name: {
+                type: String,
+                enum: Object.values(BANKS),
+                required: true,
+            },
+            card: {
+                type: Number,
+                required: true,
+            },
         },
-      ],
+    ],
 });
 
 export const PaymentDetailsModel: Model<IBank> = model<IBank>(

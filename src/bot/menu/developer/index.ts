@@ -18,10 +18,10 @@ export const developerMenu = new Menu('developer')
         await ctx.reply(MSG.welcome.user(user), {
             reply_markup: userMenu,
         });
-    })
-    // .text(MSG.buttons.developer.inactive, async (ctx) => {
-    //     await ctx.reply(MSG.deactivatedAccount);
-    // });
+    });
+// .text(MSG.buttons.developer.inactive, async (ctx) => {
+//     await ctx.reply(MSG.deactivatedAccount);
+// });
 
 developerMenu.register(userMenu);
 developerMenu.register(adminMenu);

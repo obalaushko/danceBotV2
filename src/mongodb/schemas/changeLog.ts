@@ -31,4 +31,3 @@ export const SubscriptionChangeLogModel: Model<IChangeLog> = model<IChangeLog>(
     'SubscriptionChangeLog',
     subscriptionChangeLogSchema
 );
-
