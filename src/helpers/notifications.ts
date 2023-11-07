@@ -5,7 +5,6 @@ import { getUserById } from '../mongodb/operations';
 import { MSG } from '../constants';
 
 import * as dotenv from 'dotenv';
-import { userMenu } from '../bot/menu';
 dotenv.config();
 
 const ENVS = process.env;
