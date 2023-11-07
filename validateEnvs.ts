@@ -1,12 +1,24 @@
 export const validateEnvs = (ENVS: NodeJS.ProcessEnv) => {
-    const ENV = ENVS.ENV;
+    const ENV = ENVS.NODE_ENV;
 
     if (!ENV) {
-        throw new Error('ENV is required');
+        throw new Error('NODE_ENV is required');
     }
 
-    if (!ENVS.BOT_TOKEN) {
-        throw new Error('BOT_TOKEN is required');
+    if (!ENVS.PRODUCTION_BOT_TOKEN) {
+        throw new Error('PRODUCTION_BOT_TOKEN is required');
+    }
+
+    if (!ENVS.DEVELOPMENT_BOT_TOKEN) {
+        throw new Error('DEVELOPMENT_BOT_TOKEN is required');
+    }
+
+    if (!ENVS.ADMIN_ID) {
+        throw new Error('ADMIN_ID is required');
+    }
+
+    if (!ENVS.GROUP_ID) {
+        throw new Error('GROUP_ID is required');
     }
 
     if (!ENVS.APPLICATION_NAME) {

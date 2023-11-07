@@ -16,13 +16,13 @@
         "lib": ["ES2022", "dom", "es6", "es5"],
         "types": [
             "node",
-            "@wdio/globals/types",
-            "@wdio/devtools-service",
+            // "@wdio/globals/types",
+            // "@wdio/devtools-service",
             "jest"
         ]
     },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules"],
+    "include": ["**/*.*"],
+    "exclude": ["node_modules", "dist"],
     "ts-node": {
         "esm": true,
         "experimentalSpecifierResolution": "node"

@@ -5,8 +5,8 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "start": "ts-node index.ts",
-        "dev": "nodemon --exec ts-node --esm ./index.ts",
+        "start": "NODE_ENV=production ts-node index.ts",
+        "dev": "NODE_ENV=development nodemon --exec ts-node --esm ./index.ts",
         "tsc": "tsc",
         "format:check": "prettier --check .",
         "format:write": "prettier --write .",
@@ -17,6 +17,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "@types/jest": "^29.5.5",
         "@types/node": "^20.8.4",
         "eslint": "^8.51.0",
         "eslint-config-prettier": "^9.0.0",
@@ -28,9 +29,11 @@
     },
     "dependencies": {
         "@grammyjs/conversations": "^1.1.2",
+        "@grammyjs/menu": "^1.2.1",
         "@grammyjs/parse-mode": "^1.8.1",
         "@grammyjs/ratelimiter": "^1.2.0",
         "@grammyjs/runner": "^2.0.3",
+        "@grammyjs/storage-mongodb": "^2.4.0",
         "@grammyjs/transformer-throttler": "^1.2.1",
         "dotenv": "^16.3.1",
         "grammy": "^1.19.1",
