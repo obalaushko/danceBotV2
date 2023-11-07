@@ -1,4 +1,4 @@
-import { BANKS } from './index';
+import { BANKS, ROLES } from './index';
 
 import { IBank } from '../mongodb/schemas/payment';
 import { IUser } from '../mongodb/schemas/user';
@@ -43,7 +43,8 @@ export const MSG = {
         `Користувач "${user.fullName}" отримав доступ до групи.`,
     nowNewUsers: 'Наразі немає нових користувачів.',
     chooseUserToApprove: 'Виберіть користувачів яких хочете додати до групи.',
-    alreadyExistsInGroup: 'Ви уже маєте доступ до групи, тому просто скористайтеся командою\n/start.',
+    alreadyExistsInGroup:
+        'Ваш запит схвалено і ви вже знаходитеся у відповідній телеграм групі.\nСкористайтеся командою /start.',
     inviteToGroup: (inviteLink: string) =>
         `Ваш запит схвалено!\nЧекаємо вас у нашій групі.\n${
             inviteLink ? inviteLink : ''
@@ -230,10 +231,10 @@ export const MSG = {
                 const date = user.subscription?.dataExpired!;
                 const lessons =
                     user.subscription?.usedLessons === 0
-                        ? 'ви ще не використали жодного заняття'
+                        ? 'ви ще не використали жодного заняття.'
                         : `залишилося ${remainedLessons} ${pluralizeWord(
                               remainedLessons
-                          )}`;
+                          )}.`;
                 result = `${
                     user.fullName
                 }, ваш 🎫 абонемент налічує <b>${totalLessons}</b> ${pluralizeWord(
@@ -271,6 +272,7 @@ export const MSG = {
                 '🔔 Термін дії вашого абонементу закінчився, поспішайте його оновити.',
         },
     },
+    developer: {},
     buttons: {
         admin: {
             approveUser: '📝 Запити',
@@ -306,6 +308,12 @@ export const MSG = {
             notificationActivate: '🔔 Увімкнути',
             notificationDisabled: '🔕 Вимкнути',
         },
+        developer: {
+            admin: ROLES.Admin.toUpperCase(),
+            user: ROLES.User.toUpperCase(),
+            guest: ROLES.Guest.toUpperCase(),
+            inactive: ROLES.Inactive.toUpperCase(),
+        },
         backToMain: 'До головного меню',
         back: '<< Назад',
         approve: '✅ Прийняти',
@@ -326,6 +334,7 @@ export const MSG = {
     inappropriateRole: 'Ваша роль не надає вам відповідних прав.',
     commandDisabled: 'На жаль, ця команда вам недоступна.',
     registerFirst: 'Щоб скористатися цією командою, спочатку зареєструйтеся.',
-    deactivateDAccount: 'Ваш акаунт деактивовано.',
+    deactivatedAccount: 'Ваш акаунт деактивовано.',
     onMenuOutdated: 'Оновлено, спробуйте зараз.',
+    tooManyRequest: 'Будь ласка, не надсилайте занадто багато запитів!',
 };

@@ -20,8 +20,8 @@ import {
 import { getUserById } from '../mongodb/operations';
 import { MSG, ROLES } from '../constants';
 import { isObjectEmpty } from '../utils/utils';
-import { adminMenu, userMenu } from './menu';
-import { dailyCheck, handleChatJoinRequest } from '../helpers';
+import { adminMenu, developerMenu, userMenu } from './menu';
+import { dailyCheck } from '../helpers';
 
 dotenv.config();
 
@@ -67,7 +67,7 @@ bot.use(
 
         // This is called when the limit is exceeded.
         onLimitExceeded: async (ctx) => {
-            await ctx.reply('Please refrain from sending too many requests!');
+            await ctx.reply(MSG.tooManyRequest);
         },
 
         // Note that the key should be a number in string format such as "123456789".
@@ -79,24 +79,84 @@ bot.use(
 
 bot.use(adminMenu);
 bot.use(userMenu);
+bot.use(developerMenu);
 
 //Inject conversations
 bot.use(conversations());
 bot.use(createConversation(registerConversations));
 bot.use(createConversation(guestConversations));
-// bot.use(createConversation(userConversations));
 // bot.use(createConversation(paymentDetailsConversations));
-// bot.use(createConversation(developerConversations));
 bot.use(createConversation(changeNameConversations));
 
 dailyCheck();
 
 const privateChat = bot.chatType('private');
-const groupChat = bot.chatType('group');
-const superGroupChat = bot.chatType('supergroup');
+const groupChat = bot.chatType(['group', 'supergroup']);
 
-groupChat.on('chat_join_request', handleChatJoinRequest);
-superGroupChat.on('chat_join_request', handleChatJoinRequest);
+groupChat.on('chat_join_request', async (ctx) => {
+    try {
+        const {
+            user_chat_id,
+            from,
+            invite_link,
+            chat: { id },
+        } = ctx.chatJoinRequest;
+
+        const inviteLink = invite_link?.invite_link;
+
+        const user = await getUserById(user_chat_id);
+
+        const revokeLink = async () => {
+            try {
+                inviteLink &&
+                    (await ctx.api.revokeChatInviteLink(
+                        id,
+                        inviteLink
+                    ));
+                if (user?.inviteLink) {
+                    user.inviteLink = null;
+                    await user.save();
+                }
+            } catch (err) {
+                LOGGER.error('[revokeChatInviteLink]', { metadata: err });
+            }
+        };
+
+        if (user?.approved && user.inviteLink === inviteLink) {
+            const approved = await ctx.approveChatJoinRequest(user_chat_id);
+            LOGGER.info('[approveChatJoinRequest] Approve user', {
+                metadata: user,
+            });
+
+            if (approved) {
+                LOGGER.info('[userDialogue]', { metadata: user });
+                await ctx.api.sendMessage(user.userId, MSG.welcome.user(user), {
+                    reply_markup: userMenu,
+                });
+
+                // Revoke
+                revokeLink();
+            } else {
+                LOGGER.error(
+                    '[approveChatJoinRequest] Something wrong with approve user',
+                    {
+                        metadata: ctx.chatJoinRequest,
+                    }
+                );
+            }
+        } else {
+            await ctx.declineChatJoinRequest(user_chat_id);
+            LOGGER.error('[declineChatJoinRequest] Decline user', {
+                metadata: from,
+            });
+
+            // Revoke
+            revokeLink();
+        }
+    } catch (err) {
+        LOGGER.error('[chat_join_request]', { metadata: err });
+    }
+});
 
 //START COMMAND
 privateChat.command('start', async (ctx) => {
@@ -120,9 +180,12 @@ privateChat.command('start', async (ctx) => {
             reply_markup: adminMenu,
         });
     } else if (userExists?.role === ROLES.Developer) {
-        await ctx.conversation.enter('developerConversations');
+        LOGGER.info('[developerDialogue]', { metadata: user });
+        await ctx.reply(MSG.welcome.developer(user), {
+            reply_markup: developerMenu,
+        });
     } else if (userExists?.role == ROLES.Inactive) {
-        await ctx.reply(MSG.deactivateDAccount);
+        await ctx.reply(MSG.deactivatedAccount);
     }
 });
 

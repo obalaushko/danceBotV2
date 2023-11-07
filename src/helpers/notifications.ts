@@ -27,21 +27,28 @@ export const sendUserNotification = async (userId: number, message: string) => {
 
 export const sendInviteToGroup = async (users: IUser[]) => {
     try {
-        const inviteLink = await bot.api.createChatInviteLink(GROUP_ID, {
-            creates_join_request: true,
-        });
         for (const user of users) {
             const member = await bot.api.getChatMember(GROUP_ID, user.userId);
-            
+
             if (member.status === 'member') {
                 await bot.api.sendMessage(
                     user.userId,
                     MSG.alreadyExistsInGroup
                 );
             } else {
+                const { invite_link } = await bot.api.createChatInviteLink(
+                    GROUP_ID,
+                    {
+                        creates_join_request: true,
+                    }
+                );
+
+                user.inviteLink = invite_link;
+                await user.save();
+
                 await bot.api.sendMessage(
                     user.userId,
-                    MSG.inviteToGroup(inviteLink.invite_link)
+                    MSG.inviteToGroup(invite_link)
                 );
             }
         }

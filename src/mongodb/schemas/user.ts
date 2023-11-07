@@ -12,7 +12,8 @@ export interface IUser extends Document {
     fullName?: string;
     approved?: boolean;
     notifications?: boolean;
-    paymentDetails?: IBank | null
+    paymentDetails?: IBank | null;
+    inviteLink?: string | null;
 }
 
 export const userSchema: Schema = new Schema<IUser>({
@@ -53,7 +54,11 @@ export const userSchema: Schema = new Schema<IUser>({
     },
     paymentDetails: {
         type: SchemaTypes.ObjectId,
-        ref: 'PaymentDetails'
+        ref: 'PaymentDetails',
+    },
+    inviteLink: {
+        type: String,
+        default: null
     }
 });
 
