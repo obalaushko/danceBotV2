@@ -1,3 +1,3 @@
-export { BANKS, ROLES, BOT_RIGHTS } from './global';
+export { BANKS, ROLES, BOT_RIGHTS } from './global.js';
 
-export { MSG } from './messages';
+export { MSG } from './messages.js';

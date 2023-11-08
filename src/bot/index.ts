@@ -1,5 +1,5 @@
 import { run } from '@grammyjs/runner';
-import { bot } from './bot';
+import { bot } from './bot.js';
 
 const runBot = () => {
     if (!bot.isInited()) {

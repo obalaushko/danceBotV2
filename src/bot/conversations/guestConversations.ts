@@ -1,7 +1,7 @@
-import { BotContext, ConverstaionContext } from '../types';
+import { BotContext, ConverstaionContext } from '../types/index.js';
 
-import { LOGGER } from '../../logger';
-import { MSG } from '../../constants';
+import { LOGGER } from '../../logger/index.js';
+import { MSG } from '../../constants/index.js';
 
 export const guestConversations = async (
     conversation: ConverstaionContext,

@@ -1,6 +1,6 @@
 import { Menu, MenuRange } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { LOGGER } from '../../../logger';
+import { MSG } from '../../../constants/index.js';
+import { LOGGER } from '../../../logger/index.js';
 import {
     deactivateSubscriptions,
     deleteSubscription,
@@ -9,7 +9,7 @@ import {
     getAllCanBeSetIncactiveUsers,
     getUsersByUserIds,
     updateUsersToInactive,
-} from '../../../mongodb/operations';
+} from '../../../mongodb/operations/index.js';
 
 const checkedInactive = new Set<number>();
 

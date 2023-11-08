@@ -1,2 +1,2 @@
-export { dailyCheck } from './subscriptions';
-export { sendUserNotification, sendInviteToGroup } from './notifications';
+export { dailyCheck } from './subscriptions.js';
+export { sendUserNotification, sendInviteToGroup } from './notifications.js';

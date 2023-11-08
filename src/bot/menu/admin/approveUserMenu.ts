@@ -1,8 +1,11 @@
 import { Menu, MenuRange } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { approveUsers, getAllGuestUsers } from '../../../mongodb/operations';
-import { LOGGER } from '../../../logger';
-import { sendInviteToGroup } from '../../../helpers';
+import { MSG } from '../../../constants/index.js';
+import {
+    approveUsers,
+    getAllGuestUsers,
+} from '../../../mongodb/operations/index.js';
+import { LOGGER } from '../../../logger/index.js';
+import { sendInviteToGroup } from '../../../helpers/index.js';
 
 const checked = new Set<number>();
 

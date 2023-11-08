@@ -1,8 +1,8 @@
-import { IUser } from './../mongodb/schemas/user';
-import { bot } from '../bot/bot';
-import { LOGGER } from '../logger';
-import { getUserById } from '../mongodb/operations';
-import { MSG } from '../constants';
+import { IUser } from './../mongodb/schemas/user.js';
+import { bot } from '../bot/bot.js';
+import { LOGGER } from '../logger/index.js';
+import { getUserById } from '../mongodb/operations/index.js';
+import { MSG } from '../constants/index.js';
 
 import * as dotenv from 'dotenv';
 dotenv.config();

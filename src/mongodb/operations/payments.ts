@@ -1,7 +1,3 @@
-import { LOGGER } from '../../logger';
-import { IBank, PaymentDetailsModel } from '../schemas/payment';
-import { getUserById, getUserWithPaymentDetails } from './users';
-
 // export const checkPaymentDetails = async ({
 //     userId,
 //     bank,
@@ -9,6 +5,10 @@ import { getUserById, getUserWithPaymentDetails } from './users';
 // }: Pick<IBank, 'userId' | 'bank' | 'card'>): Promise<IBank | null> => {
 //     try {
 //         const userWithPayment = await getUserWithPaymentDetails(userId);
+
+import { LOGGER } from '../../logger/index.js';
+import { IBank, PaymentDetailsModel } from '../schemas/payment.js';
+import { getUserById, getUserWithPaymentDetails } from './users.js';
 
 //         if (!userWithPayment?.paymentDetails) {
 //             const user = await UserModel.findOne({ userId });

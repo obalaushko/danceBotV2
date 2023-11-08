@@ -1,7 +1,7 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { userMenu } from '../user';
-import { adminMenu } from '../admin';
+import { MSG } from '../../../constants/index.js';
+import { userMenu } from '../user/index.js';
+import { adminMenu } from '../admin/index.js';
 
 export const developerMenu = new Menu('developer')
     .text(MSG.buttons.developer.admin, async (ctx) => {

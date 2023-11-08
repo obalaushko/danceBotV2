@@ -1,7 +1,7 @@
 import { Document, Schema, Model, model, Types } from 'mongoose';
-import { logSubscriptionChange } from '../operations';
-import { MSG } from '../../constants';
-import { sendUserNotification } from '../../helpers';
+import { logSubscriptionChange } from '../operations/changeLog.js';
+import { sendUserNotification } from '../../helpers/notifications.js';
+import { MSG } from '../../constants/messages.js';
 
 export interface ISubscription extends Document {
     userId: number;

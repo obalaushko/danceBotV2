@@ -1,3 +1,3 @@
-export { adminMenu } from './admin';
-export { userMenu } from './user';
-export { developerMenu } from './developer';
+export { adminMenu } from './admin/index.js';
+export { userMenu } from './user/index.js';
+export { developerMenu } from './developer/index.js';

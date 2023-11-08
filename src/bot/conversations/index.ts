@@ -1,6 +1,4 @@
-export { changeNameConversations } from './changeNameConversations';
-export { registerConversations } from './registerConversations';
-export { adminConversations } from './adminConversations';
-export { guestConversations } from './guestConversations';
-export { startConversation } from './startConversations';
-export { paymentDetailsConversations } from './paymentDetailsConversations';
+export { changeNameConversations } from './changeNameConversations.js';
+export { registerConversations } from './registerConversations.js';
+export { guestConversations } from './guestConversations.js';
+export { paymentDetailsConversations } from './paymentDetailsConversations.js';

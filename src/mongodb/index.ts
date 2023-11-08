@@ -1,1 +1,1 @@
-export { connectDb } from './connectDb';
+export { connectDb } from './connectDb.js';

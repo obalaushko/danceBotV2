@@ -1,8 +1,8 @@
 import { BANKS, ROLES } from './index';
 
-import { IBank } from '../mongodb/schemas/payment';
-import { IUser } from '../mongodb/schemas/user';
-import { convertDate, pluralizeWord } from '../utils/utils';
+import { IBank } from '../mongodb/schemas/payment.js';
+import { IUser } from '../mongodb/schemas/user.js';
+import { convertDate, pluralizeWord } from '../utils/utils.js';
 
 interface ITGUser {
     first_name?: string;

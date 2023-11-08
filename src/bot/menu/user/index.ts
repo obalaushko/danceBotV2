@@ -1,12 +1,12 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { backToUserMain } from './backToMainMenu';
+import { MSG } from '../../../constants/index.js';
+import { backToUserMain } from './backToMainMenu.js';
 import {
     getUserById,
     getUserWithSubscriptionById,
-} from '../../../mongodb/operations';
-import { notificationsMenu } from './notificationsMenu';
-import { LOGGER } from '../../../logger';
+} from '../../../mongodb/operations/index.js';
+import { notificationsMenu } from './notificationsMenu.js';
+import { LOGGER } from '../../../logger/index.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {

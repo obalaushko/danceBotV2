@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
-import { LOGGER } from '../../logger';
-import { SubscriptionChangeLogModel } from '../schemas/changeLog';
+import { LOGGER } from '../../logger/index.js';
+import { SubscriptionChangeLogModel } from '../schemas/changeLog.js';
 
 export const logSubscriptionChange = async (
     userId: number,

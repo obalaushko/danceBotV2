@@ -1,11 +1,11 @@
-import { MSG } from '../constants';
-import { LOGGER } from '../logger';
+import { MSG } from '../constants/index.js';
+import { LOGGER } from '../logger/index.js';
 import {
     ISubscription,
     SubscriptionModel,
-} from '../mongodb/schemas/subscription';
-import { IUser, UserModel } from '../mongodb/schemas/user';
-import { sendUserNotification } from './notifications';
+} from '../mongodb/schemas/subscription.js';
+import { IUser, UserModel } from '../mongodb/schemas/user.js';
+import { sendUserNotification } from './notifications.js';
 
 export const dailyCheck = () => {
     // Function for checking and deactivating subscriptions

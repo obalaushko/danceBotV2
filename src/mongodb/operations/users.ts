@@ -1,6 +1,7 @@
-import { MSG, ROLES } from '../../constants';
-import { LOGGER } from '../../logger';
-import { IUser, UserModel } from '../schemas/user';
+import { ROLES } from '../../constants/global.js';
+import { MSG } from '../../constants/messages.js';
+import { LOGGER } from '../../logger/index.js';
+import { IUser, UserModel } from '../schemas/user.js';
 
 export const addUser = async ({
     userId,
