@@ -1,9 +1,8 @@
-import * as dotenv from 'dotenv';
-
+import { connectDb } from './mongodb/connectDb.js';
 import { validateEnvs } from './validateEnvs.js';
 import { runBot } from './bot/index.js';
-import { connectDb } from './mongodb/connectDb.js';
 import { LOGGER } from './logger/index.js';
+import * as dotenv from 'dotenv';
 
 dotenv.config();
 
