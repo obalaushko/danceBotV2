@@ -1,4 +1,4 @@
-import { BANKS, ROLES } from './index';
+import { BANKS, ROLES } from './index.js';
 
 import { IBank } from '../mongodb/schemas/payment.js';
 import { IUser } from '../mongodb/schemas/user.js';

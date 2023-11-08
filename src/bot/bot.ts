@@ -15,7 +15,7 @@ import {
     changeNameConversations,
     guestConversations,
     registerConversations,
-} from './conversations';
+} from './conversations/index.js';
 import { getUserById } from '../mongodb/operations/index.js';
 import { BOT_RIGHTS, MSG, ROLES } from '../constants/index.js';
 import { isObjectEmpty } from '../utils/utils.js';
