@@ -1,7 +1,7 @@
 import { Document, Schema, Model, model, SchemaTypes } from 'mongoose';
-import { ROLES } from '../../constants';
-import { ISubscription } from './subscription';
-import { IBank } from './payment';
+import { ROLES } from '../../constants/global.js';
+import { ISubscription } from './subscription.js';
+import { IBank } from './payment.js';
 
 export interface IUser extends Document {
     userId: number;

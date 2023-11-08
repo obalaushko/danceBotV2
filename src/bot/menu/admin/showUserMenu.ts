@@ -1,12 +1,12 @@
+import { Menu } from '@grammyjs/menu';
+import { MSG } from '../../../constants/index.js';
+import { backToMain } from './backToMainMenu.js';
 import {
     getAllActiveUserUsers,
     getAllDeactiveUserUsers,
     getAllGuestUsers,
     getAllUsers,
-} from './../../../mongodb/operations/users';
-import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { backToMain } from './backToMainMenu';
+} from '../../../mongodb/operations/users.js';
 
 export const showUserMenu = new Menu('showUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,

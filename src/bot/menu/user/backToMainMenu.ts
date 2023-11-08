@@ -1,5 +1,5 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
+import { MSG } from '../../../constants/index.js';
 
 export const backToUserMain = new Menu('backToUserMain', {
     onMenuOutdated: MSG.onMenuOutdated,

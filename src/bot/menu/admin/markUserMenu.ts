@@ -1,10 +1,10 @@
 import { Menu, MenuRange } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
+import { MSG } from '../../../constants/index.js';
 import {
     getAllActiveUserUsers,
     markLessonAsUsed,
-} from '../../../mongodb/operations';
-import { LOGGER } from '../../../logger';
+} from '../../../mongodb/operations/index.js';
+import { LOGGER } from '../../../logger/index.js';
 
 export const markUserMenu = new Menu('markUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,

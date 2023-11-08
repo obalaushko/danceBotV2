@@ -1,12 +1,12 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { approveUserMenu } from './approveUserMenu';
-import { markUserMenu } from './markUserMenu';
-import { updateSubscriptionMenu } from './updateSubscriptionMenu';
-import { showUserMenu } from './showUserMenu';
-import { updatePaymentDetailsMenu } from './updatePaymentDetailsMenu';
-import { settingsMenu } from './settingsMenu';
-import { removeUserMenu } from './removeUserMenu';
+import { MSG } from '../../../constants/index.js';
+import { approveUserMenu } from './approveUserMenu.js';
+import { markUserMenu } from './markUserMenu.js';
+import { updateSubscriptionMenu } from './updateSubscriptionMenu.js';
+import { showUserMenu } from './showUserMenu.js';
+import { updatePaymentDetailsMenu } from './updatePaymentDetailsMenu.js';
+import { settingsMenu } from './settingsMenu.js';
+import { removeUserMenu } from './removeUserMenu.js';
 
 export const adminMenu = new Menu('admin')
     .text(MSG.buttons.admin.approveUser, async (ctx) => {

@@ -1,5 +1,5 @@
-import { LOGGER } from '../../logger';
-import { ISubscription, SubscriptionModel } from '../schemas/subscription';
+import { LOGGER } from '../../logger/index.js';
+import { ISubscription, SubscriptionModel } from '../schemas/subscription.js';
 
 export const addSubscription = async ({
     userId,

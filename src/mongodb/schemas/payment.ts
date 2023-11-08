@@ -1,5 +1,5 @@
 import { Document, Model, Schema, model } from 'mongoose';
-import { BANKS } from '../../constants';
+import { BANKS } from '../../constants/global.js';
 
 export interface IBank extends Document {
     userId: number;

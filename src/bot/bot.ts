@@ -1,4 +1,3 @@
-import { BOT_RIGHTS } from './../constants/global';
 import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
@@ -6,22 +5,22 @@ import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
-import { BotContext } from './types';
-import { COMMANDS } from './commands';
+import { BotContext } from './types/index.js';
+import { COMMANDS } from './commands/index.js';
 import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
-import { LOGGER } from '../logger';
+import { LOGGER } from '../logger/index.js';
 import {
     changeNameConversations,
     guestConversations,
     registerConversations,
 } from './conversations';
-import { getUserById } from '../mongodb/operations';
-import { MSG, ROLES } from '../constants';
-import { isObjectEmpty } from '../utils/utils';
-import { adminMenu, developerMenu, userMenu } from './menu';
-import { dailyCheck } from '../helpers';
+import { getUserById } from '../mongodb/operations/index.js';
+import { BOT_RIGHTS, MSG, ROLES } from '../constants/index.js';
+import { isObjectEmpty } from '../utils/utils.js';
+import { adminMenu, developerMenu, userMenu } from './menu/index.js';
+import { dailyCheck } from '../helpers/index.js';
 
 dotenv.config();
 

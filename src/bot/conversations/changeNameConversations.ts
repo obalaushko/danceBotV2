@@ -1,9 +1,9 @@
-import { BotContext, ConverstaionContext } from '../types';
+import { BotContext, ConverstaionContext } from '../types/index.js';
 
-import { LOGGER } from '../../logger';
-import { MSG } from '../../constants';
-import { updateUserById } from '../../mongodb/operations';
-import { isCancel } from '../../utils/utils';
+import { LOGGER } from '../../logger/index.js';
+import { MSG } from '../../constants/index.js';
+import { updateUserById } from '../../mongodb/operations/index.js';
+import { isCancel } from '../../utils/utils.js';
 
 export const changeNameConversations = async (
     conversation: ConverstaionContext,

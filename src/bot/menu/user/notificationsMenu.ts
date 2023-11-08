@@ -1,6 +1,9 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants';
-import { getUserById, updateUserById } from '../../../mongodb/operations';
+import { MSG } from '../../../constants/index.js';
+import {
+    getUserById,
+    updateUserById,
+} from '../../../mongodb/operations/index.js';
 
 export const notificationsMenu = new Menu('notificationsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,

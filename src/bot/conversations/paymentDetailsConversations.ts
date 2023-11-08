@@ -1,11 +1,8 @@
-import { MSG } from '../../constants';
-import { LOGGER } from '../../logger';
-import {
-    createPaymentDetails,
-    getPaymentDetailsExist,
-} from '../../mongodb/operations';
-import { isCancel } from '../../utils/utils';
-import { BotContext, ConverstaionContext } from '../types';
+import { MSG } from '../../constants/index.js';
+import { LOGGER } from '../../logger/index.js';
+import { getPaymentDetailsExist } from '../../mongodb/operations/index.js';
+import { isCancel } from '../../utils/utils.js';
+import { BotContext, ConverstaionContext } from '../types/index.js';
 
 export const paymentDetailsConversations = async (
     conversation: ConverstaionContext,

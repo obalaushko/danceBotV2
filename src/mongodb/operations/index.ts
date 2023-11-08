@@ -1,6 +1,6 @@
-export { createPaymentDetails, getPaymentDetailsExist } from './payments';
+export { createPaymentDetails, getPaymentDetailsExist } from './payments.js';
 
-export { logSubscriptionChange } from './changeLog';
+export { logSubscriptionChange } from './changeLog.js';
 
 export {
     addUser,
@@ -19,7 +19,7 @@ export {
     deleteUsers,
     getUsersByUserIds,
     getUserWithSubscriptionById,
-} from './users';
+} from './users.js';
 export {
     addSubscription,
     activateSubscriptions,
@@ -27,4 +27,4 @@ export {
     getSubscriptionById,
     markLessonAsUsed,
     deleteSubscription,
-} from './subscriptions';
+} from './subscriptions.js';

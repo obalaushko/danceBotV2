@@ -1,1 +1,1 @@
-export { logger as LOGGER } from './winston';
+export { logger as LOGGER } from './winston.js';
