@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "start": "NODE_ENV=production node ./dist/index.js",
-        "dev": "NODE_ENV=development nodemon --exec ts-node --esm ./index.ts",
+        "dev": "NODE_ENV=development nodemon --exec node --loader ts-node/esm ./src/index.ts",
         "build": "rm -rf ./dist && tsc",
         "format:check": "prettier --check .",
         "format:write": "prettier --write .",
