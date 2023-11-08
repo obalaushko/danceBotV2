@@ -20,11 +20,7 @@
             // "@wdio/globals/types",
             // "@wdio/devtools-service",
             "jest"
-        ],
-        "baseUrl": "./dist",
-        "paths": {
-            "*": ["*"]
-        }
+        ]
     },
     "include": ["**/*.*"],
     "exclude": ["node_modules", "dist"],
