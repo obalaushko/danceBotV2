@@ -44,7 +44,7 @@ const logger = createLogger({
 
 if (mode === 'production') {
     try {
-        logger.add(new LogtailTransport(logtail));
+        logger.add(new LogtailTransport(logtail)); // https://logs.betterstack.com/team/218160/tail
     } catch (err) {
         console.error(err);
     }
