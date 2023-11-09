@@ -12,6 +12,7 @@
         "skipLibCheck": true,
         "allowSyntheticDefaultImports": true,
         "isolatedModules": true,
+        "declaration": true,
         "moduleResolution": "node",
         "lib": ["ES2022", "dom", "es6", "es5"],
         "types": [
