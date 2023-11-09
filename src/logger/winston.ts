@@ -5,7 +5,12 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 // const LOGGER_BOT_TOKEN = process.env.LOGGER_BOT_TOKEN || '';
-// const mode = process.env.NODE_ENV || 'development';
+const mode = process.env.NODE_ENV || 'development';
+
+import { Logtail } from '@logtail/node';
+import { LogtailTransport } from '@logtail/winston';
+
+const logtail = new Logtail('zKUX6WT9BKeWu5vUsd5WUU4s');
 
 const { combine, timestamp, json, errors } = format;
 const errorsFormat = errors({ stack: true });
@@ -31,19 +36,19 @@ const errorsFormat = errors({ stack: true });
 const logger = createLogger({
     transports: [
         new transports.File({
-            level: 'info',
-            filename: 'info.log',
-        }),
-        new transports.File({
             level: 'error',
             filename: 'app-error.log',
         }),
     ],
 });
 
-// if (mode === 'production') {
-//     logger.add(telegramTransport);
-// }
+if (mode === 'production') {
+    try {
+        logger.add(new LogtailTransport(logtail));
+    } catch (err) {
+        console.error(err);
+    }
+}
 
 logger.add(
     new transports.Console({
