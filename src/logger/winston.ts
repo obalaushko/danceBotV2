@@ -12,7 +12,7 @@ const errorsFormat = errors({ stack: true });
 
 const telegramTransport = new TelegramLogger({
     token: LOGGER_BOT_TOKEN,
-    chatId: -4089006461,
+    chatId: -4022952026,
     disableNotification: true,
     batchingDelay: 1000,
     parseMode: 'HTML',
