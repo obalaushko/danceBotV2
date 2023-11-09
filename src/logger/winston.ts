@@ -12,7 +12,7 @@ const errorsFormat = errors({ stack: true });
 
 const telegramTransport = new TelegramLogger({
     token: LOGGER_BOT_TOKEN,
-    chatId: -4022952026,
+    chatId: -4022952026, //https://api.telegram.org/<BOT_TOKEN>/getUpdates
     disableNotification: true,
     batchingDelay: 1000,
     parseMode: 'HTML',
@@ -30,9 +30,9 @@ const telegramTransport = new TelegramLogger({
 
 const logger = createLogger();
 
-if (mode === 'production') {
-    logger.add(telegramTransport);
-}
+// if (mode === 'production') {
+//     logger.add(telegramTransport);
+// }
 
 logger.add(
     new transports.Console({
