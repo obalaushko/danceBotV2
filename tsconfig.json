@@ -2,7 +2,7 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
-		"outDir": "./dist",
+        "outDir": "./dist",
         "resolveJsonModule": true,
         "allowJs": true,
         "esModuleInterop": true,
@@ -16,10 +16,9 @@
         "moduleResolution": "node",
         "lib": ["ES2022", "dom", "es6", "es5"],
         "types": [
-            "node",
+            "node"
             // "@wdio/globals/types",
             // "@wdio/devtools-service",
-            "jest"
         ]
     },
     "include": ["src/**/*"],
