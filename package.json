@@ -20,7 +20,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "@types/jest": "^29.5.5",
+        "@types/jest": "^29.5.8",
         "@types/node": "^20.8.4",
         "eslint": "^8.51.0",
         "eslint-config-prettier": "^9.0.0",
