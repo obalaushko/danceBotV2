@@ -30,9 +30,9 @@ const telegramTransport = new TelegramLogger({
 
 const logger = createLogger();
 
-// if (mode === 'production') {
-//     logger.add(telegramTransport);
-// }
+if (mode === 'production') {
+    logger.add(telegramTransport);
+}
 
 logger.add(
     new transports.Console({
