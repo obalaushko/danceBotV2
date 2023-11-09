@@ -28,7 +28,18 @@ const errorsFormat = errors({ stack: true });
 //     },
 // });
 
-const logger = createLogger();
+const logger = createLogger({
+    transports: [
+        new transports.File({
+            level: 'info',
+            filename: 'info.log',
+        }),
+        new transports.File({
+            level: 'error',
+            filename: 'app-error.log',
+        }),
+    ],
+});
 
 // if (mode === 'production') {
 //     logger.add(telegramTransport);
