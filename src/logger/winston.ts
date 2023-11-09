@@ -30,13 +30,13 @@ const telegramTransport = new TelegramLogger({
 
 const logger = createLogger();
 
-if (mode === 'production') {
-    try {
-        logger.add(telegramTransport);
-    } catch (err) {
-        console.error(err)
-    }
-}
+// if (mode === 'production') {
+//     try {
+//         logger.add(telegramTransport);
+//     } catch (err) {
+//         console.error(err)
+//     }
+// }
 
 logger.add(
     new transports.Console({
