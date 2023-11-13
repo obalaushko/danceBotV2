@@ -43,7 +43,7 @@ activateSubscriptionMenu
                     .text(
                         {
                             text: checkedActive.has(user.userId)
-                                ? `${user.fullName!} ✔️`
+                                ? `✔️ ${user.fullName!}`
                                 : user.fullName!,
                             payload: user.userId.toString(),
                         },
@@ -103,7 +103,7 @@ deactivateSubscriptionMenu
                     .text(
                         {
                             text: checkedDeactive.has(user.userId)
-                                ? `${user.fullName!} ✔️`
+                                ? `✔️ ${user.fullName!}`
                                 : user.fullName!,
                             payload: user.userId.toString(),
                         },
