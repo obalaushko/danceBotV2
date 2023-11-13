@@ -23,12 +23,12 @@ approveUserMenu
 
         const range = new MenuRange();
         if (guestUsers?.length) {
-            guestUsers.map((user) => {
+            guestUsers.map((user, index) => {
                 range
                     .text(
                         {
                             text: checked.has(user.userId)
-                                ? `${user.fullName!} ✔️`
+                                ? `✔️ ${user.fullName!}`
                                 : user.fullName!,
                             payload: user.userId.toString(),
                         },

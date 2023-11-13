@@ -67,7 +67,7 @@ const inactiveMenu = new Menu('inactiveMenu', {
                 range.text(
                     {
                         text: checkedInactive.has(user.userId)
-                            ? `${user.fullName!} ✔️`
+                            ? `✔️ ${user.fullName!}`
                             : user.fullName!,
                         payload: user.userId.toString(),
                     },
@@ -133,7 +133,7 @@ const removeMenu = new Menu('removeMenu', {
                 range.text(
                     {
                         text: checkedRemove.has(user.userId)
-                            ? `${user.fullName!} ✔️`
+                            ? `✔️ ${user.fullName!}`
                             : user.fullName!,
                         payload: user.userId.toString(),
                     },
