@@ -2,7 +2,11 @@ import { BANKS, ROLES } from './index.js';
 
 import { IBank } from '../mongodb/schemas/payment.js';
 import { IUser } from '../mongodb/schemas/user.js';
-import { convertDate, pluralizeWord } from '../utils/utils.js';
+import {
+    capitalizeFirstLetter,
+    convertDate,
+    pluralizeWord,
+} from '../utils/utils.js';
 
 interface ITGUser {
     first_name?: string;
@@ -178,7 +182,34 @@ export const MSG = {
         wrongEnterCard: `Ведіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
     },
     settings: {
-        main: 'Забув що у цьому меню хотів зробити.',
+        main: 'Ви можете оновити дані учнів та деякі налаштування бота.\n\n❕ Деякі налаштування будуть виконані поза звичайним робочим процесом.',
+        users: 'Виберіть учня для оновлення.',
+        bot: 'Виберіть параметр який хочете змінити.',
+        setupUser: (user: IUser) => {
+            const {
+                userId,
+                fullName,
+                username,
+                subscription,
+                role,
+                approved,
+                notifications,
+                firstName,
+                inviteLink,
+            } = user;
+            return `Вам доступні тільки декілька значень для зміни!\nКористувач: <b>${fullName}</b>\n<code>userId: ${userId}\nusername: ${
+                username ? username : 'null'
+            }\nfirstName: ${firstName}\nrole: ${role}\napproved: ${approved}\nnotifications: ${notifications}\ninviteLink: ${inviteLink}\nsubscription: {\nactive: ${subscription?.active}\ntotalLessons: ${subscription?.totalLessons}\nusedLessons: ${subscription?.usedLessons}\nremainedLessons: ${subscription?.remainedLessons}\nfirstActivation: ${subscription?.firstActivation}\ndataExpired: ${subscription?.dataExpired}\n}</code>`;
+        },
+        setup: {
+            role: '⚠️ Не використовуйте цю функцію без необхідності.\n\nВиберіть нову роль для учня відмінну від існуючої.\n\nРоль <b>Admin</b> позбавить учня можливостей оновлювати абонемент, та зробить його адміністратором.\n\nРоль <b>Guest</b> позбавить учня можливості оновлювати абонемент, він залишиться у групі, але не матиме доступу до свого абонементу.\n\nРоль <b>Inactive</b> обмежує використання бота для користувача.\n\nРоль <b>User</b> дозволяє отримувати дані про абонемент, та бути учасником групи <i>(якщо запрошення отримано)</i>',
+            notifications: 'Активуйте або ж деактивуйте сповіщення для учня.',
+            totalLessons:
+                'Виберіть загальну кількість занять в абонементі для цього учня.\nЗа замовчуванням в абонементі 8 занять',
+            usedLessons:
+                'Змініть кількість використаних занять в абонементі для цього учня.\nЯкщо ви не хочете щоб юзер дізнався про ці зміни, тимчасово вимкніть сповіщення цьому учню.',
+            cancel: 'Операцію скасовано, щоб повернутися до головного меню скористайтеся командою /start.',
+        },
     },
     remove: {
         main: 'Ви можете видалити користувачів або призупити їхню взаємодію з ботом.',
@@ -296,10 +327,14 @@ export const MSG = {
         paymentDetails: {
             update: 'Оновити реквізити',
         },
-        settings: {},
+        settings: {
+            users: '💃 Учні',
+            bot: '🤖 Бот',
+        },
         removed: {
             inactive: '⚠️ Призупинити',
             remove: '❌ Видалити',
+            return: '↩️ Повернути',
         },
         user: {
             showSubscription: '🎫 Мій абонемент',
@@ -309,10 +344,10 @@ export const MSG = {
             notificationDisabled: '🔕 Вимкнути',
         },
         developer: {
-            admin: ROLES.Admin.toUpperCase(),
-            user: ROLES.User.toUpperCase(),
-            guest: ROLES.Guest.toUpperCase(),
-            inactive: ROLES.Inactive.toUpperCase(),
+            admin: capitalizeFirstLetter(ROLES.Admin),
+            user: capitalizeFirstLetter(ROLES.User),
+            guest: capitalizeFirstLetter(ROLES.Guest),
+            inactive: capitalizeFirstLetter(ROLES.Inactive),
         },
         backToMain: 'До головного меню',
         back: '<< Назад',

@@ -25,3 +25,7 @@ export const pluralizeWord = (number: number) => {
         return 'занять'; // Відмінюємо для інших чисел
     }
 };
+
+export const capitalizeFirstLetter = (text: string): string => {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+};

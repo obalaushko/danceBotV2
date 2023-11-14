@@ -5,8 +5,7 @@ import {
 } from '@grammyjs/conversations';
 
 interface SessionData {
-    itemLevel: string;
-    isDEGANft: boolean;
+    editedUserId: number | null;
 }
 export type SessionContext = Context & SessionFlavor<SessionData>;
 export type BotContext = SessionContext & ConversationFlavor;
