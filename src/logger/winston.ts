@@ -6,11 +6,12 @@ dotenv.config();
 
 // const LOGGER_BOT_TOKEN = process.env.LOGGER_BOT_TOKEN || '';
 const mode = process.env.NODE_ENV || 'development';
+const LOGTAIL_TOKEN = process.env.LOGTAIL_TOKEN || ''
 
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';
 
-const logtail = new Logtail('zKUX6WT9BKeWu5vUsd5WUU4s');
+const logtail = new Logtail(LOGTAIL_TOKEN);
 
 const { combine, timestamp, json, errors } = format;
 const errorsFormat = errors({ stack: true });

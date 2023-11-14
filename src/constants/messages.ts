@@ -240,12 +240,12 @@ export const MSG = {
         confirmRemoved: (users: IUser[] | null) => {
             let userList = `Ви впевнені що хочете видалити ${
                 users?.length === 1 ? 'цього користувача' : 'цих користувачів'
-            } назавжди. Ця дія невідворотна!\n`;
+            } назавжди?\n⚠️ Ця дія невідворотна!\n`;
 
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>\n`;
+                    userList += `Користувач: <b>${userFullName}</b>\n`;
                 });
 
             return userList;

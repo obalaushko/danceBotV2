@@ -16,6 +16,14 @@
         "lint:check": "eslint .",
         "lint:fix": "eslint --fix ."
     },
+    "_moduleAliases": {
+        "@utils": "./dist/utils",
+        "@mongodb": "./dist/mongodb",
+        "@logger": "./dist/logger",
+        "@helpers": "./dist/helpers",
+        "@constants": "./dist/constants",
+        "@bot": "./dist/bot"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC",
@@ -42,6 +50,7 @@
         "@logtail/winston": "^0.4.13",
         "dotenv": "^16.3.1",
         "grammy": "^1.19.1",
+        "module-alias": "^2.2.3",
         "mongoose": "^7.6.1",
         "typescript": "^5.2.2",
         "winston": "^3.11.0",
