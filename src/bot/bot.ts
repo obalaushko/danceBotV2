@@ -13,7 +13,6 @@ import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger/index.js';
 import {
     changeNameConversations,
-    guestConversations,
     registerConversations,
 } from './conversations/index.js';
 import { BOT_RIGHTS, MSG } from '../constants/index.js';
@@ -90,7 +89,6 @@ bot.use(developerMenu);
 //Inject conversations
 bot.use(conversations());
 bot.use(createConversation(registerConversations));
-bot.use(createConversation(guestConversations));
 // bot.use(createConversation(paymentDetailsConversations));
 bot.use(createConversation(changeNameConversations));
 

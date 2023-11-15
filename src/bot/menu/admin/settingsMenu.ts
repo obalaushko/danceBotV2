@@ -66,7 +66,7 @@ const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
         await ctx.editMessageText(MSG.welcome.admin(user));
     });
 // SubMenu
-settingUserMenu.register(setupUserMenu);
+settingUserMenu.register(setupUserMenu as any);
 
 // Bot menu
 const settingBotMenu = new Menu('settingBotMenu', {

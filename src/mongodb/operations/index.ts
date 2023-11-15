@@ -27,4 +27,5 @@ export {
     getSubscriptionById,
     markLessonAsUsed,
     deleteSubscription,
+    updateSubscriptionById,
 } from './subscriptions.js';

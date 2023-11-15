@@ -45,13 +45,33 @@ export const addSubscription = async ({
 };
 
 export const getSubscriptionById = async (
-    id: number
+    userId: number
 ): Promise<ISubscription | null> => {
     try {
-        const subscription = await SubscriptionModel.findOne({ userId: id });
+        const subscription = await SubscriptionModel.findOne({ userId });
         return subscription;
     } catch (error: any) {
         LOGGER.error('[getSubscriptionById][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const updateSubscriptionById = async (
+    userId: number,
+    update: Partial<ISubscription>
+): Promise<ISubscription | null> => {
+    try {
+        const subscription = await getSubscriptionById(userId);
+        if (subscription) {
+            Object.assign(subscription, update);
+            await subscription.save();
+            return subscription;
+        }
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[updateSubscriptionById][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;

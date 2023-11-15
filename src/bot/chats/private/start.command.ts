@@ -15,7 +15,8 @@ export const startCommand = () => {
         if (!userExists) {
             await ctx.conversation.enter('registerConversations');
         } else if (userExists?.role === ROLES.Guest) {
-            await ctx.conversation.enter('guestConversations');
+            LOGGER.info('[guestConversations]', { metadata: user });
+            await ctx.reply(MSG.waitAssigned);
         } else if (userExists?.role === ROLES.User) {
             LOGGER.info('[userDialogue]', { metadata: user });
             await ctx.reply(MSG.welcome.user(user), {
