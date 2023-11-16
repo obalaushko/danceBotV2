@@ -100,7 +100,6 @@ export const getGroupedSubscriptionChanges =
                 }
             }
 
-            console.log(groupedChanges);
             return groupedChanges;
         } catch (error: any) {
             LOGGER.error('[getGroupedSubscriptionChanges][error]', {
