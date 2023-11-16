@@ -1,6 +1,10 @@
 export { createPaymentDetails, getPaymentDetailsExist } from './payments.js';
 
-export { logSubscriptionChange } from './changeLog.js';
+export {
+    addLogSubscriptionChange,
+    getGroupedSubscriptionChangeLogs,
+    getGroupedSubscriptionChanges,
+} from './changeLog.js';
 
 export {
     addUser,

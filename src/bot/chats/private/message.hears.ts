@@ -225,14 +225,14 @@ export const messageHears = () => {
 
             switch (action) {
                 case 'Role':
-                    roleSwitch(ctx, message, userId);
+                    await roleSwitch(ctx, message, userId);
                     break;
                 case 'Notifications':
-                    notificationSwitch(ctx, message, userId);
+                    await notificationSwitch(ctx, message, userId);
                     break;
                 case 'TotalLessons':
                 case 'UsedLessons':
-                    lessonsSwitch(ctx, message, userId, action);
+                    await lessonsSwitch(ctx, message, userId, action);
                     break;
             }
 

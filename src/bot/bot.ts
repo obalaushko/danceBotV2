@@ -27,7 +27,6 @@ import {
     messageHears,
     startCommand,
 } from './chats/index.js';
-
 dotenv.config();
 
 //Env vars

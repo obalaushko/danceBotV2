@@ -7,6 +7,10 @@ import {
 } from '../../../mongodb/operations/users.js';
 import { setupUserMenu } from './userSetupMenu.js';
 import { SessionContext } from '../../types/index.js';
+import {
+    getGroupedSubscriptionChangeLogs,
+    getGroupedSubscriptionChanges,
+} from '../../../mongodb/operations/changeLog.js';
 
 // Users menu
 const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
@@ -15,7 +19,7 @@ const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
     .dynamic(async () => {
         try {
             const users = await getAllUsers();
-            
+
             const range = new MenuRange<SessionContext>();
             if (users?.length) {
                 users.map((user, index) => {
@@ -69,9 +73,19 @@ const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
 settingUserMenu.register(setupUserMenu as any);
 
 // Bot menu
-const settingBotMenu = new Menu('settingBotMenu', {
+const settingHistoryMenu = new Menu('settingHistoryMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
-});
+})
+    .row()
+    .text(MSG.buttons.back, async (ctx) => {
+        ctx.menu.back();
+        await ctx.editMessageText(MSG.settings.main);
+    })
+    .text(MSG.buttons.backToMain, async (ctx) => {
+        const { user } = await ctx.getAuthor();
+        ctx.menu.nav('admin');
+        await ctx.editMessageText(MSG.welcome.admin(user));
+    });
 
 // Main menu
 export const settingsMenu = new Menu('settingsMenu', {
@@ -81,9 +95,11 @@ export const settingsMenu = new Menu('settingsMenu', {
         ctx.menu.nav('settingUserMenu');
         await ctx.editMessageText(MSG.settings.users);
     })
-    .text(MSG.buttons.settings.bot, async (ctx) => {
-        ctx.menu.nav('settingBotMenu');
-        await ctx.editMessageText(MSG.settings.bot);
+    .text(MSG.buttons.settings.history, async (ctx) => {
+        const history = await getGroupedSubscriptionChanges();
+
+        ctx.menu.nav('settingHistoryMenu');
+        await ctx.editMessageText(MSG.settings.history(history));
     })
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
@@ -93,4 +109,4 @@ export const settingsMenu = new Menu('settingsMenu', {
     });
 
 settingsMenu.register(settingUserMenu as any);
-settingsMenu.register(settingBotMenu);
+settingsMenu.register(settingHistoryMenu);
