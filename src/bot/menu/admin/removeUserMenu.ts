@@ -10,6 +10,7 @@ import {
     getUsersByUserIds,
     updateUsersToInactive,
 } from '../../../mongodb/operations/index.js';
+import { removeUserFromGroup } from '../../../helpers/index.js';
 
 const checkedInactive = new Set<number>();
 
@@ -39,6 +40,7 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
             checkedRemove.clear();
 
             await deleteSubscription(userIds);
+            await removeUserFromGroup(userIds);
 
             ctx.menu.nav('admin');
             await ctx.editMessageText(MSG.welcome.admin(user));

@@ -4,6 +4,7 @@ export {
     addLogSubscriptionChange,
     getGroupedSubscriptionChangeLogs,
     getGroupedSubscriptionChanges,
+    deleteOldLogs,
 } from './changeLog.js';
 
 export {

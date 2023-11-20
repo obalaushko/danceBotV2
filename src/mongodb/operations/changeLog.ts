@@ -7,7 +7,6 @@ import {
 } from '../schemas/changeLog.js';
 import { getUserById } from './users.js';
 import moment from 'moment-timezone';
-import { FORMAT_DATE } from '../../constants/global.js';
 
 export const addLogSubscriptionChange = async (
     userId: number,
@@ -108,3 +107,17 @@ export const getGroupedSubscriptionChanges =
             return null;
         }
     };
+
+export const deleteOldLogs = async (): Promise<void> => {
+    try {
+        const threeMonthsAgo = moment().subtract(3, 'months').utc().format();
+
+        await SubscriptionChangeLogModel.deleteMany({
+            changeDate: { $lt: threeMonthsAgo },
+        });
+    } catch (error: any) {
+        LOGGER.error('[deleteOldLogs][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+    }
+};

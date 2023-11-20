@@ -44,7 +44,8 @@ const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
 //     out: outConfig,
 // });
 
-bot.api.setMyCommands(COMMANDS);
+bot.api.setMyCommands([], { scope: { type: 'all_group_chats' } });
+bot.api.setMyCommands(COMMANDS, { scope: { type: 'all_private_chats' } });
 bot.api.setMyDescription(MSG.myDescriptions);
 bot.api.setMyDefaultAdministratorRights({
     // https://core.telegram.org/bots/api#chatadministratorrights

@@ -188,7 +188,7 @@ export const MSG = {
         users: 'Виберіть учня для оновлення.',
         history: (history: GroupedChanges | null) => {
             let text =
-                'Історія відображає коли був активований чи деактивований абонемент, та відображає в які дні учень використовував його.\n\n⚠️ Дати відвідування можуть бути не точними, все залежить у який день вчитель відмітив учня.\n<i>Історія відображається приблизно за останні 3 місяці.</i>\n';
+                'Історія відображає коли був активований чи деактивований абонемент, та відображає в які дні учень використовував його.\n\n⚠️ Дати відвідування можуть бути не точними, все залежить у який день вчитель відмітив учня.\n<i>Історія відображається за останні 3 місяці.</i>\n';
 
             for (let date in history) {
                 text += `\n<b>Дата: ${date}</b>\n`;
@@ -255,7 +255,8 @@ export const MSG = {
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>, деактивовано.\n`;
+                    const userName = user.username;
+                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, деактивовано.\n`;
                 });
 
             return userList;
@@ -267,7 +268,8 @@ export const MSG = {
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>, видалено назавжди.\n`;
+                    const userName = user.username;
+                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, видалено назавжди.\n`;
                 });
 
             return userList;
@@ -280,7 +282,8 @@ export const MSG = {
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувач: <b>${userFullName}</b>\n`;
+                    const userName = user.username;
+                    userList += `Користувач: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}\n`;
                 });
 
             return userList;
