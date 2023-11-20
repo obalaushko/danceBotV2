@@ -1,5 +1,5 @@
 import { Document, Schema, Model, model, Types } from 'mongoose';
-import { logSubscriptionChange } from '../operations/changeLog.js';
+import { addLogSubscriptionChange } from '../operations/changeLog.js';
 import { sendUserNotification } from '../../helpers/notifications.js';
 import { MSG } from '../../constants/messages.js';
 
@@ -63,7 +63,7 @@ subscriptionSchema.methods.setChangeLog = async (
     subscriptionId: Types.ObjectId,
     changeType: string
 ) => {
-    await logSubscriptionChange(userId, subscriptionId, changeType);
+    await addLogSubscriptionChange(userId, subscriptionId, changeType);
 };
 
 subscriptionSchema.pre('save', function (next) {

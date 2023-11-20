@@ -7,6 +7,10 @@ export interface IChangeLog extends Document {
     changeDate: Date;
 }
 
+export interface GroupedChanges {
+    [date: string]: { fullName: string; changes: string[] }[];
+}
+
 const subscriptionChangeLogSchema = new Schema({
     userId: {
         type: Number,

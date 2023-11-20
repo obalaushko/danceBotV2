@@ -1,5 +1,5 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants/index.js';
+import { MSG, ROLES } from '../../../constants/index.js';
 import { backToMain } from './backToMainMenu.js';
 import {
     getAllActiveUserUsers,
@@ -32,10 +32,11 @@ export const showUserMenu = new Menu('showUserMenu', {
         );
     })
     .text(MSG.buttons.showUsers.allUsers, async (ctx) => {
-        const allUsers = await getAllUsers();
-
+        const allUsers = await getAllUsers() || [];
+        const users = allUsers.filter((user) => user.role !== ROLES.Admin)
+        
         ctx.menu.nav('backToMain');
-        await ctx.editMessageText(MSG.showUsers.all(allUsers));
+        await ctx.editMessageText(MSG.showUsers.all(users));
     })
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {

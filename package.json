@@ -1,6 +1,6 @@
 {
     "name": "dance_bot_grammy",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Telegram bot (grammY)",
     "main": "index.js",
     "type": "module",
@@ -16,12 +16,21 @@
         "lint:check": "eslint .",
         "lint:fix": "eslint --fix ."
     },
+    "_moduleAliases": {
+        "@utils": "./dist/utils",
+        "@mongodb": "./dist/mongodb",
+        "@logger": "./dist/logger",
+        "@helpers": "./dist/helpers",
+        "@constants": "./dist/constants",
+        "@bot": "./dist/bot"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "@types/jest": "^29.5.8",
         "@types/node": "^20.8.4",
+        "@types/node-cron": "^3.0.11",
         "eslint": "^8.51.0",
         "eslint-config-prettier": "^9.0.0",
         "nodemon": "^3.0.1",
@@ -42,7 +51,10 @@
         "@logtail/winston": "^0.4.13",
         "dotenv": "^16.3.1",
         "grammy": "^1.19.1",
+        "module-alias": "^2.2.3",
+        "moment-timezone": "^0.5.43",
         "mongoose": "^7.6.1",
+        "node-cron": "^3.0.3",
         "typescript": "^5.2.2",
         "winston": "^3.11.0",
         "winston-transport": "^4.5.0"

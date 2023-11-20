@@ -1,11 +1,13 @@
 import { MSG } from '../constants/index.js';
 import { LOGGER } from '../logger/index.js';
+import { deleteOldLogs } from '../mongodb/operations/changeLog.js';
 import {
     ISubscription,
     SubscriptionModel,
 } from '../mongodb/schemas/subscription.js';
 import { IUser, UserModel } from '../mongodb/schemas/user.js';
 import { sendUserNotification } from './notifications.js';
+import cron from 'node-cron';
 
 export const dailyCheck = () => {
     // Function for checking and deactivating subscriptions
@@ -38,7 +40,11 @@ export const dailyCheck = () => {
         }
     };
 
-    checkAndDeactivateSubscriptions();
-    // Call the function to check and deactivate subscriptions, for example, every day
-    setInterval(checkAndDeactivateSubscriptions, 24 * 60 * 60 * 1000); // 24 hours
+    cron.schedule('0 12 * * *', function () {
+        checkAndDeactivateSubscriptions();
+    });
+
+    cron.schedule('0 0 * * *', function () {
+        deleteOldLogs();
+    });
 };

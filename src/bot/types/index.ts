@@ -4,9 +4,17 @@ import {
     type ConversationFlavor,
 } from '@grammyjs/conversations';
 
+export type Action =
+    | 'Role'
+    | 'Notifications'
+    | 'TotalLessons'
+    | 'UsedLessons'
+    | null;
+
+
 interface SessionData {
-    itemLevel: string;
-    isDEGANft: boolean;
+    editedUserId: number | null;
+    editedActions: Action;
 }
 export type SessionContext = Context & SessionFlavor<SessionData>;
 export type BotContext = SessionContext & ConversationFlavor;

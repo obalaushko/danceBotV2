@@ -2,7 +2,13 @@ import { BANKS, ROLES } from './index.js';
 
 import { IBank } from '../mongodb/schemas/payment.js';
 import { IUser } from '../mongodb/schemas/user.js';
-import { convertDate, pluralizeWord } from '../utils/utils.js';
+import {
+    capitalizeFirstLetter,
+    convertDate,
+    pluralizeWord,
+} from '../utils/utils.js';
+import { ISubscription } from '../mongodb/schemas/subscription.js';
+import { GroupedChanges } from '../mongodb/schemas/changeLog.js';
 
 interface ITGUser {
     first_name?: string;
@@ -178,7 +184,67 @@ export const MSG = {
         wrongEnterCard: `Ведіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
     },
     settings: {
-        main: 'Забув що у цьому меню хотів зробити.',
+        main: 'Ви можете оновити дані учнів та переглянути історію користуванням абонементом.\n\n❕ Деякі налаштування будуть виконані поза звичайним робочим процесом.',
+        users: 'Виберіть учня для оновлення.',
+        history: (history: GroupedChanges | null) => {
+            let text =
+                'Історія відображає коли був активований чи деактивований абонемент, та відображає в які дні учень використовував його.\n\n⚠️ Дати відвідування можуть бути не точними, все залежить у який день вчитель відмітив учня.\n<i>Історія відображається за останні 3 місяці.</i>\n';
+
+            for (let date in history) {
+                text += `\n<b>Дата: ${date}</b>\n`;
+                history[date].map((item) => {
+                    text += `Ім'я: ${item.fullName}\n`;
+                    text += `Зміни: ${item.changes.join(', ')}\n`;
+                });
+            }
+
+            return text;
+        },
+        setupUser: (user: IUser) => {
+            const {
+                userId,
+                fullName,
+                username,
+                subscription,
+                role,
+                approved,
+                notifications,
+                firstName,
+                inviteLink,
+            } = user;
+            return `Вам доступні тільки декілька значень для зміни!\nКористувач: <b>${fullName}</b>\n<code>userId: ${userId}\nusername: ${
+                username ? username : 'null'
+            }\nfirstName: ${firstName}\n[role: ${role}]\napproved: ${approved}\n[notifications: ${notifications}]\ninviteLink: ${inviteLink}\nsubscription: {\n\tactive: ${subscription?.active}\n\t[totalLessons: ${subscription?.totalLessons}]\n\t[usedLessons: ${subscription?.usedLessons}]\n\tremainedLessons: ${subscription?.remainedLessons}\n\tfirstActivation: ${subscription?.firstActivation}\n\tdataExpired: ${subscription?.dataExpired}\n}</code>`;
+        },
+        setup: {
+            role: '⚠️ Не використовуйте цю функцію без необхідності.\n\nВиберіть нову роль для учня відмінну від існуючої.\n\nРоль <b>Admin</b> позбавить учня можливостей оновлювати абонемент, та зробить його адміністратором.\n\nРоль <b>Guest</b> позбавить учня можливості оновлювати абонемент, він залишиться у групі, але не матиме доступу до свого абонементу.\n\nРоль <b>Inactive</b> обмежує використання бота для користувача.\n\nРоль <b>User</b> дозволяє отримувати дані про абонемент, та бути учасником групи <i>(якщо запрошення отримано)</i>',
+            notifications: 'Активуйте або ж деактивуйте сповіщення для учня.',
+            totalLessons:
+                'Виберіть загальну кількість занять в абонементі для цього учня.\nЗа замовчуванням в абонементі 8 занять',
+            usedLessons:
+                'Змініть кількість використаних занять в абонементі для цього учня.\nЯкщо ви не хочете щоб юзер дізнався про ці зміни, тимчасово вимкніть сповіщення цьому учню.\n⚠️ Використаних занять повинно бути менше ніж загальна кількість.',
+            cancel: 'Операцію скасовано, щоб повернутися до головного меню скористайтеся командою /start.',
+        },
+        updateRole: {
+            success: (user: IUser) =>
+                `Користувач <b>${user.fullName}</b>, отримав роль <code>${user.role}</code>.`,
+        },
+        updateNotifications: {
+            success: (user: IUser) =>
+                `Користувач <b>${
+                    user.fullName
+                }</b>, отримав нове значення сповіщень <b>${
+                    user.notifications ? 'увімкнено' : 'вимкнуто'
+                }</b>`,
+        },
+        totalLessons: {
+            success: (subscription: ISubscription) =>
+                `Користувач, отримав нове значення загальної кількості занять в абонементі: <b>${subscription.totalLessons}</b>`,
+        },
+        usedLessons: {
+            success: (subscription: ISubscription) =>
+                `Користувач, отримав нове значення використаних занять в абонементі: <b>${subscription.usedLessons}</b>`,
+        },
     },
     remove: {
         main: 'Ви можете видалити користувачів або призупити їхню взаємодію з ботом.',
@@ -189,7 +255,8 @@ export const MSG = {
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>, деактивовано.\n`;
+                    const userName = user.username;
+                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, деактивовано.\n`;
                 });
 
             return userList;
@@ -201,7 +268,8 @@ export const MSG = {
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>, видалено назавжди.\n`;
+                    const userName = user.username;
+                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, видалено назавжди.\n`;
                 });
 
             return userList;
@@ -209,12 +277,13 @@ export const MSG = {
         confirmRemoved: (users: IUser[] | null) => {
             let userList = `Ви впевнені що хочете видалити ${
                 users?.length === 1 ? 'цього користувача' : 'цих користувачів'
-            } назавжди. Ця дія невідворотна!\n`;
+            } назавжди?\n⚠️ Ця дія невідворотна!\n`;
 
             users &&
                 users.forEach((user) => {
                     const userFullName = user.fullName;
-                    userList += `Користувача: <b>${userFullName}</b>\n`;
+                    const userName = user.username;
+                    userList += `Користувач: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}\n`;
                 });
 
             return userList;
@@ -296,10 +365,24 @@ export const MSG = {
         paymentDetails: {
             update: 'Оновити реквізити',
         },
-        settings: {},
+        settings: {
+            users: '💃 Учні',
+            history: '📅 Історія',
+            lessons: {
+                1: '1',
+                2: '2',
+                3: '3',
+                4: '4',
+                5: '5',
+                6: '6',
+                7: '7',
+                8: '8',
+            },
+        },
         removed: {
             inactive: '⚠️ Призупинити',
             remove: '❌ Видалити',
+            return: '↩️ Повернути',
         },
         user: {
             showSubscription: '🎫 Мій абонемент',
@@ -309,10 +392,10 @@ export const MSG = {
             notificationDisabled: '🔕 Вимкнути',
         },
         developer: {
-            admin: ROLES.Admin.toUpperCase(),
-            user: ROLES.User.toUpperCase(),
-            guest: ROLES.Guest.toUpperCase(),
-            inactive: ROLES.Inactive.toUpperCase(),
+            admin: capitalizeFirstLetter(ROLES.Admin),
+            user: capitalizeFirstLetter(ROLES.User),
+            guest: capitalizeFirstLetter(ROLES.Guest),
+            inactive: capitalizeFirstLetter(ROLES.Inactive),
         },
         backToMain: 'До головного меню',
         back: '<< Назад',
@@ -327,6 +410,10 @@ export const MSG = {
         failedToRemove: 'Виникла помилка видалення. Спробуйте ще раз!',
         unknownError: 'Виникла невідома помилка. Спробуйте ще раз!',
     },
+    cancelUpdate: 'Оновлення скасовано!',
+    cancelEdit: 'Редагування скасовано!',
+    cancelAdd: 'Додавання скасовано!',
+    cancelRemove: 'Видалення скасовано!',
     leaveConversation: 'Розмову завершено.',
     overLeaveConversation:
         'У вас немає активних розмов з ботом. Щоб розпочати нову, скористайтеся командою /start.',

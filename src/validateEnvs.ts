@@ -9,8 +9,12 @@ export const validateEnvs = (ENVS: NodeJS.ProcessEnv) => {
         throw new Error('PRODUCTION_BOT_TOKEN is required');
     }
 
-    if (!ENVS.DEVELOPMENT_BOT_TOKEN) {
+    if (ENV === 'development' && !ENVS.DEVELOPMENT_BOT_TOKEN) {
         throw new Error('DEVELOPMENT_BOT_TOKEN is required');
+    }
+
+    if (!ENVS.LOGTAIL_TOKEN) {
+        throw new Error('LOGTAIL_TOKEN is required');
     }
 
     if (!ENVS.ADMIN_ID) {

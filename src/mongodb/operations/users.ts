@@ -134,7 +134,7 @@ export const updateUserById = async (
 export const getAllUsers = async (): Promise<IUser[] | null> => {
     try {
         const users = await UserModel.find({
-            role: { $nin: [ROLES.Admin, ROLES.Developer] },
+            role: { $nin: [ROLES.Developer] },
         })
             .populate({
                 path: 'subscription',

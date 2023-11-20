@@ -75,6 +75,7 @@ markUserMenu
 
         return range;
     })
+    .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();
         ctx.menu.back();
