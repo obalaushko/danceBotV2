@@ -1,7 +1,7 @@
 import { IUser } from './../mongodb/schemas/user.js';
 import { bot } from '../bot/bot.js';
 import { LOGGER } from '../logger/index.js';
-import { getUserById } from '../mongodb/operations/index.js';
+import { getAllUserUsers, getUserById } from '../mongodb/operations/index.js';
 import { MSG } from '../constants/index.js';
 
 import * as dotenv from 'dotenv';
@@ -56,4 +56,27 @@ export const sendInviteToGroup = async (users: IUser[]) => {
             metadata: err,
         });
     }
+};
+
+export const sendMailingToUsers = async (messages: string) => {
+    const users = await getAllUserUsers();
+
+    users &&
+        users.forEach(async (user) => {
+            try {
+                if (user.notifications) {
+                    await bot.api.sendMessage(user.userId, messages);
+                    LOGGER.info(
+                        `[sendMailingToUsers] Success send mailing ${user.userId}`
+                    );
+                }
+            } catch (err) {
+                LOGGER.error(
+                    `[sendMailingToUsers] Failed to write to user ${user.userId}.`,
+                    {
+                        metadata: err,
+                    }
+                );
+            }
+        });
 };
