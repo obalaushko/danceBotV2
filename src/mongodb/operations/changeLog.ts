@@ -110,11 +110,12 @@ export const getGroupedSubscriptionChanges =
 
 export const deleteOldLogs = async (): Promise<void> => {
     try {
-        const threeMonthsAgo = moment().subtract(3, 'months').utc().format();
+        const twoMonthsAgo = moment().subtract(2, 'months').utc().format();
 
         await SubscriptionChangeLogModel.deleteMany({
-            changeDate: { $lt: threeMonthsAgo },
+            changeDate: { $lt: twoMonthsAgo },
         });
+        LOGGER.info('[deleteOldLogs], Remove old logs');
     } catch (error: any) {
         LOGGER.error('[deleteOldLogs][error]', {
             metadata: { error: error, stack: error.stack.toString() },
