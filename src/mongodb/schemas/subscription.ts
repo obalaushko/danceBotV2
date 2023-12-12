@@ -2,6 +2,7 @@ import { Document, Schema, Model, model, Types } from 'mongoose';
 import { addLogSubscriptionChange } from '../operations/changeLog.js';
 import { sendUserNotification } from '../../helpers/notifications.js';
 import { MSG } from '../../constants/messages.js';
+import moment from 'moment-timezone';
 
 export interface ISubscription extends Document {
     userId: number;
@@ -45,17 +46,9 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
 });
 
 subscriptionSchema.methods.setExpirationDate = function () {
-    const today = new Date();
-    const expirationDate = new Date(
-        today.getUTCFullYear(),
-        today.getUTCMonth(),
-        today.getUTCDate(),
-        today.getUTCHours(),
-        today.getUTCMinutes(),
-        today.getUTCSeconds()
-    );
-    expirationDate.setUTCMonth(expirationDate.getUTCMonth() + 2);
-    this.dataExpired = expirationDate;
+    const today = moment().utc();
+    const expirationDate = today.add(40, 'days');
+    this.dataExpired = expirationDate.toDate();
 };
 
 subscriptionSchema.methods.setChangeLog = async (
