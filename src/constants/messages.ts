@@ -101,8 +101,8 @@ export const MSG = {
                     const firstName = user.firstName;
                     const userFullName = user.fullName;
                     const remainedLessons = user.subscription?.remainedLessons;
-                    const dataExpired = user.subscription?.dataExpired!;
-                    const formattedDate = convertDate(dataExpired);
+                    const dateExpired = user.subscription?.dateExpired!;
+                    const formattedDate = convertDate(dateExpired);
                     userList += `- <b>${userFullName}</b> (${firstName}), залишилося занять: <b>${remainedLessons}</b>, абонемент закінчується ${formattedDate};\n`;
                 });
             } else {
@@ -220,7 +220,7 @@ export const MSG = {
             } = user;
             return `Вам доступні тільки декілька значень для зміни!\nКористувач: <b>${fullName}</b>\n<code>userId: ${userId}\nusername: ${
                 username ? username : 'null'
-            }\nfirstName: ${firstName}\n[role: ${role}]\napproved: ${approved}\n[notifications: ${notifications}]\ninviteLink: ${inviteLink}\nsubscription: {\n\tactive: ${subscription?.active}\n\t[totalLessons: ${subscription?.totalLessons}]\n\t[usedLessons: ${subscription?.usedLessons}]\n\tremainedLessons: ${subscription?.remainedLessons}\n\tfirstActivation: ${subscription?.firstActivation}\n\tdataExpired: ${subscription?.dataExpired}\n}</code>`;
+            }\nfirstName: ${firstName}\n[role: ${role}]\napproved: ${approved}\n[notifications: ${notifications}]\ninviteLink: ${inviteLink}\nsubscription: {\n\tactive: ${subscription?.active}\n\t[totalLessons: ${subscription?.totalLessons}]\n\t[usedLessons: ${subscription?.usedLessons}]\n\tremainedLessons: ${subscription?.remainedLessons}\n\tfirstActivation: ${subscription?.firstActivation}\n\tdataExpired: ${subscription?.dateExpired}\n}</code>`;
         },
         setup: {
             role: '⚠️ Не використовуйте цю функцію без необхідності.\n\nВиберіть нову роль для учня відмінну від існуючої.\n\nРоль <b>Admin</b> позбавить учня можливостей оновлювати абонемент, та зробить його адміністратором.\n\nРоль <b>Guest</b> позбавить учня можливості оновлювати абонемент, він залишиться у групі, але не матиме доступу до свого абонементу.\n\nРоль <b>Inactive</b> обмежує використання бота для користувача.\n\nРоль <b>User</b> дозволяє отримувати дані про абонемент, та бути учасником групи <i>(якщо запрошення отримано)</i>',
@@ -303,7 +303,7 @@ export const MSG = {
             if (isActive) {
                 const totalLessons = user.subscription?.totalLessons!;
                 const remainedLessons = user.subscription?.remainedLessons!;
-                const date = user.subscription?.dataExpired!;
+                const date = user.subscription?.dateExpired!;
                 const lessons =
                     user.subscription?.usedLessons === 0
                         ? 'ви ще не використали жодного заняття.'
@@ -346,6 +346,9 @@ export const MSG = {
             expired:
                 '🔔 Термін дії вашого абонементу закінчився, поспішайте його оновити.',
         },
+        freeze: {
+            main: 'Ви можете призупинити дію абонементу один раз протягом 90 днів, терміном на 10 днів.'
+        }
     },
     developer: {},
     buttons: {
@@ -401,6 +404,8 @@ export const MSG = {
             notifications: '🔔 Сповіщення',
             notificationActivate: '🔔 Увімкнути',
             notificationDisabled: '🔕 Вимкнути',
+            freezeSubscription: 'Призупинити абонемент',
+            freezeApprove: '⏸ Призупинити'
         },
         developer: {
             admin: capitalizeFirstLetter(ROLES.Admin),

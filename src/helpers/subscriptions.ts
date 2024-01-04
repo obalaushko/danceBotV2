@@ -17,12 +17,12 @@ export const dailyCheck = () => {
             if (user.subscription) {
                 const subscription: ISubscription | null =
                     await SubscriptionModel.findById(user.subscription);
-                if (subscription && subscription.dataExpired) {
+                if (subscription && subscription.dateExpired) {
                     const currentDate: Date = new Date();
                     const currentUtcDate: Date = new Date(
                         currentDate.toISOString()
                     );
-                    if (currentUtcDate > subscription.dataExpired) {
+                    if (currentUtcDate > subscription.dateExpired) {
                         subscription.active = false; // Deactivate the subscription if the expiration date has passed
                         await subscription.save(); // Save the updated subscription
                         if (user.notifications) {

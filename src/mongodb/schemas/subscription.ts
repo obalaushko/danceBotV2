@@ -11,7 +11,12 @@ export interface ISubscription extends Document {
     remainedLessons?: number;
     active?: boolean;
     firstActivation?: boolean;
-    dataExpired?: Date;
+    dateExpired?: Date;
+    freeze?: {
+        lastDateFreeze?: Date;
+        dateExpired?: Date;
+        active: boolean;
+    }
 }
 
 const subscriptionSchema: Schema = new Schema<ISubscription>({
@@ -40,15 +45,27 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
         type: Boolean,
         default: false,
     },
-    dataExpired: {
+    dateExpired: {
         type: Date,
     },
+    freeze: {
+        lastDateFreeze: {
+            type: Date,
+        },
+        dateExpired: {
+            type: Date,
+        },
+        active: {
+            type: Boolean,
+            default: false,
+        }
+    }
 });
 
 subscriptionSchema.methods.setExpirationDate = function () {
     const today = moment().utc();
     const expirationDate = today.add(40, 'days');
-    this.dataExpired = expirationDate.toDate();
+    this.dateExpired = expirationDate.toDate();
 };
 
 subscriptionSchema.methods.setChangeLog = async (
@@ -76,7 +93,7 @@ subscriptionSchema.pre('save', function (next) {
             this.setExpirationDate();
             this.usedLessons = 0;
         } else if (!this.active) {
-            this.dataExpired = undefined;
+            this.dateExpired = undefined;
             this.usedLessons = 0;
         }
 
