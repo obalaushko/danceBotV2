@@ -7,6 +7,7 @@ import {
 } from '../../../mongodb/operations/index.js';
 import { notificationsMenu } from './notificationsMenu.js';
 import { LOGGER } from '../../../logger/index.js';
+import { freezeSubscriptionMenu } from './freezeSubscription.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
@@ -17,7 +18,11 @@ export const userMenu = new Menu('user')
         const user = await getUserWithSubscriptionById(id);
 
         if (user) {
-            ctx.menu.nav('backToUserMain');
+            if (user.subscription?.active) {
+                ctx.menu.nav('freezeSubscriptionMenu');
+            } else {
+                ctx.menu.nav('backToUserMain');
+            }
             await ctx.editMessageText(MSG.user.subscription(user));
         } else {
             await ctx.editMessageText(MSG.errors.unknownError);
@@ -43,4 +48,5 @@ export const userMenu = new Menu('user')
     });
 
 userMenu.register(backToUserMain);
+userMenu.register(freezeSubscriptionMenu);
 userMenu.register(notificationsMenu);
