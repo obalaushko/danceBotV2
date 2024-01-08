@@ -15,7 +15,9 @@ export interface ISubscription extends Document {
     freeze?: {
         lastDateFreeze?: Date;
         dateExpired?: Date;
+        frozenUntil?: Date;
         active: boolean;
+        usedLessons?: number;
     }
 }
 
@@ -55,9 +57,15 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
         dateExpired: {
             type: Date,
         },
+        frozenUntil: {
+            type: Date,
+        },
         active: {
             type: Boolean,
             default: false,
+        },
+        usedLessons: {
+            type: Number
         }
     }
 });

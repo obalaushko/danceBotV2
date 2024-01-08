@@ -21,7 +21,11 @@ export const userMenu = new Menu('user')
             if (user.subscription?.active) {
                 ctx.menu.nav('freezeSubscriptionMenu');
             } else {
-                ctx.menu.nav('backToUserMain');
+                if (user.subscription?.freeze?.active) {
+                    ctx.menu.nav('freezeSubscriptionMenu');
+                } else {
+                    ctx.menu.nav('backToUserMain');
+                }
             }
             await ctx.editMessageText(MSG.user.subscription(user));
         } else {

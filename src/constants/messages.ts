@@ -5,6 +5,7 @@ import { IUser } from '../mongodb/schemas/user.js';
 import {
     capitalizeFirstLetter,
     convertDate,
+    freezeIsAllowed,
     pluralizeWord,
 } from '../utils/utils.js';
 import { ISubscription } from '../mongodb/schemas/subscription.js';
@@ -43,6 +44,7 @@ export const MSG = {
         'Будь ласка, введіть ім\'я та прізвище у форматі "Ім\'я Прізвище"',
     approveUser: (user: ITGUser) =>
         `Зареєстровано нового користувача "${user.fullName}".\nЩоб прийняти або відхілити запит скористайтеся відповідною командою /start.`,
+    frozenUser: (user: IUser) => `Користувач ${user.fullName}, призупинив дію абонементу.`,
     backToWait: (user: ITGUser) =>
         `Користувача "${user.fullName}" переміщено до черги.`,
     approved: (user: ITGUser) =>
@@ -117,7 +119,10 @@ export const MSG = {
                 users.forEach((user) => {
                     const firstName = user.firstName;
                     const userFullName = user.fullName;
-                    userList += `- <b>${userFullName}</b> (${firstName})\n`;
+                    const frozen = user.subscription?.freeze?.active
+                        ? 'Призупинений'
+                        : '';
+                    userList += `- <b>${userFullName}</b> (${firstName}) <i><u>${frozen}</u></i>\n`;
                 });
             } else {
                 userList =
@@ -151,11 +156,16 @@ export const MSG = {
                     const subscription = user.subscription?.active
                         ? 'Так'
                         : 'Ні';
+                    const frozen = user.subscription?.freeze?.active
+                        ? ' (Призупинений)'
+                        : '';
                     const approved = user.approved ? 'Так' : 'Ні';
                     const notifications = user.notifications ? '🔔' : '🔕';
                     userList += `- <b>${userFullName}</b> (${firstName})${
                         username && `, @${username}`
-                    }\nРоль: <code>${role}</code>\nСповіщення: ${notifications}\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${subscription}</b>\n\n`;
+                    }\nРоль: <code>${role}</code>\nСповіщення: ${notifications}\nПрийнятий до групи: <b>${approved}</b>\nМає активний абонемент: <b>${
+                        subscription + frozen
+                    }</b>\n\n`;
                 });
             } else {
                 userList = 'Такого не може бути, але не знайдено жодного.';
@@ -190,7 +200,7 @@ export const MSG = {
         mailing: {
             main: 'Ви можете за допомогою бота відправляти усім учням які прийняті до групи (не залежно від статусу абонементу) повідомлення про нові реквізити.',
             custom: 'Напишіть повідомлення яке хочете відправити усім учням.',
-            payment: ''
+            payment: '',
         },
         history: (history: GroupedChanges | null) => {
             let text =
@@ -262,7 +272,9 @@ export const MSG = {
                 users.forEach((user) => {
                     const userFullName = user.fullName;
                     const userName = user.username;
-                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, деактивовано.\n`;
+                    userList += `Користувача: <b>${userFullName}</b> ${
+                        userName ? `(${userName})` : ''
+                    }, деактивовано.\n`;
                 });
 
             return userList;
@@ -275,7 +287,9 @@ export const MSG = {
                 users.forEach((user) => {
                     const userFullName = user.fullName;
                     const userName = user.username;
-                    userList += `Користувача: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}, видалено назавжди.\n`;
+                    userList += `Користувача: <b>${userFullName}</b> ${
+                        userName ? `(${userName})` : ''
+                    }, видалено назавжди.\n`;
                 });
 
             return userList;
@@ -289,7 +303,9 @@ export const MSG = {
                 users.forEach((user) => {
                     const userFullName = user.fullName;
                     const userName = user.username;
-                    userList += `Користувач: <b>${userFullName}</b> ${userName ? `(${userName})` : ''}\n`;
+                    userList += `Користувач: <b>${userFullName}</b> ${
+                        userName ? `(${userName})` : ''
+                    }\n`;
                 });
 
             return userList;
@@ -299,6 +315,7 @@ export const MSG = {
         subscription: (user: IUser) => {
             let result = '';
             const isActive = user.subscription?.active;
+            const isFreeze = user.subscription?.freeze?.active;
 
             if (isActive) {
                 const totalLessons = user.subscription?.totalLessons!;
@@ -317,6 +334,9 @@ export const MSG = {
                 )}, ${lessons}\nТермін дії абонементу закінчується <i>${convertDate(
                     date
                 )}</i>`;
+            } else if (isFreeze) {
+                const frozenUntil = user.subscription?.freeze?.frozenUntil;
+                result = `Ваш абонемент призупинено на 10 днів.\n\n<i>Абонемент відновиться ${convertDate(frozenUntil!)}</i>`;
             } else {
                 const firstActivation = user.subscription?.firstActivation;
                 result = `${
@@ -345,10 +365,15 @@ export const MSG = {
                 '🔔 Ви використали усі заняття, поспішайте оновити абонемент.',
             expired:
                 '🔔 Термін дії вашого абонементу закінчився, поспішайте його оновити.',
+            defrostSubscriptions: '🔔 Ваш абонемент знову активний.'
         },
         freeze: {
-            main: 'Ви можете призупинити дію абонементу один раз протягом 90 днів, терміном на 10 днів.'
-        }
+            main: 'Ви можете призупинити дію абонементу один раз протягом 90 днів, терміном до 10 днів.',
+            frozen: (subscription: ISubscription) => `Ваш абонемент було призупинено до ${convertDate(subscription.freeze?.frozenUntil!)}, ви можете  відновити його у будь-який момент.`,
+            defrost: `Ваш абонемент відновлено!`,
+            isNotAllowed: (subscription: ISubscription) => `Ви вже використали можливість призупинити дію абонементу за останні 90 днів.\n\nПризупинення буде доступне: ${freezeIsAllowed(subscription.freeze?.lastDateFreeze)}`
+
+        },
     },
     developer: {},
     buttons: {
@@ -380,7 +405,7 @@ export const MSG = {
             mailing: {
                 main: '🤖 Розсилка',
                 payment: 'Реквізити',
-                custom: 'Власне повідомлення'
+                custom: 'Власне повідомлення',
             },
             lessons: {
                 1: '1',
@@ -405,7 +430,9 @@ export const MSG = {
             notificationActivate: '🔔 Увімкнути',
             notificationDisabled: '🔕 Вимкнути',
             freezeSubscription: 'Призупинити абонемент',
-            freezeApprove: '⏸ Призупинити'
+            defrostSubscription: 'Відновити абонемент',
+            freezeApprove: (frozen: boolean) =>
+                frozen ? '▶️ Відновити' : '⏸ Призупинити',
         },
         developer: {
             admin: capitalizeFirstLetter(ROLES.Admin),
@@ -445,4 +472,4 @@ export const MSG = {
 
 // Dynamic option
 MSG.settings.mailing.payment = `Ось так буде виглядати повідомлення яке отримають учні\n\n${MSG.payments.static}`;
-MSG.payments.updatedStatic = `Реквізити оновлено!\n\n${MSG.payments.static}`
+MSG.payments.updatedStatic = `Реквізити оновлено!\n\n${MSG.payments.static}`;

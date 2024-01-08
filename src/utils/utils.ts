@@ -1,3 +1,5 @@
+import moment from 'moment-timezone';
+
 export const isCancel = (messsage: string) => {
     if (messsage === '/cancel') {
         return true;
@@ -10,10 +12,15 @@ export const isObjectEmpty = (obj: object) => {
 };
 
 export const convertDate = (date: Date) => {
-    const day = date.getUTCDate().toString().padStart(2, '0');
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-    const year = date.getUTCFullYear();
-    return `${day}.${month}.${year}`;
+    return moment(date).format('DD.MM.YYYY');
+};
+
+export const freezeIsAllowed = (date: Date | undefined): string => {
+    if (!date) throw new Error('[freezeIsAllowed] Date is empty!');
+
+    const dateAllowed = moment(date).add(90, 'days').toDate();
+
+    return convertDate(dateAllowed);
 };
 
 export const pluralizeWord = (number: number) => {
@@ -28,4 +35,16 @@ export const pluralizeWord = (number: number) => {
 
 export const capitalizeFirstLetter = (text: string): string => {
     return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+export const checkLastFreeze = (dateFreeze: Date | undefined): boolean => {
+    if (!dateFreeze) return true;
+    const today = moment.utc();
+
+    const diff = moment.utc(dateFreeze).diff(today, 'days');
+    if (diff >= 90) {
+        return true;
+    } else {
+        return false;
+    }
 };
