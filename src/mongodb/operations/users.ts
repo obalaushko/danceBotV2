@@ -235,7 +235,7 @@ export const getAllDeactiveUserUsers = async (): Promise<IUser[] | null> => {
         const deactiveUserUsers = await UserModel.find({ role: ROLES.User })
             .populate({
                 path: 'subscription',
-                match: { active: false },
+                match: { active: false, 'freeze.active': false },
                 select: '-_id',
             })
             .exec();

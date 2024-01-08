@@ -33,4 +33,5 @@ export {
     markLessonAsUsed,
     deleteSubscription,
     updateSubscriptionById,
+    freezeSubscriptionByUserId as freezeSubscription
 } from './subscriptions.js';

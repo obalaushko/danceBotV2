@@ -1,5 +1,7 @@
+import moment from 'moment-timezone';
 import { LOGGER } from '../../logger/index.js';
 import { ISubscription, SubscriptionModel } from '../schemas/subscription.js';
+import { checkLastFreeze } from '../../utils/utils.js';
 
 export const addSubscription = async ({
     userId,
@@ -195,5 +197,124 @@ export const deleteSubscription = async (
             metadata: { error: error, stack: error.stack.toString() },
         });
         return false;
+    }
+};
+
+// Freeze
+interface IStatus {
+    active: boolean;
+    frozen: boolean;
+}
+export const getSubscriptionStatuses = async (
+    userId: number
+): Promise<IStatus | null> => {
+    try {
+        const subscription = await getSubscriptionById(userId);
+        if (subscription) {
+            const active = subscription.active || false;
+            const frozen = subscription.freeze?.active || false;
+            return { active, frozen };
+        }
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[getSubscriptionStatuses][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+export const freezeSubscriptionByUserId = async (
+    userId: number
+): Promise<ISubscription | null> => {
+    try {
+        const subscription = await getSubscriptionById(userId);
+
+        if (subscription) {
+            const freezeIsAllowed = checkLastFreeze(
+                subscription.freeze?.lastDateFreeze
+            );
+            if (!freezeIsAllowed) return null;
+            const today = moment().utc();
+
+            const freeze = {
+                active: true,
+                lastDateFreeze: today,
+                frozenUntil: moment.utc(today).add(10, 'days').toDate(),
+                dateExpired: moment
+                    .utc(subscription.dateExpired)
+                    .add(10, 'days')
+                    .toDate(),
+                usedLessons: subscription.usedLessons,
+            };
+
+            Object.assign(subscription, { freeze }, { active: false });
+            await subscription.save();
+
+            LOGGER.info('[freezeSubscriptionByUserId][success]', {
+                metadata: subscription,
+            });
+            return subscription;
+        }
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[freezeSubscriptionByUserId][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const defrostSubscriptionByUserId = async (
+    userId: number
+): Promise<ISubscription | null> => {
+    try {
+        const subscription = await getSubscriptionById(userId);
+
+        if (subscription) {
+            // First active and save
+            Object.assign(subscription, { active: true });
+            await subscription.save();
+
+            const today = moment().utc().startOf('day');
+
+            const freeze = {
+                lastDateFreeze: subscription.freeze?.lastDateFreeze,
+                active: false,
+                frozenUntil: undefined,
+                dateExpired: undefined,
+                usedLessons: undefined,
+            };
+            const diff = moment
+                .utc(subscription.freeze?.frozenUntil)
+                .startOf('day')
+                .diff(today, 'days');
+
+            const dateExpired = moment
+                .utc(subscription.freeze?.dateExpired)
+                .subtract(diff, 'days')
+                .toDate();
+
+            Object.assign(
+                subscription,
+                { freeze },
+                {
+                    usedLessons: subscription.freeze?.usedLessons,
+                    dateExpired,
+                }
+            );
+            await subscription.save();
+
+            LOGGER.info('[defrostSubscriptionByUserId][success]', {
+                metadata: subscription,
+            });
+
+            return subscription;
+        }
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[defrostSubscriptionByUserId][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
     }
 };
