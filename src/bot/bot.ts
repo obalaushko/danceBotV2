@@ -72,7 +72,9 @@ bot.use(
 
         // This is called when the limit is exceeded.
         onLimitExceeded: async (ctx) => {
-            await ctx.reply(MSG.tooManyRequest);
+            if (ctx.chat?.type === 'private') {
+                await ctx.reply(MSG.tooManyRequest);
+            }
         },
 
         // Note that the key should be a number in string format such as "123456789".
