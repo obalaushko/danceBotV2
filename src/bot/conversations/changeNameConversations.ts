@@ -47,7 +47,7 @@ export const changeNameConversations = async (
     const updateFullName = await conversation.external(
         async () =>
             await updateUserById(user.id, {
-                fullName,
+                fullName, // TODO update telegram username and first name
             })
     );
     if (updateFullName) {
