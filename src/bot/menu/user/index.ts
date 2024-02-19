@@ -1,5 +1,5 @@
 import { Menu } from '@grammyjs/menu';
-import { MSG } from '../../../constants/index.js';
+import { MSG, ROLES } from '../../../constants/index.js';
 import { backToUserMain } from './backToMainMenu.js';
 import {
     getUserById,
@@ -8,6 +8,7 @@ import {
 import { notificationsMenu } from './notificationsMenu.js';
 import { LOGGER } from '../../../logger/index.js';
 import { freezeSubscriptionMenu } from './freezeSubscription.js';
+import { returnToGroupMenu } from './returnToGroupMenu.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
@@ -18,6 +19,11 @@ export const userMenu = new Menu('user')
         const user = await getUserWithSubscriptionById(id);
 
         if (user) {
+            if (user.role === ROLES.Inactive) {
+                ctx.menu.nav('returnToGroupMenu');
+                await ctx.editMessageText(MSG.deactivatedAccount);
+                return;
+            }
             if (user.subscription?.active) {
                 ctx.menu.nav('freezeSubscriptionMenu');
             } else {
@@ -54,3 +60,4 @@ export const userMenu = new Menu('user')
 userMenu.register(backToUserMain);
 userMenu.register(freezeSubscriptionMenu);
 userMenu.register(notificationsMenu);
+userMenu.register(returnToGroupMenu);

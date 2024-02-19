@@ -4,6 +4,7 @@ import { LOGGER } from '../../../logger/index.js';
 import { getUserById } from '../../../mongodb/operations/users.js';
 import { privateChat } from '../../bot.js';
 import { adminMenu, developerMenu, userMenu } from '../../menu/index.js';
+import { returnToGroupMenu } from '../../menu/user/returnToGroupMenu.js';
 
 export const startCommand = () => {
     privateChat.command('start', async (ctx) => {
@@ -33,7 +34,9 @@ export const startCommand = () => {
                 reply_markup: developerMenu,
             });
         } else if (userExists?.role == ROLES.Inactive) {
-            await ctx.reply(MSG.deactivatedAccount);
+            await ctx.reply(MSG.deactivatedAccount, {
+                reply_markup: returnToGroupMenu,
+            });
         }
     });
 };

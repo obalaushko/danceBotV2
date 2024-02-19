@@ -1,4 +1,3 @@
-
 import { MSG } from '../../../constants/messages.js';
 import { privateChat } from '../../bot.js';
 import { updateUserById } from '../../../mongodb/operations/users.js';

@@ -7,10 +7,17 @@ dotenv.config();
 const ENVS = process.env;
 const GROUP_ID = ENVS.GROUP_ID || '';
 
-export const removeUserFromGroup = async (userIds: number[]) => {
+export const removeUserFromGroup = async (
+    userIds: number[],
+    typeGroup: string = 'supergroup'
+) => {
     userIds.forEach(async (id) => {
         try {
-            await bot.api.unbanChatMember(GROUP_ID, id);
+            if (typeGroup === 'supergroup') {
+                await bot.api.unbanChatMember(GROUP_ID, id);
+            } else {
+                await bot.api.banChatMember(GROUP_ID, id);
+            }
         } catch (err) {
             LOGGER.error('[removeUserFromGroup] Failed remove from group', {
                 metadata: err,

@@ -1,10 +1,12 @@
-import { MSG } from "../../../constants/messages.js";
-import { LOGGER } from "../../../logger/index.js";
-import { getUserById } from "../../../mongodb/operations/users.js";
-import { groupChat } from "../../bot.js";
-import { userMenu } from "../../menu/index.js";
+import { MSG } from '../../../constants/messages.js';
+import { LOGGER } from '../../../logger/index.js';
+import { updateUsersToInactive } from '../../../mongodb/operations/index.js';
+import { getUserById } from '../../../mongodb/operations/users.js';
+import { groupChat } from '../../bot.js';
+import { userMenu } from '../../menu/index.js';
 
-export const joinRequestHears = () => {
+export const groupRequestHears = () => {
+    // !Bot must be admin in group
     groupChat.on('chat_join_request', async (ctx) => {
         try {
             const {
@@ -13,11 +15,11 @@ export const joinRequestHears = () => {
                 invite_link,
                 chat: { id },
             } = ctx.chatJoinRequest;
-    
+
             const inviteLink = invite_link?.invite_link;
-    
+
             const user = await getUserById(user_chat_id);
-    
+
             const revokeLink = async () => {
                 try {
                     inviteLink &&
@@ -30,19 +32,23 @@ export const joinRequestHears = () => {
                     LOGGER.error('[revokeChatInviteLink]', { metadata: err });
                 }
             };
-    
+
             if (user?.approved && user.inviteLink === inviteLink) {
                 const approved = await ctx.approveChatJoinRequest(user_chat_id);
                 LOGGER.info('[approveChatJoinRequest] Approve user', {
                     metadata: user,
                 });
-    
+
                 if (approved) {
                     LOGGER.info('[userDialogue]', { metadata: user });
-                    await ctx.api.sendMessage(user.userId, MSG.welcome.user(user), {
-                        reply_markup: userMenu,
-                    });
-    
+                    await ctx.api.sendMessage(
+                        user.userId,
+                        MSG.welcome.user(user),
+                        {
+                            reply_markup: userMenu,
+                        }
+                    );
+
                     // Revoke
                     revokeLink();
                 } else {
@@ -58,7 +64,7 @@ export const joinRequestHears = () => {
                 LOGGER.error('[declineChatJoinRequest] Decline user', {
                     metadata: from,
                 });
-    
+
                 // Revoke
                 revokeLink();
             }
@@ -66,4 +72,25 @@ export const joinRequestHears = () => {
             LOGGER.error('[chat_join_request]', { metadata: err });
         }
     });
-}
+
+    groupChat.on(':left_chat_member', async (ctx) => {
+        const user = ctx.message.left_chat_member;
+        LOGGER.info('[left_chat_member]', { metadata: user });
+
+        try {
+            const deactivatedUser = await updateUsersToInactive(user.id);
+
+            if (deactivatedUser?.length) {
+                LOGGER.info('[Inactive]', {
+                    metadata: deactivatedUser,
+                });
+            } else {
+                LOGGER.error('[Inactive]', {
+                    metadata: deactivatedUser,
+                });
+            }
+        } catch (error) {
+            LOGGER.error('[Inactive]', { metadata: error });
+        }
+    });
+};

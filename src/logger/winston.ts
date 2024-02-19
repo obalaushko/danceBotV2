@@ -6,7 +6,7 @@ dotenv.config();
 
 // const LOGGER_BOT_TOKEN = process.env.LOGGER_BOT_TOKEN || '';
 const mode = process.env.NODE_ENV || 'development';
-const LOGTAIL_TOKEN = process.env.LOGTAIL_TOKEN || ''
+const LOGTAIL_TOKEN = process.env.LOGTAIL_TOKEN || '';
 
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';

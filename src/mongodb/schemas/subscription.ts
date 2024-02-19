@@ -12,13 +12,14 @@ export interface ISubscription extends Document {
     active?: boolean;
     firstActivation?: boolean;
     dateExpired?: Date;
+    lastDateUsed?: Date;
     freeze?: {
         lastDateFreeze?: Date;
         dateExpired?: Date;
         frozenUntil?: Date;
         active: boolean;
         usedLessons?: number;
-    }
+    };
 }
 
 const subscriptionSchema: Schema = new Schema<ISubscription>({
@@ -50,6 +51,9 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     dateExpired: {
         type: Date,
     },
+    lastDateUsed: {
+        type: Date,
+    },
     freeze: {
         lastDateFreeze: {
             type: Date,
@@ -65,9 +69,9 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
             default: false,
         },
         usedLessons: {
-            type: Number
-        }
-    }
+            type: Number,
+        },
+    },
 });
 
 subscriptionSchema.methods.setExpirationDate = function () {
@@ -103,6 +107,9 @@ subscriptionSchema.pre('save', function (next) {
         } else if (!this.active) {
             this.dateExpired = undefined;
             this.usedLessons = 0;
+
+            const today = moment().utc();
+            this.lastDateUsed = today;
         }
 
         changeType = this.active ? 'activation' : 'deactivation';

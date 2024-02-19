@@ -7,10 +7,7 @@ import {
 } from '../../../mongodb/operations/users.js';
 import { setupUserMenu } from './userSetupMenu.js';
 import { SessionContext } from '../../types/index.js';
-import {
-    getGroupedSubscriptionChangeLogs,
-    getGroupedSubscriptionChanges,
-} from '../../../mongodb/operations/changeLog.js';
+import { getGroupedSubscriptionChanges } from '../../../mongodb/operations/changeLog.js';
 import { sendMailingToUsers } from '../../../helpers/notifications.js';
 
 // Users menu
@@ -105,9 +102,10 @@ const confirmMailingMenu = new Menu('confirmMailingMenu', {
 const mailingMenu = new Menu('mailingMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
-    .text(MSG.buttons.settings.mailing.payment, async (ctx) => {
-        ctx.menu.nav('confirmMailingMenu');
-        await ctx.editMessageText(MSG.settings.mailing.payment);
+    .text(MSG.buttons.settings.mailing.custom, async (ctx) => {
+        // ctx.menu.nav('confirmMailingMenu');
+        ctx.menu.close();
+        await ctx.editMessageText(MSG.settings.mailing.custom);
     })
     .row()
     .text(MSG.buttons.back, async (ctx) => {
@@ -135,11 +133,11 @@ export const settingsMenu = new Menu('settingsMenu', {
         ctx.menu.nav('settingHistoryMenu');
         await ctx.editMessageText(MSG.settings.history(history));
     })
-    .row()
-    .text(MSG.buttons.settings.mailing.main, async (ctx) => {
-        ctx.menu.nav('mailingMenu');
-        await ctx.editMessageText(MSG.settings.mailing.main);
-    })
+    // .row()
+    // .text(MSG.buttons.settings.mailing.main, async (ctx) => {
+    //     ctx.menu.nav('mailingMenu');
+    //     await ctx.editMessageText(MSG.settings.mailing.main);
+    // })
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();

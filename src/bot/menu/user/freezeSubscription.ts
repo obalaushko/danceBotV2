@@ -1,6 +1,9 @@
 import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants/messages.js';
-import { getUserWithSubscriptionById, getUserById } from '../../../mongodb/operations/users.js';
+import {
+    getUserWithSubscriptionById,
+    getUserById,
+} from '../../../mongodb/operations/users.js';
 import {
     defrostSubscriptionByUserId,
     freezeSubscriptionByUserId,

@@ -11,7 +11,6 @@ export type Action =
     | 'UsedLessons'
     | null;
 
-
 interface SessionData {
     editedUserId: number | null;
     editedActions: Action;
