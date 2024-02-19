@@ -40,8 +40,8 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
             checkedRemove.clear();
 
             await deleteSubscription(userIds);
-            const chatInfo = await ctx.getChat();
-            await removeUserFromGroup(userIds, chatInfo.type);
+            
+            await removeUserFromGroup(userIds);
 
             ctx.menu.nav('admin');
             await ctx.editMessageText(MSG.welcome.admin(user));
@@ -95,6 +95,8 @@ const inactiveMenu = new Menu('inactiveMenu', {
                         });
 
                         await deactivateSubscriptions(userIds);
+
+                        await removeUserFromGroup(userIds);
 
                         ctx.menu.update();
                         await ctx.editMessageText(
