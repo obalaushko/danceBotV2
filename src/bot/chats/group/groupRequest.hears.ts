@@ -1,3 +1,4 @@
+import { ROLES } from '../../../constants/global.js';
 import { MSG } from '../../../constants/messages.js';
 import { LOGGER } from '../../../logger/index.js';
 import { updateUsersToInactive } from '../../../mongodb/operations/index.js';
@@ -78,6 +79,9 @@ export const groupRequestHears = () => {
         LOGGER.info('[left_chat_member]', { metadata: user });
 
         try {
+            const checkUser = await getUserById(user.id);
+            if (checkUser && checkUser.role === ROLES.Inactive) return;
+
             const deactivatedUser = await updateUsersToInactive(user.id);
 
             if (deactivatedUser?.length) {
