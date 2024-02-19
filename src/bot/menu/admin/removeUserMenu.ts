@@ -40,7 +40,8 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
             checkedRemove.clear();
 
             await deleteSubscription(userIds);
-            await removeUserFromGroup(userIds);
+            const chatInfo = await ctx.getChat();
+            await removeUserFromGroup(userIds, chatInfo.type);
 
             ctx.menu.nav('admin');
             await ctx.editMessageText(MSG.welcome.admin(user));

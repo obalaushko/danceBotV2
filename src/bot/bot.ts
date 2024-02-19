@@ -23,7 +23,7 @@ import {
     cancelCommand,
     changeNameCommand,
     helpCommand,
-    joinRequestHears,
+    groupRequestHears,
     messageHears,
     startCommand,
 } from './chats/index.js';
@@ -100,7 +100,7 @@ export const privateChat = bot.chatType('private');
 export const groupChat = bot.chatType(['group', 'supergroup']);
 
 // Group
-joinRequestHears();
+groupRequestHears();
 
 //START COMMAND
 // Private
@@ -110,21 +110,9 @@ cancelCommand();
 changeNameCommand();
 helpCommand();
 aboutCommand();
+
+// listener message must be last
 messageHears();
-
-// privateChat.command('updatePaymentDetails', async (ctx) => {
-//     const { user } = await ctx.getAuthor();
-//     if (user.is_bot) return;
-
-//     const userExists = await getUserById(user.id);
-
-//     if (
-//         userExists?.role === ROLES.Admin ||
-//         userExists?.role === ROLES.Developer
-//     ) {
-//         await ctx.conversation.enter('paymentDetailsConversations');
-//     }
-// });
 
 //CRASH HANDLER
 bot.catch((err) => {

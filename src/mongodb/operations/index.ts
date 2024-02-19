@@ -20,7 +20,7 @@ export {
     getUserWithPaymentDetails,
     getAllCanBeDeletedUsers,
     getAllCanBeSetIncactiveUsers,
-    updateUsersToInactive,
+    updateUserToInactive as updateUsersToInactive,
     deleteUsers,
     getUsersByUserIds,
     getUserWithSubscriptionById,
@@ -33,5 +33,5 @@ export {
     markLessonAsUsed,
     deleteSubscription,
     updateSubscriptionById,
-    freezeSubscriptionByUserId as freezeSubscription
+    freezeSubscriptionByUserId as freezeSubscription,
 } from './subscriptions.js';

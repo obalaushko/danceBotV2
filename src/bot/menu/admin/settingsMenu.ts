@@ -7,9 +7,7 @@ import {
 } from '../../../mongodb/operations/users.js';
 import { setupUserMenu } from './userSetupMenu.js';
 import { SessionContext } from '../../types/index.js';
-import {
-    getGroupedSubscriptionChanges,
-} from '../../../mongodb/operations/changeLog.js';
+import { getGroupedSubscriptionChanges } from '../../../mongodb/operations/changeLog.js';
 import { sendMailingToUsers } from '../../../helpers/notifications.js';
 
 // Users menu

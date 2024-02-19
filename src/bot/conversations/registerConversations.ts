@@ -71,7 +71,13 @@ export const registerConversations = async (
     if (newUser) {
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 
-        await ctx.api.sendMessage(ADMIN_ID, MSG.approveUser(newUser));
+        try {
+            await ctx.api.sendMessage(ADMIN_ID, MSG.approveUser(newUser));
+        } catch (error) {
+            LOGGER.error(
+                `[registerConversations]: Send admin message ${error}`
+            );
+        }
     }
 
     return;

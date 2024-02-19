@@ -32,9 +32,9 @@ export const showUserMenu = new Menu('showUserMenu', {
         );
     })
     .text(MSG.buttons.showUsers.allUsers, async (ctx) => {
-        const allUsers = await getAllUsers() || [];
-        const users = allUsers.filter((user) => user.role !== ROLES.Admin)
-        
+        const allUsers = (await getAllUsers()) || [];
+        const users = allUsers.filter((user) => user.role !== ROLES.Admin);
+
         ctx.menu.nav('backToMain');
         await ctx.editMessageText(MSG.showUsers.all(users));
     })

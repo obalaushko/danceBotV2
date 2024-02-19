@@ -311,7 +311,7 @@ export const getAllCanBeDeletedUsers = async (): Promise<IUser[] | null> => {
     }
 };
 
-export const updateUsersToInactive = async (
+export const updateUserToInactive = async (
     userIds: number | number[]
 ): Promise<IUser[] | null> => {
     try {
@@ -337,6 +337,30 @@ export const updateUsersToInactive = async (
         return null;
     } catch (error: any) {
         LOGGER.error('[updateUsersToInactive][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+export const updateInactiveToGuest = async (
+    userId: number
+): Promise<IUser | null> => {
+    try {
+        const user = await UserModel.findOne({ userId }).exec();
+
+        if (user) {
+            user.role = ROLES.Guest;
+            user.notifications = true;
+
+            await user.save();
+
+            return user;
+        }
+
+        return null;
+    } catch (error: any) {
+        LOGGER.error('[updateInactiveToUser][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;

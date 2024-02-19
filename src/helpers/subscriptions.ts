@@ -8,9 +8,11 @@ import {
 } from '../mongodb/schemas/subscription.js';
 import { IUser, UserModel } from '../mongodb/schemas/user.js';
 import { sendUserNotification } from './notifications.js';
-import cron from 'node-cron';
 import { defrostSubscriptionByUserId } from '../mongodb/operations/subscriptions.js';
 import { getUserById } from '../mongodb/operations/users.js';
+
+import cron from 'node-cron';
+import { removeUserFromGroup } from './users.js';
 
 export const dailyCheck = () => {
     // Function for checking and deactivating subscriptions
@@ -66,12 +68,56 @@ export const dailyCheck = () => {
         }
     };
 
-    cron.schedule('0 12 * * *', function () {
-        checkAndDeactivateSubscriptions();
-        checkAndDefrostSubscriptions();
-    });
+    const checkLastDayOfUsage = async () => {
+        const subscriptions: ISubscription[] | null =
+            await SubscriptionModel.find();
 
-    cron.schedule('0 0 * * *', function () {
-        deleteOldLogs();
-    });
+        for (const subscription of subscriptions) {
+            if (subscription && subscription.lastDateUsed) {
+                const currentUtcDate = moment.utc();
+                const lastDay = moment(subscription.lastDateUsed);
+
+                const diffDays = currentUtcDate.diff(lastDay, 'days');
+
+                if (diffDays >= 90) {
+                    // Deactivate user [left_chat_member] and remove from group
+                    await removeUserFromGroup([subscription.userId]);
+
+                    // Reset lastDateUsed
+                    subscription.lastDateUsed = undefined;
+                    await subscription.save();
+                } else if (diffDays === 80) {
+                    // Send notification if it hasn't been sent yet
+                    await sendUserNotification(
+                        subscription.userId,
+                        MSG.user.notification.lastDayOfUsage
+                    );
+                }
+            }
+        }
+    };
+
+    cron.schedule(
+        '0 12 * * *',
+        async function () {
+            await checkAndDeactivateSubscriptions();
+            await checkAndDefrostSubscriptions();
+            await checkLastDayOfUsage();
+        },
+        {
+            scheduled: true,
+            timezone: 'Europe/Kiev',
+        }
+    );
+
+    cron.schedule(
+        '0 0 * * *',
+        async function () {
+            await deleteOldLogs();
+        },
+        {
+            scheduled: true,
+            timezone: 'Europe/Kiev',
+        }
+    );
 };
