@@ -13,8 +13,13 @@ import { LogtailTransport } from '@logtail/winston';
 
 const logtail = new Logtail(LOGTAIL_TOKEN);
 
-const { combine, timestamp, json, errors } = format;
-const errorsFormat = errors({ stack: true });
+const { combine, timestamp, colorize, printf } = format;
+// const errorsFormat = errors({ stack: true });
+const consoleFormat = printf(({ level, message, timestamp, metadata }) => {
+    return `${timestamp} ${level}: ${message} ${
+        metadata ? JSON.stringify(metadata, null, 2) : ''
+    }`;
+});
 
 // const telegramTransport = new TelegramLogger({
 //     token: LOGGER_BOT_TOKEN,
@@ -54,7 +59,11 @@ if (mode === 'production') {
 logger.add(
     new transports.Console({
         level: 'info',
-        format: combine(timestamp(), json(), errorsFormat),
+        format: combine(
+            colorize({ colors: { info: 'blue', error: 'red' }, level: true }),
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            consoleFormat
+        ),
     })
 );
 

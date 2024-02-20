@@ -17,7 +17,6 @@ import {
 } from './conversations/index.js';
 import { BOT_RIGHTS, MSG } from '../constants/index.js';
 import { adminMenu, developerMenu, userMenu } from './menu/index.js';
-import { dailyCheck } from '../helpers/index.js';
 import {
     aboutCommand,
     cancelCommand,
@@ -27,6 +26,8 @@ import {
     messageHears,
     startCommand,
 } from './chats/index.js';
+import { tasksCron } from '../helpers/tasksCron.js';
+import { autoRetry } from '@grammyjs/auto-retry';
 dotenv.config();
 
 //Env vars
@@ -38,19 +39,32 @@ const BOT_TOKEN =
 
 //BOT CONFIG
 const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
+
+bot.api.config.use(
+    autoRetry({
+        maxRetryAttempts: 2,
+        maxDelaySeconds: 10,
+    })
+);
 // const throttler = apiThrottler({
 //     global: globalConfig,
 //     group: groupConfig,
 //     out: outConfig,
 // });
 
-bot.api.setMyCommands([], { scope: { type: 'all_group_chats' } });
-bot.api.setMyCommands(COMMANDS, { scope: { type: 'all_private_chats' } });
-bot.api.setMyDescription(MSG.myDescriptions);
-bot.api.setMyDefaultAdministratorRights({
-    // https://core.telegram.org/bots/api#chatadministratorrights
-    rights: BOT_RIGHTS,
-});
+try {
+    await bot.api.setMyCommands([], { scope: { type: 'all_group_chats' } });
+    await bot.api.setMyCommands(COMMANDS, {
+        scope: { type: 'all_private_chats' },
+    });
+    await bot.api.setMyDescription(MSG.myDescriptions);
+    await bot.api.setMyDefaultAdministratorRights({
+        // https://core.telegram.org/bots/api#chatadministratorrights
+        rights: BOT_RIGHTS,
+    });
+} catch (error) {
+    LOGGER.error('[setBotApi]', { metadata: error });
+}
 
 bot.use(hydrateReply);
 // bot.api.config.use(throttler);
@@ -94,7 +108,7 @@ bot.use(createConversation(registerConversations));
 // bot.use(createConversation(paymentDetailsConversations));
 bot.use(createConversation(changeNameConversations));
 
-dailyCheck();
+tasksCron();
 
 export const privateChat = bot.chatType('private');
 export const groupChat = bot.chatType(['group', 'supergroup']);
