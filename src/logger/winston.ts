@@ -13,8 +13,8 @@ import { LogtailTransport } from '@logtail/winston';
 
 const logtail = new Logtail(LOGTAIL_TOKEN);
 
-const { combine, timestamp, colorize, printf } = format;
-// const errorsFormat = errors({ stack: true });
+const { combine, timestamp, colorize, json, errors, printf } = format;
+const errorsFormat = errors({ stack: true });
 const consoleFormat = printf(({ level, message, timestamp, metadata }) => {
     return `${timestamp} ${level}: ${message} ${
         metadata ? JSON.stringify(metadata, null, 2) : ''
@@ -55,16 +55,27 @@ if (mode === 'production') {
         console.error(err);
     }
 }
-
-logger.add(
-    new transports.Console({
-        level: 'info',
-        format: combine(
-            colorize({ colors: { info: 'blue', error: 'red' }, level: true }),
-            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            consoleFormat
-        ),
-    })
-);
+if (mode === 'development') {
+    logger.add(
+        new transports.Console({
+            level: 'info',
+            format: combine(
+                colorize({
+                    colors: { info: 'blue', error: 'red' },
+                    level: true,
+                }),
+                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+                consoleFormat
+            ),
+        })
+    );
+} else if (mode === 'production') {
+    logger.add(
+        new transports.Console({
+            level: 'info',
+            format: combine(timestamp(), json(), errorsFormat),
+        })
+    );
+}
 
 export { logger };
