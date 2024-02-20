@@ -331,6 +331,9 @@ export const updateUserToInactive = async (
                 userId: { $in: userIdArray },
             });
 
+            LOGGER.info('[updateUserToInactive][success]', {
+                metadata: { users },
+            });
             return users;
         }
 
