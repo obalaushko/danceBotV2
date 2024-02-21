@@ -23,7 +23,7 @@ const consoleFormat = printf(({ level, message, timestamp, metadata }) => {
 
 // const telegramTransport = new TelegramLogger({
 //     token: LOGGER_BOT_TOKEN,
-//     chatId: -4022952026, //https://api.telegram.org/<BOT_TOKEN>/getUpdates
+//     chatId: <GROUP_ID>, //https://api.telegram.org/<BOT_TOKEN>/getUpdates
 //     disableNotification: true,
 //     batchingDelay: 1000,
 //     parseMode: 'HTML',
@@ -69,13 +69,14 @@ if (mode === 'development') {
             ),
         })
     );
-} else if (mode === 'production') {
-    logger.add(
-        new transports.Console({
-            level: 'info',
-            format: combine(timestamp(), json(), errorsFormat),
-        })
-    );
-}
+} 
+// else if (mode === 'production') {
+//     logger.add(
+//         new transports.Console({
+//             level: 'info',
+//             format: combine(timestamp(), json(), errorsFormat),
+//         })
+//     );
+// }
 
 export { logger };
