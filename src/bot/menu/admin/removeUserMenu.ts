@@ -40,7 +40,7 @@ const confirmRemoveMenu = new Menu('confirmRemoveMenu', {
             checkedRemove.clear();
 
             await deleteSubscription(userIds);
-            
+
             await removeUserFromGroup(userIds);
 
             ctx.menu.nav('admin');
