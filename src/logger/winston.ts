@@ -13,8 +13,8 @@ import { LogtailTransport } from '@logtail/winston';
 
 const logtail = new Logtail(LOGTAIL_TOKEN);
 
-const { combine, timestamp, colorize, json, errors, printf } = format;
-const errorsFormat = errors({ stack: true });
+const { combine, timestamp, colorize, printf } = format;
+// const errorsFormat = errors({ stack: true });
 const consoleFormat = printf(({ level, message, timestamp, metadata }) => {
     return `${timestamp} ${level}: ${message} ${
         metadata ? JSON.stringify(metadata, null, 2) : ''
@@ -52,6 +52,7 @@ if (mode === 'production') {
     try {
         logger.add(new LogtailTransport(logtail, { level: 'debug' })); // https://logs.betterstack.com/team/218160/tail
     } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err);
     }
 }

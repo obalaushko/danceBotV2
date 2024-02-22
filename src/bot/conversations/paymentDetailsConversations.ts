@@ -15,7 +15,6 @@ export const paymentDetailsConversations = async (
         async () => await getPaymentDetailsExist(user.id)
     );
 
-    console.log(userWithPayment);
     if (userWithPayment) {
         // update
     } else {

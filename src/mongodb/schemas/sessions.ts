@@ -2,7 +2,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 
 export interface ISession extends Document {
     userId: string;
-    data?: any;
+    data?: object;
 }
 
 const sessionSchema: Schema = new Schema({

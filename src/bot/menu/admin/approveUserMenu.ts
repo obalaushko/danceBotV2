@@ -18,12 +18,12 @@ export const approveUserMenu = new Menu('approveUserMenu', {
 });
 
 approveUserMenu
-    .dynamic(async (ctx) => {
+    .dynamic(async () => {
         const guestUsers = await getAllGuestUsers();
 
         const range = new MenuRange();
         if (guestUsers?.length) {
-            guestUsers.map((user, index) => {
+            guestUsers.map((user) => {
                 range
                     .text(
                         {
