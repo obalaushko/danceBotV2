@@ -4,14 +4,19 @@ import {
     getUserById,
     updateUserById,
 } from '../../../mongodb/operations/index.js';
+import { LOGGER } from '../../../logger/index.js';
 
 export const notificationsMenu = new Menu('notificationsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
     .text(MSG.buttons.user.notificationActivate, async (ctx) => {
         const {
-            user: { id },
+            user: { id, username },
         } = await ctx.getAuthor();
+
+        LOGGER.debug('[NotificationsMenu][notificationActivate]', {
+            metadata: { id, username },
+        });
 
         const user = await getUserById(id);
 
@@ -25,8 +30,12 @@ export const notificationsMenu = new Menu('notificationsMenu', {
     })
     .text(MSG.buttons.user.notificationDisabled, async (ctx) => {
         const {
-            user: { id },
+            user: { id, username },
         } = await ctx.getAuthor();
+
+        LOGGER.debug('[NotificationsMenu][notificationDisabled]', {
+            metadata: { id, username },
+        });
 
         const user = await getUserById(id);
 

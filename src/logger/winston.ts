@@ -50,7 +50,7 @@ const logger = createLogger({
 
 if (mode === 'production') {
     try {
-        logger.add(new LogtailTransport(logtail)); // https://logs.betterstack.com/team/218160/tail
+        logger.add(new LogtailTransport(logtail, { level: 'debug' })); // https://logs.betterstack.com/team/218160/tail
     } catch (err) {
         console.error(err);
     }
@@ -58,7 +58,7 @@ if (mode === 'production') {
 if (mode === 'development') {
     logger.add(
         new transports.Console({
-            level: 'info',
+            level: 'debug',
             format: combine(
                 colorize({
                     colors: { info: 'blue', error: 'red' },
@@ -69,7 +69,7 @@ if (mode === 'development') {
             ),
         })
     );
-} 
+}
 // else if (mode === 'production') {
 //     logger.add(
 //         new transports.Console({

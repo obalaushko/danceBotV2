@@ -13,8 +13,12 @@ import { returnToGroupMenu } from './returnToGroupMenu.js';
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
         const {
-            user: { id },
+            user: { id, username },
         } = await ctx.getAuthor();
+
+        LOGGER.debug('[userMenu][showSubscription]', {
+            metadata: { id, username },
+        });
 
         const user = await getUserWithSubscriptionById(id);
 
@@ -40,9 +44,10 @@ export const userMenu = new Menu('user')
     })
     .text(MSG.buttons.user.notifications, async (ctx) => {
         const {
-            user: { id },
+            user: { id, username },
         } = await ctx.getAuthor();
         try {
+            LOGGER.debug('[NotificationsMenu]', { metadata: { id, username } });
             const user = await getUserById(id);
 
             ctx.menu.nav('notificationsMenu');
@@ -53,6 +58,14 @@ export const userMenu = new Menu('user')
     })
     .row()
     .text(MSG.buttons.user.paymentDetails, async (ctx) => {
+        const {
+            user: { id, username },
+        } = await ctx.getAuthor();
+
+        LOGGER.debug('[userMenu][paymentDetails]', {
+            metadata: { id, username },
+        });
+
         ctx.menu.nav('backToUserMain');
         await ctx.editMessageText(MSG.payments.static);
     });

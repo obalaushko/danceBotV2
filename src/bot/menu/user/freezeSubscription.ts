@@ -12,6 +12,7 @@ import {
 import { checkLastFreeze } from '../../../utils/utils.js';
 
 import * as dotenv from 'dotenv';
+import { LOGGER } from '../../../logger/index.js';
 dotenv.config();
 
 const ENVS = process.env;
@@ -20,8 +21,10 @@ const ADMIN_ID = ENVS.ADMIN_ID || '';
 const freezeSubMenu = new Menu('freezeSubMenu')
     .dynamic(async (ctx) => {
         const {
-            user: { id },
+            user: { id, username },
         } = await ctx.getAuthor();
+        LOGGER.debug('[freezeSubMenu]', { metadata: { id, username } });
+
         const user = await getUserWithSubscriptionById(id);
         const range = new MenuRange();
 
