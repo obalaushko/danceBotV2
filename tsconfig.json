@@ -24,13 +24,15 @@
         "declaration": true,
         "moduleResolution": "node",
         "lib": ["ES2022", "dom", "es6", "es5"],
+        "typeRoots": ["node_modules/@types"],
         "types": [
-            "node"
+            "node",
+            "jest",
             // "@wdio/globals/types",
             // "@wdio/devtools-service",
         ]
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "__tests__/"],
     "exclude": ["node_modules", "dist"],
     "ts-node": {
         "esm": true,
