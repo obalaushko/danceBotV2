@@ -3,7 +3,7 @@ import { bot } from '../bot/bot.js';
 import * as dotenv from 'dotenv';
 import { LOGGER } from '../logger/index.js';
 import { UserModel } from '../mongodb/schemas/user.js';
-import { updateUserToInactive } from '../mongodb/operations/users.js';
+import { updateUsersToInactive } from '../mongodb/operations/users.js';
 import { ROLES } from '../constants/global.js';
 dotenv.config();
 
@@ -50,7 +50,7 @@ export const checkAndUpdateTelegramUser = async () => {
             }
 
             if (status === 'left' && user.role !== ROLES.Inactive) {
-                await updateUserToInactive(id);
+                await updateUsersToInactive(id);
             }
         }
     } catch (err) {

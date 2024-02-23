@@ -90,7 +90,7 @@ const inactiveMenu = new Menu('inactiveMenu', {
 
                     checkedInactive.clear();
                     if (updateUsers?.length) {
-                        LOGGER.info('[Inactive]', {
+                        LOGGER.info('[inactiveMenu][Inactive]', {
                             metadata: updateUsers,
                         });
 
@@ -103,7 +103,7 @@ const inactiveMenu = new Menu('inactiveMenu', {
                             MSG.remove.inactive(updateUsers)
                         );
                     } else {
-                        LOGGER.error('[Inactive]', {
+                        LOGGER.error('[inactiveMenu][Inactive]', {
                             metadata: updateUsers,
                         });
                         await ctx.reply(MSG.errors.failedToUpdate);

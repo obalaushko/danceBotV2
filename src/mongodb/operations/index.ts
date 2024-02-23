@@ -20,7 +20,7 @@ export {
     getUserWithPaymentDetails,
     getAllCanBeDeletedUsers,
     getAllCanBeSetIncactiveUsers,
-    updateUserToInactive as updateUsersToInactive,
+    updateUsersToInactive,
     deleteUsers,
     getUsersByUserIds,
     getUserWithSubscriptionById,
