@@ -311,7 +311,7 @@ export const getAllCanBeDeletedUsers = async (): Promise<IUser[] | null> => {
     }
 };
 
-export const updateUserToInactive = async (
+export const updateUsersToInactive = async (
     userIds: number | number[]
 ): Promise<IUser[] | null> => {
     try {
@@ -331,7 +331,7 @@ export const updateUserToInactive = async (
                 userId: { $in: userIdArray },
             });
 
-            LOGGER.info('[updateUserToInactive][success]', {
+            LOGGER.info('[updateUsersToInactive][success]', {
                 metadata: { users },
             });
             return users;

@@ -210,7 +210,7 @@ export const MSG = {
             let text =
                 'Історія відображає коли був активований чи деактивований абонемент, та відображає в які дні учень використовував його.\n\n⚠️ Дати відвідування можуть бути не точними, все залежить у який день вчитель відмітив учня.\n<i>Історія відображається за останні 2 місяці.</i>\n';
 
-            for (let date in history) {
+            for (const date in history) {
                 text += `\n<b>Дата: ${date}</b>\n`;
                 history[date].map((item) => {
                     text += `Ім'я: ${item.fullName}\n`;
@@ -379,7 +379,7 @@ export const MSG = {
             main: 'Ви можете призупинити дію абонементу один раз протягом 90 днів, терміном до 10 днів.',
             frozen: (subscription: ISubscription) =>
                 `Ваш абонемент було призупинено до ${convertDate(
-                    subscription.freeze?.frozenUntil!
+                    subscription?.freeze?.frozenUntil!
                 )}, ви можете  відновити його у будь-який момент.`,
             defrost: `Ваш абонемент відновлено!`,
             isNotAllowed: (subscription: ISubscription) =>
