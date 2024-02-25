@@ -5,6 +5,13 @@ import { MSG } from '../../constants/index.js';
 import { updateUserById } from '../../mongodb/operations/index.js';
 import { isCancel } from '../../utils/utils.js';
 
+/**
+ * Changes the name of the user in a conversation.
+ * 
+ * @param conversation - The conversation context.
+ * @param ctx - The bot context.
+ * @returns A promise that resolves when the name is successfully changed.
+ */
 export const changeNameConversations = async (
     conversation: ConverstaionContext,
     ctx: BotContext

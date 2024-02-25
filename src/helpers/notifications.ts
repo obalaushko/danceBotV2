@@ -10,6 +10,11 @@ dotenv.config();
 const ENVS = process.env;
 const GROUP_ID = ENVS.GROUP_ID || '';
 
+/**
+ * Sends a notification to a user.
+ * @param userId - The ID of the user to send the notification to.
+ * @param message - The message to be sent as the notification.
+ */
 export const sendUserNotification = async (userId: number, message: string) => {
     const owner = await getUserById(userId);
     try {
@@ -24,6 +29,12 @@ export const sendUserNotification = async (userId: number, message: string) => {
     }
 };
 
+/**
+ * Sends an invite to a group for each user in the provided array.
+ * If the user is already a member of the group, a message is sent to the user.
+ * If the user is not a member, an invite link is created and sent to the user.
+ * @param users - An array of IUser objects representing the users to send invites to.
+ */
 export const sendInviteToGroup = async (users: IUser[]) => {
     try {
         for (const user of users) {
@@ -58,6 +69,10 @@ export const sendInviteToGroup = async (users: IUser[]) => {
     }
 };
 
+/**
+ * Sends a mailing to all users who have notifications enabled.
+ * @param messages - The messages to be sent.
+ */
 export const sendMailingToUsers = async (messages: string) => {
     const users = await getAllUserUsers();
 

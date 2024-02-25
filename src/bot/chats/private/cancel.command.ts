@@ -3,6 +3,10 @@ import { LOGGER } from '../../../logger/index.js';
 import { isObjectEmpty } from '../../../utils/utils.js';
 import { privateChat } from '../../bot.js';
 
+/**
+ * Defines the cancel command for private chats.
+ * This command allows the user to cancel an ongoing conversation.
+ */
 export const cancelCommand = () => {
     privateChat.command('cancel', async (ctx) => {
         const stats = await ctx.conversation.active();

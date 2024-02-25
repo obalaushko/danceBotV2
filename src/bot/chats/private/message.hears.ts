@@ -6,7 +6,16 @@ import { BotContext } from '../../types/index.js';
 import { updateSubscriptionById } from '../../../mongodb/operations/subscriptions.js';
 import { ROLES } from '../../../constants/global.js';
 
+/**
+ * Handles various message hears in private chats.
+ */
 export const messageHears = () => {
+    /**
+     * Updates the role of a user.
+     * @param userId - The ID of the user.
+     * @param role - The new role for the user.
+     * @returns A promise that resolves to a string indicating the result of the update operation.
+     */
     const handlerUpdateRole = async (
         userId: number,
         role: string
@@ -20,6 +29,13 @@ export const messageHears = () => {
         }
     };
 
+    /**
+     * Updates the notification settings for a user.
+     * 
+     * @param userId - The ID of the user.
+     * @param notifications - The new notification setting.
+     * @returns A promise that resolves to a string indicating the result of the update.
+     */
     const handlerUpdateNotifications = async (
         userId: number,
         notifications: boolean
@@ -33,6 +49,13 @@ export const messageHears = () => {
         }
     };
 
+    /**
+     * Updates the total number of lessons for a user.
+     * 
+     * @param userId - The ID of the user.
+     * @param totalLessons - The new total number of lessons.
+     * @returns A promise that resolves to a string indicating the result of the update.
+     */
     const handlerUpdateTotalLessons = async (
         userId: number,
         totalLessons: number
@@ -48,6 +71,13 @@ export const messageHears = () => {
         }
     };
 
+    /**
+     * Updates the number of used lessons for a user.
+     * 
+     * @param userId - The ID of the user.
+     * @param usedLessons - The number of used lessons to update.
+     * @returns A promise that resolves to a string indicating the success or failure of the update.
+     */
     const handlerUpdateUsedLessons = async (
         userId: number,
         usedLessons: number
@@ -63,6 +93,13 @@ export const messageHears = () => {
         }
     };
 
+    /**
+     * Handles role switching based on the received message.
+     * 
+     * @param ctx - The BotContext object.
+     * @param message - The message received.
+     * @param userId - The ID of the user.
+     */
     const roleSwitch = async (
         ctx: BotContext,
         message: string,
@@ -121,6 +158,12 @@ export const messageHears = () => {
         }
     };
 
+    /**
+     * Handles the notification switch based on the received message.
+     * @param ctx The bot context.
+     * @param message The received message.
+     * @param userId The user ID.
+     */
     const notificationSwitch = async (
         ctx: BotContext,
         message: string,
@@ -160,6 +203,13 @@ export const messageHears = () => {
                 break;
         }
     };
+    /**
+     * Handles the switch cases for the lessons in a private message.
+     * @param ctx The BotContext object.
+     * @param message The message string.
+     * @param userId The user ID.
+     * @param action The action string.
+     */
     const lessonsSwitch = async (
         ctx: BotContext,
         message: string,

@@ -3,6 +3,16 @@ import { LOGGER } from '../../logger/index.js';
 import { ISubscription, SubscriptionModel } from '../schemas/subscription.js';
 import { checkLastFreeze } from '../../utils/utils.js';
 
+/**
+ * Adds a subscription to the database.
+ * 
+ * @param {Object} subscriptionData - The subscription data.
+ * @param {string} subscriptionData.userId - The ID of the user.
+ * @param {number} subscriptionData.totalLessons - The total number of lessons in the subscription.
+ * @param {number} subscriptionData.usedLessons - The number of lessons already used.
+ * @param {boolean} subscriptionData.active - Indicates if the subscription is active.
+ * @returns {Promise<ISubscription | null>} A promise that resolves to the saved subscription or null if it already exists or an error occurred.
+ */
 export const addSubscription = async ({
     userId,
     totalLessons,
@@ -46,6 +56,11 @@ export const addSubscription = async ({
     }
 };
 
+/**
+ * Retrieves a subscription by its user ID.
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to the subscription object if found, or null if not found.
+ */
 export const getSubscriptionById = async (
     userId: number
 ): Promise<ISubscription | null> => {
@@ -60,6 +75,13 @@ export const getSubscriptionById = async (
     }
 };
 
+/**
+ * Updates a subscription by its ID.
+ * 
+ * @param userId - The ID of the user.
+ * @param update - The partial subscription object containing the fields to update.
+ * @returns A promise that resolves to the updated subscription, or null if the subscription does not exist or an error occurs.
+ */
 export const updateSubscriptionById = async (
     userId: number,
     update: Partial<ISubscription>
@@ -80,6 +102,12 @@ export const updateSubscriptionById = async (
     }
 };
 
+/**
+ * Activates subscriptions for the specified user(s).
+ * 
+ * @param userId - The ID of the user or an array of user IDs.
+ * @returns A promise that resolves to an array of updated subscriptions, or null if no subscriptions were found.
+ */
 export const activateSubscriptions = async (
     userId: number | number[]
 ): Promise<ISubscription[] | null> => {
@@ -114,6 +142,11 @@ export const activateSubscriptions = async (
     }
 };
 
+/**
+ * Deactivates subscriptions for the specified user(s).
+ * @param userId - The ID(s) of the user(s) whose subscriptions should be deactivated.
+ * @returns A promise that resolves to an array of updated subscriptions, or null if no subscriptions were found.
+ */
 export const deactivateSubscriptions = async (
     userId: number | number[]
 ): Promise<ISubscription[] | null> => {
@@ -145,6 +178,11 @@ export const deactivateSubscriptions = async (
     }
 };
 
+/**
+ * Marks a lesson as used for the specified user(s).
+ * @param userId - The ID of the user or an array of user IDs.
+ * @returns A promise that resolves to an array of updated subscriptions, or null if no subscriptions were found.
+ */
 export const markLessonAsUsed = async (
     userId: number | number[]
 ): Promise<ISubscription[] | null> => {
@@ -177,6 +215,11 @@ export const markLessonAsUsed = async (
     }
 };
 
+/**
+ * Deletes a subscription from the database.
+ * @param userId - The ID of the user or an array of user IDs.
+ * @returns A promise that resolves to a boolean indicating whether the subscription was successfully deleted.
+ */
 export const deleteSubscription = async (
     userId: number | number[]
 ): Promise<boolean> => {
@@ -205,6 +248,11 @@ interface IStatus {
     active: boolean;
     frozen: boolean;
 }
+/**
+ * Retrieves the subscription statuses for a given user.
+ * @param userId - The ID of the user.
+ * @returns A Promise that resolves to an object containing the active and frozen status of the subscription, or null if no subscription is found.
+ */
 export const getSubscriptionStatuses = async (
     userId: number
 ): Promise<IStatus | null> => {
@@ -223,6 +271,13 @@ export const getSubscriptionStatuses = async (
         return null;
     }
 };
+
+/**
+ * Freezes a subscription by user ID.
+ * 
+ * @param userId - The ID of the user.
+ * @returns A Promise that resolves to the frozen subscription if successful, or null if the subscription does not exist or freezing is not allowed.
+ */
 export const freezeSubscriptionByUserId = async (
     userId: number
 ): Promise<ISubscription | null> => {
@@ -264,6 +319,12 @@ export const freezeSubscriptionByUserId = async (
     }
 };
 
+/**
+ * Defrosts a subscription by user ID.
+ * 
+ * @param userId - The ID of the user.
+ * @returns A promise that resolves to the defrosted subscription, or null if the subscription does not exist.
+ */
 export const defrostSubscriptionByUserId = async (
     userId: number
 ): Promise<ISubscription | null> => {
