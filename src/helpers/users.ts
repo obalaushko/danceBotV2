@@ -8,6 +8,10 @@ dotenv.config();
 const ENVS = process.env;
 const GROUP_ID = ENVS.GROUP_ID || '';
 //! BOT must be admin in the group
+/**
+ * Removes users from a group.
+ * @param userIds - An array of user IDs to be removed from the group.
+ */
 export const removeUserFromGroup = async (userIds: number[]) => {
     const { type } = await bot.api.getChat(GROUP_ID);
 
@@ -26,6 +30,14 @@ export const removeUserFromGroup = async (userIds: number[]) => {
     });
 };
 
+/**
+ * Checks and updates the Telegram users in the database.
+ * Retrieves the users from the UserModel and updates their first name and username
+ * based on the information obtained from the Telegram API.
+ * If the update is successful, the changes are saved to the database.
+ * If the update fails, a warning message is logged.
+ * If an error occurs during the process, an error message is logged.
+ */
 export const checkAndUpdateTelegramUser = async () => {
     try {
         const users = await UserModel.find();

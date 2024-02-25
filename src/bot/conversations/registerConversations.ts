@@ -11,6 +11,13 @@ dotenv.config();
 const ENVS = process.env;
 const ADMIN_ID = ENVS.ADMIN_ID || '';
 
+/**
+ * Registers conversations for the bot.
+ * 
+ * @param conversation - The conversation context.
+ * @param ctx - The bot context.
+ * @returns A promise that resolves when the conversations are registered.
+ */
 export const registerConversations = async (
     conversation: ConverstaionContext,
     ctx: BotContext

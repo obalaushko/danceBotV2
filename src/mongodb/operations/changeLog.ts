@@ -8,6 +8,14 @@ import {
 import { getUserById } from './users.js';
 import moment from 'moment-timezone';
 
+/**
+ * Adds a log entry for a subscription change.
+ * 
+ * @param userId - The ID of the user.
+ * @param subscriptionId - The ID of the subscription.
+ * @param changeType - The type of change.
+ * @returns A Promise that resolves to void.
+ */
 export const addLogSubscriptionChange = async (
     userId: number,
     subscriptionId: Types.ObjectId,
@@ -30,6 +38,10 @@ export const addLogSubscriptionChange = async (
 };
 
 // ! Deprecated
+/**
+ * Retrieves grouped subscription change logs.
+ * @returns A promise that resolves to an array of grouped change logs or null if an error occurs.
+ */
 export const getGroupedSubscriptionChangeLogs = async (): Promise<
     IChangeLog[] | null
 > => {
@@ -62,6 +74,10 @@ export const getGroupedSubscriptionChangeLogs = async (): Promise<
     }
 };
 
+/**
+ * Retrieves grouped subscription changes from the database.
+ * @returns A Promise that resolves to an object containing grouped changes, or null if an error occurs.
+ */
 export const getGroupedSubscriptionChanges =
     async (): Promise<GroupedChanges | null> => {
         try {
@@ -108,6 +124,11 @@ export const getGroupedSubscriptionChanges =
         }
     };
 
+/**
+ * Deletes old logs from the subscription change log collection.
+ * Logs that are older than two months will be removed.
+ * @returns A Promise that resolves to void.
+ */
 export const deleteOldLogs = async (): Promise<void> => {
     try {
         const twoMonthsAgo = moment().subtract(2, 'months').utc().format();

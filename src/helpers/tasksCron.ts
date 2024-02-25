@@ -7,6 +7,9 @@ import {
 import { deleteOldLogs } from '../mongodb/operations/changeLog.js';
 import { checkAndUpdateTelegramUser } from './users.js';
 
+/**
+ * Schedules and runs various tasks using cron jobs.
+ */
 export const tasksCron = async () => {
     cron.schedule(
         '0 12 * * *',

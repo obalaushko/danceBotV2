@@ -6,6 +6,9 @@ import { privateChat } from '../../bot.js';
 import { adminMenu, developerMenu, userMenu } from '../../menu/index.js';
 import { returnToGroupMenu } from '../../menu/user/returnToGroupMenu.js';
 
+/**
+ * Defines the start command for private chats.
+ */
 export const startCommand = () => {
     privateChat.command('start', async (ctx) => {
         const { user } = await ctx.getAuthor();
