@@ -13,6 +13,8 @@ const runBot = () => {
                         'chat_member',
                         'chosen_inline_result',
                         'edited_channel_post',
+                        'message_reaction',
+                        'message_reaction_count',
                         'edited_message',
                         'inline_query',
                         'message',
