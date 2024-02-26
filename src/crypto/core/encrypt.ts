@@ -16,6 +16,12 @@ if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR);
 }
 
+/**
+ * Encrypts a password using AES-256-CBC encryption algorithm.
+ * 
+ * @param password - The password to be encrypted.
+ * @returns A Promise that resolves to a Buffer containing the encrypted data, or null if encryption fails.
+ */
 export const encrypt = async (password: string): Promise<Buffer | null> => {
     try {
         const algorithm = 'aes-256-cbc';

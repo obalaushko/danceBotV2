@@ -3,6 +3,7 @@ import { BotContext, ConverstaionContext } from '../../bot/types/index.js';
 import { LOGGER } from '../../logger/index.js';
 import { CMSG } from './constants/index.js';
 import { encrypt } from '../core/encrypt.js';
+import { writeToFile } from '../core/file.manager.js';
 
 const keyboard = new Keyboard()
     .text(CMSG.buttons.encrypt)
@@ -45,6 +46,11 @@ export const cryptoConversations = async (
     const messageText = message?.text;
     await selectMode(messageText);
 
+    /**
+     * Selects the mode of the crypto conversation based on the original message.
+     * Leaves the current conversation and handles encryption or decryption based on the original message.
+     * @param originalMessage The original message received from the user.
+     */
     async function selectMode(originalMessage: string) {
         await leaveConversation(originalMessage);
 
@@ -56,6 +62,13 @@ export const cryptoConversations = async (
         }
     }
 
+    /**
+     * Handles the encryption process.
+     *
+     * @param ctx - The BotContext object.
+     * @param conversation - The ConverstaionContext object.
+     * @returns A Promise that resolves when the encryption process is completed.
+     */
     async function handleEncryption(
         ctx: BotContext,
         conversation: ConverstaionContext
@@ -66,10 +79,10 @@ export const cryptoConversations = async (
         // password or buttons
         const { message: passOrText } =
             await conversation.waitFor('message:text');
-        const text = passOrText.text;
+        const password = passOrText.text;
 
-        if (buttonsValues.some((button) => text.includes(button))) {
-            await selectMode(text);
+        if (buttonsValues.some((button) => password.includes(button))) {
+            await selectMode(password);
         } else {
             // TODO: Investigate out why it doesn't work after deleting in this way, the next message sent by the user gives an error
             // await passOrText.delete().catch((error) => {
@@ -91,13 +104,17 @@ export const cryptoConversations = async (
                 ':document',
                 'message:text',
             ]);
+            const buttonsText = fileOrText.message?.text || '';
 
-            if (fileOrText.message?.document) {
+            if (buttonsValues.some((button) => buttonsText.includes(button))) {
+                console.log(buttonsText)
+                await selectMode(password);
+            } else if (fileOrText.message?.document) {
                 const file = await fileOrText.getFile();
 
                 await file.download('dump/encrypt.txt'); //TODO check if file has .txt extension
 
-                const newFileBuffer = await encrypt(text);
+                const newFileBuffer = await encrypt(password);
 
                 if (newFileBuffer) {
                     const file = new InputFile(newFileBuffer, 'encrypt.json');
@@ -106,7 +123,10 @@ export const cryptoConversations = async (
                         caption: CMSG.text.ecnrypted,
                     });
 
-                    const removeAfterMinute = await ctx.reply(CMSG.text.remove);
+                    const removeAfterMinute = await ctx.reply(
+                        CMSG.text.remove,
+                        { reply_markup: { remove_keyboard: true } }
+                    );
 
                     setTimeout(async () => {
                         // remove original file/text
@@ -126,13 +146,63 @@ export const cryptoConversations = async (
                                 );
                             })
                         );
-                        await ctx.reply(CMSG.text.removed, {
-                            reply_markup: { remove_keyboard: true },
-                        });
+                        await ctx.reply(CMSG.text.removed);
                     }, 60 * 1000);
                 }
             } else if (fileOrText.message?.text) {
-                console.log(fileOrText.message.text);
+                const messageText = fileOrText.message.text;
+                const newFileTxt = await writeToFile(
+                    'encrypt.txt',
+                    messageText
+                );
+
+                if (newFileTxt) {
+                    const newFileBuffer = await encrypt(password);
+
+                    if (newFileBuffer) {
+                        const file = new InputFile(
+                            newFileBuffer,
+                            'encrypt.json'
+                        );
+
+                        const encryptedFile = await ctx.replyWithDocument(
+                            file,
+                            {
+                                caption: CMSG.text.ecnrypted,
+                            }
+                        );
+
+                        const removeAfterMinute = await ctx.reply(
+                            CMSG.text.remove,
+                            { reply_markup: { remove_keyboard: true } }
+                        );
+
+                        setTimeout(async () => {
+                            // remove original file/text
+                            ctx.chat?.id &&
+                                (await ctx.api.deleteMessage(
+                                    ctx.chat?.id,
+                                    fileOrText.message.message_id
+                                ));
+                            // remove encrypted file
+                            [encryptedFile, removeAfterMinute].forEach(
+                                (message) =>
+                                    message.delete().catch((error) => {
+                                        LOGGER.error(
+                                            '[cryptoConversations][selectMode][delete]',
+                                            {
+                                                metadata: error,
+                                            }
+                                        );
+                                    })
+                            );
+                            await ctx.reply(CMSG.text.removed);
+                        }, 60 * 1000);
+                    }
+                }
+            } else {
+                await ctx.reply(CMSG.text.error);
+                await selectMode(password);
             }
         }
     }
