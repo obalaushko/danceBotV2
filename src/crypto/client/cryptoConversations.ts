@@ -18,8 +18,9 @@ export const cryptoConversations = async (
     ctx: BotContext
 ) => {
     /**
-     * Leaves the current conversation in the cryptography mode.
-     * @param message - The message received from the user.
+     * Leaves the conversation if the provided message matches the cancel command or button.
+     * @param message - The message to check for cancellation.
+     * @returns A boolean indicating whether the conversation was left or not.
      */
     const leaveConversation = async (message: string) => {
         try {
@@ -31,370 +32,288 @@ export const cryptoConversations = async (
                 await ctx.reply(CMSG.text.cancel, {
                     reply_markup: { remove_keyboard: true },
                 });
-                return;
+                return true;
             }
         } catch (error) {
             LOGGER.error('[cryptoConversations][leaveConversation]', {
                 metadata: error,
             });
         }
+        return false;
+    };
+
+    /**
+     * Capitalizes the first letter of a word.
+     * @param word - The word to capitalize.
+     * @returns The word with the first letter capitalized.
+     */
+    function capitalizeFirstLetter(word: string): string {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    /**
+     * Selects the mode of operation based on the original message.
+     * If the original message is "encrypt", it calls handleCryptoOperation with the 'encrypt' mode.
+     * If the original message is "decrypt", it calls handleCryptoOperation with the 'decrypt' mode.
+     * @param originalMessage The original message received.
+     */
+    const selectMode = async (originalMessage: string) => {
+        if (await leaveConversation(originalMessage)) {
+            return;
+        }
+
+        if (originalMessage === CMSG.buttons.encrypt) {
+            await handleCryptoOperation(ctx, conversation, 'encrypt');
+        } else if (originalMessage === CMSG.buttons.decrypt) {
+            await handleCryptoOperation(ctx, conversation, 'decrypt');
+        }
+    };
+
+    /**
+     * Handles the crypto operation (encrypt or decrypt) based on the given parameters.
+     * 
+     * @param ctx - The BotContext object.
+     * @param conversation - The ConverstaionContext object.
+     * @param operation - The operation to perform, either 'encrypt' or 'decrypt'.
+     */
+    const handleCryptoOperation = async (
+        ctx: BotContext,
+        conversation: ConverstaionContext,
+        operation: 'encrypt' | 'decrypt'
+    ) => {
+        const isEncrypting: boolean = operation === 'encrypt';
+        const buttonsValues = Object.values(CMSG.buttons);
+        const actionText = isEncrypting ? CMSG.text.encrypt : CMSG.text.decrypt;
+
+        await ctx.reply(actionText);
+
+        const { message: passOrText } =
+            await conversation.waitFor('message:text');
+        const password: string = passOrText.text;
+
+        if (buttonsValues.some((button) => password.includes(button))) {
+            await selectMode(password);
+        } else {
+            try {
+                ctx.chat?.id &&
+                    (await ctx.api.deleteMessage(
+                        ctx.chat?.id,
+                        passOrText.message_id
+                    ));
+            } catch (error) {
+                LOGGER.error(
+                    `[cryptoConversations][handle${operation}][delete]`,
+                    { metadata: error }
+                );
+            }
+
+            const waitFileOrText = async (repeat = false) => {
+                const promptText = repeat
+                    ? CMSG.text[
+                          `repeatNextStepAfterPass${capitalizeFirstLetter(
+                              operation
+                          )}` as keyof typeof CMSG.text
+                      ]
+                    : CMSG.text[
+                          `nextStepAfterPass${capitalizeFirstLetter(
+                              operation
+                          )}` as keyof typeof CMSG.text
+                      ];
+
+                await ctx.reply(promptText);
+
+                const fileOrText = await conversation.waitFor([
+                    ':document',
+                    'message:text',
+                ]);
+
+                const buttonsText = fileOrText.message?.text || '';
+
+                if (
+                    buttonsValues.some((button) => buttonsText.includes(button))
+                ) {
+                    await selectMode(buttonsText);
+                } else if (fileOrText.message?.document) {
+                    await handleDocument(
+                        isEncrypting,
+                        ctx,
+                        conversation,
+                        fileOrText,
+                        waitFileOrText,
+                        password
+                    );
+                } else if (fileOrText.message?.text) {
+                    await handleTextMessage(
+                        isEncrypting,
+                        ctx,
+                        fileOrText,
+                        password
+                    );
+                } else {
+                    await ctx.reply(CMSG.text.error);
+                    await selectMode(
+                        isEncrypting
+                            ? CMSG.buttons.encrypt
+                            : CMSG.buttons.decrypt
+                    );
+                }
+            };
+
+            await waitFileOrText();
+        }
+    };
+
+    /**
+     * Handles the document based on the specified parameters.
+     * @param isEncrypting - Indicates whether the document is being encrypted or decrypted.
+     * @param ctx - The BotContext object.
+     * @param conversation - The ConverstaionContext object.
+     * @param fileOrText - The file or text to be processed.
+     * @param waitFileOrText - The function to wait for the file or text.
+     * @param password - The password used for encryption or decryption.
+     */
+    const handleDocument = async (
+        isEncrypting: boolean,
+        ctx: BotContext,
+        conversation: ConverstaionContext,
+        fileOrText: any,
+        waitFileOrText: Function,
+        password: string
+    ) => {
+        const fileType = fileOrText.message?.document?.mime_type;
+
+        if (
+            (isEncrypting && fileType !== 'text/plain') ||
+            (!isEncrypting && fileType !== 'application/json')
+        ) {
+            await ctx.reply(CMSG.text.wrongType);
+            await waitFileOrText(true);
+            return;
+        }
+
+        const fileName = isEncrypting ? 'encrypt.txt' : 'decrypt.json';
+
+        const file = await fileOrText.getFile();
+
+        await conversation.external(async () => {
+            await file.download(`dump/${fileName}`);
+        });
+
+        const newFileBuffer = await conversation.external(
+            async () =>
+                await (isEncrypting ? encrypt(password) : decrypt(password))
+        );
+
+        if (newFileBuffer) {
+            const fileExtension = isEncrypting ? 'encrypt.json' : 'decrypt.txt';
+            const file = new InputFile(newFileBuffer, fileExtension);
+
+            const actionText = isEncrypting
+                ? CMSG.text.ecnrypted
+                : CMSG.text.decrypted;
+            const encryptedFile = await ctx.replyWithDocument(file, {
+                caption: actionText,
+            });
+
+            const removeAfterMinute = await ctx.reply(CMSG.text.remove, {
+                reply_markup: { remove_keyboard: true },
+            });
+
+            setTimeout(async () => {
+                try {
+                    ctx.chat?.id &&
+                        (await ctx.api.deleteMessage(
+                            ctx.chat?.id,
+                            fileOrText.message.message_id
+                        ));
+                    [encryptedFile, removeAfterMinute].forEach((message) =>
+                        message.delete().catch((error: any) => {
+                            LOGGER.error(
+                                `[cryptoConversations][selectMode][delete]`,
+                                { metadata: error }
+                            );
+                        })
+                    );
+                } catch (error) {
+                    LOGGER.error(`[cryptoConversations][selectMode][delete]`, {
+                        metadata: error,
+                    });
+                }
+                await ctx.reply(CMSG.text.removed);
+            }, 60 * 1000);
+        }
+    };
+
+    /**
+     * Handles a text message by encrypting or decrypting the message content and sending the result as a document.
+     * @param isEncrypting - A boolean indicating whether the message should be encrypted or decrypted.
+     * @param ctx - The BotContext object.
+     * @param fileOrText - The file or text message to be processed.
+     * @param password - The password used for encryption or decryption.
+     */
+    const handleTextMessage = async (
+        isEncrypting: boolean,
+        ctx: BotContext,
+        fileOrText: any,
+        password: string
+    ) => {
+        const messageText = fileOrText.message.text;
+        const fileName = isEncrypting ? 'encrypt.txt' : 'decrypt.txt';
+
+        const newFileTxt = await fileManager.writeToFile(fileName, messageText);
+
+        if (newFileTxt) {
+            const newFileBuffer = await (isEncrypting
+                ? encrypt(password)
+                : decrypt(password));
+
+            if (newFileBuffer) {
+                const fileExtension = isEncrypting
+                    ? 'encrypt.json'
+                    : 'decrypt.txt';
+                const file = new InputFile(newFileBuffer, fileExtension);
+
+                const actionText = isEncrypting
+                    ? CMSG.text.ecnrypted
+                    : CMSG.text.decrypted;
+                const encryptedFile = await ctx.replyWithDocument(file, {
+                    caption: actionText,
+                });
+
+                const removeAfterMinute = await ctx.reply(CMSG.text.remove, {
+                    reply_markup: { remove_keyboard: true },
+                });
+
+                setTimeout(async () => {
+                    try {
+                        ctx.chat?.id &&
+                            (await ctx.api.deleteMessage(
+                                ctx.chat?.id,
+                                fileOrText.message.message_id
+                            ));
+                        [encryptedFile, removeAfterMinute].forEach((message) =>
+                            message.delete().catch((error: any) => {
+                                LOGGER.error(
+                                    `[cryptoConversations][selectMode][delete]`,
+                                    { metadata: error }
+                                );
+                            })
+                        );
+                    } catch (error) {
+                        LOGGER.error(
+                            `[cryptoConversations][selectMode][delete]`,
+                            { metadata: error }
+                        );
+                    }
+                    await ctx.reply(CMSG.text.removed);
+                }, 60 * 1000);
+            }
+        }
     };
 
     await ctx.reply(CMSG.text.start, { reply_markup: keyboard });
-
     const { message } = await conversation.waitFor('message:text');
 
     const messageText = message?.text;
     await selectMode(messageText);
-
-    /**
-     * Selects the mode of the crypto conversation based on the original message.
-     * Leaves the current conversation and handles encryption or decryption based on the original message.
-     * @param originalMessage The original message received from the user.
-     */
-    async function selectMode(originalMessage: string) {
-        await leaveConversation(originalMessage);
-
-        if (originalMessage === CMSG.buttons.encrypt) {
-            await handleEncryption(ctx, conversation);
-        }
-        if (originalMessage === CMSG.buttons.decrypt) {
-            await handleDecryption(ctx, conversation);
-        }
-    }
-
-    /**
-     * Handles the encryption process.
-     *
-     * @param ctx - The BotContext object.
-     * @param conversation - The ConverstaionContext object.
-     * @returns A Promise that resolves when the encryption process is completed.
-     */
-    async function handleEncryption(
-        ctx: BotContext,
-        conversation: ConverstaionContext
-    ) {
-        const buttonsValues = Object.values(CMSG.buttons);
-        await ctx.reply(CMSG.text.encrypt);
-
-        // password or buttons
-        const { message: passOrText } =
-            await conversation.waitFor('message:text');
-        const password = passOrText.text;
-
-        if (buttonsValues.some((button) => password.includes(button))) {
-            await selectMode(password);
-        } else {
-            try {
-                // Remove the password message
-                ctx.chat?.id &&
-                    (await ctx.api.deleteMessage(
-                        ctx.chat?.id,
-                        passOrText.message_id
-                    ));
-            } catch (error) {
-                LOGGER.error(
-                    '[cryptoConversations][handleEncryption][delete]',
-                    { metadata: error }
-                );
-            }
-
-            /**
-             * Waits for the user to provide either a document or a text message.
-             *
-             * @param repeat - Indicates whether to repeat the prompt message.
-             * @returns A promise that resolves to the user's input, which can be either a document or a text message.
-             */
-            const waitFileOrText = async (repeat: boolean = false) => {
-                if (repeat) {
-                    await ctx.reply(CMSG.text.repeatNextStepAfterPassEncrypt);
-                } else {
-                    await ctx.reply(CMSG.text.nextStepAfterPassEncrypt);
-                }
-
-                const fileOrText = await conversation.waitFor([
-                    ':document',
-                    'message:text',
-                ]);
-
-                const buttonsText = fileOrText.message?.text || '';
-
-                if (
-                    buttonsValues.some((button) => buttonsText.includes(button))
-                ) {
-                    await selectMode(buttonsText);
-                } else if (fileOrText.message?.document) {
-                    const fileType = fileOrText.message?.document?.mime_type;
-
-                    if (fileType !== 'text/plain') {
-                        await ctx.reply(CMSG.text.wrongType);
-
-                        await waitFileOrText(true);
-                        return;
-                    }
-
-                    const file = await fileOrText.getFile();
-
-                    await conversation.external(async () => {
-                        await file.download('dump/encrypt.txt');
-                    });
-
-                    const newFileBuffer = await conversation.external(
-                        async () => await encrypt(password)
-                    );
-
-                    if (newFileBuffer) {
-                        const file = new InputFile(
-                            newFileBuffer,
-                            'encrypt.json'
-                        );
-
-                        const encryptedFile = await ctx.replyWithDocument(
-                            file,
-                            {
-                                caption: CMSG.text.ecnrypted,
-                            }
-                        );
-
-                        const removeAfterMinute = await ctx.reply(
-                            CMSG.text.remove,
-                            { reply_markup: { remove_keyboard: true } }
-                        );
-
-                        setTimeout(async () => {
-                            // remove original file/text
-                            try {
-                                ctx.chat?.id &&
-                                    (await ctx.api.deleteMessage(
-                                        ctx.chat?.id,
-                                        fileOrText.message.message_id
-                                    ));
-                                // remove encrypted file
-                                [encryptedFile, removeAfterMinute].forEach(
-                                    (message) =>
-                                        message.delete().catch((error) => {
-                                            LOGGER.error(
-                                                '[cryptoConversations][selectMode][delete]',
-                                                {
-                                                    metadata: error,
-                                                }
-                                            );
-                                        })
-                                );
-                            } catch (error) {
-                                LOGGER.error(
-                                    '[cryptoConversations][selectMode][delete]',
-                                    { metadata: error }
-                                );
-                            }
-                            await ctx.reply(CMSG.text.removed);
-                        }, 60 * 1000);
-                    }
-                } else if (fileOrText.message?.text) {
-                    const messageText = fileOrText.message.text;
-                    const newFileTxt = await fileManager.writeToFile(
-                        'encrypt.txt',
-                        messageText
-                    );
-
-                    if (newFileTxt) {
-                        const newFileBuffer = await encrypt(password);
-
-                        if (newFileBuffer) {
-                            const file = new InputFile(
-                                newFileBuffer,
-                                'encrypt.json'
-                            );
-
-                            const encryptedFile = await ctx.replyWithDocument(
-                                file,
-                                {
-                                    caption: CMSG.text.ecnrypted,
-                                }
-                            );
-
-                            const removeAfterMinute = await ctx.reply(
-                                CMSG.text.remove,
-                                { reply_markup: { remove_keyboard: true } }
-                            );
-
-                            setTimeout(async () => {
-                                // remove original file/text
-                                try {
-                                    ctx.chat?.id &&
-                                        (await ctx.api.deleteMessage(
-                                            ctx.chat?.id,
-                                            fileOrText.message.message_id
-                                        ));
-                                    // remove encrypted file
-                                    [encryptedFile, removeAfterMinute].forEach(
-                                        (message) =>
-                                            message.delete().catch((error) => {
-                                                LOGGER.error(
-                                                    '[cryptoConversations][selectMode][delete]',
-                                                    {
-                                                        metadata: error,
-                                                    }
-                                                );
-                                            })
-                                    );
-                                } catch (error) {
-                                    LOGGER.error(
-                                        '[cryptoConversations][selectMode][delete]',
-                                        { metadata: error }
-                                    );
-                                }
-                                await ctx.reply(CMSG.text.removed);
-                            }, 60 * 1000);
-                        }
-                    }
-                } else {
-                    await ctx.reply(CMSG.text.error);
-                    await selectMode(CMSG.buttons.encrypt);
-                }
-            };
-
-            await waitFileOrText();
-        }
-    }
-
-    async function handleDecryption(
-        ctx: BotContext,
-        conversation: ConverstaionContext
-    ) {
-        const buttonsValues = Object.values(CMSG.buttons);
-        await ctx.reply(CMSG.text.decrypt);
-
-        const { message: passOrText } =
-            await conversation.waitFor('message:text');
-        const password = passOrText.text;
-
-        if (buttonsValues.some((button) => password.includes(button))) {
-            await selectMode(password);
-        } else {
-            try {
-                // Remove the password message
-                ctx.chat?.id &&
-                    (await ctx.api.deleteMessage(
-                        ctx.chat?.id,
-                        passOrText.message_id
-                    ));
-            } catch (error) {
-                LOGGER.error(
-                    '[cryptoConversations][handleEncryption][delete]',
-                    { metadata: error }
-                );
-            }
-
-            const waitFileOrText = async (repeat: boolean = false) => {
-                if (repeat) {
-                    await ctx.reply(CMSG.text.repeatNextStepAfterPassDecrypt);
-                } else {
-                    await ctx.reply(CMSG.text.nextStepAfterPassDecrypt);
-                }
-
-                const fileOrText = await conversation.waitFor([
-                    ':document',
-                    'message:text',
-                ]);
-
-                const buttonsText = fileOrText.message?.text || '';
-
-                if (
-                    buttonsValues.some((button) => buttonsText.includes(button))
-                ) {
-                    await selectMode(buttonsText);
-                } else if (fileOrText.message?.document) {
-                    const fileType = fileOrText.message?.document?.mime_type;
-
-                    if (fileType !== 'application/json') {
-                        await ctx.reply(CMSG.text.wrongType);
-
-                        await waitFileOrText(true);
-                        return;
-                    }
-
-                    const file = await fileOrText.getFile();
-
-                    await conversation.external(async () => {
-                        await file.download('dump/decrypt.json');
-                    });
-
-                    const newFileBuffer = await conversation.external(
-                        async () => await decrypt(password)
-                    );
-
-                    if (newFileBuffer) {
-                        const file = new InputFile(
-                            newFileBuffer,
-                            'decrypt.txt'
-                        );
-
-                        const decryptedFile = await ctx.replyWithDocument(
-                            file,
-                            {
-                                caption: CMSG.text.decrypted,
-                            }
-                        );
-
-                        const removeAfterMinute = await ctx.reply(
-                            CMSG.text.remove,
-                            { reply_markup: { remove_keyboard: true } }
-                        );
-
-                        setTimeout(async () => {
-                            // remove original file/text
-                            try {
-                                ctx.chat?.id &&
-                                    (await ctx.api.deleteMessage(
-                                        ctx.chat?.id,
-                                        fileOrText.message.message_id
-                                    ));
-                                // remove encrypted file
-                                [decryptedFile, removeAfterMinute].forEach(
-                                    (message) =>
-                                        message.delete().catch((error) => {
-                                            LOGGER.error(
-                                                '[cryptoConversations][selectMode][delete]',
-                                                {
-                                                    metadata: error,
-                                                }
-                                            );
-                                        })
-                                );
-                            } catch (error) {
-                                LOGGER.error(
-                                    '[cryptoConversations][selectMode][delete]',
-                                    { metadata: error }
-                                );
-                            }
-                            await ctx.reply(CMSG.text.removed);
-                        }, 60 * 1000);
-                    } else {
-                        try {
-                            ctx.chat?.id &&
-                                (await ctx.api.deleteMessage(
-                                    ctx.chat?.id,
-                                    fileOrText.message.message_id
-                                ));
-                        } catch (error: any) {
-                            LOGGER.error(
-                                '[cryptoConversations][selectMode][delete]',
-                                { metadata: error }
-                            );
-                        }
-                        await ctx.reply(CMSG.text.wrongPassword);
-                        await selectMode(CMSG.buttons.decrypt);
-                    }
-                } else {
-                    await ctx.reply(CMSG.text.error);
-                    await selectMode(CMSG.buttons.decrypt);
-                }
-            };
-
-            await waitFileOrText();
-        }
-    }
-
-    return;
 };

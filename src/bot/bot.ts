@@ -29,9 +29,9 @@ import {
 } from './chats/index.js';
 import { tasksCron } from '../helpers/tasksCron.js';
 import { autoRetry } from '@grammyjs/auto-retry';
-import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
+import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 dotenv.config();
 
 //Env vars

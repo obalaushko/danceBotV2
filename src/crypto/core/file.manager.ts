@@ -71,7 +71,7 @@ class FileManager {
         return new Promise<string>((resolve, reject) => {
             fs.readFile(path.join(this.DATA_DIR, filename), 'utf8', (err, data) => {
                 if (err) {
-                    LOGGER.error('[readFile]', { metadata: err });
+                    LOGGER.error('[readFromFile]', { metadata: err });
                     reject(err);
                 } else {
                     resolve(data);
@@ -93,7 +93,7 @@ class FileManager {
         return new Promise<Buffer>((resolve, reject) => {
             fs.readFile(path.join(this.DATA_DIR, filename), (err, data) => {
                 if (err) {
-                    LOGGER.error('[readFile]', { metadata: err });
+                    LOGGER.error('[returnFileLikeBuffer]', { metadata: err });
                     reject(err);
                 } else {
                     resolve(data);
