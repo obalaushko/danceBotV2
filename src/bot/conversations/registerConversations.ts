@@ -23,7 +23,6 @@ export const registerConversations = async (
     ctx: BotContext
 ) => {
     const { user } = await ctx.getAuthor();
-    LOGGER.info('[registerConversations]', { metadata: user });
 
     await ctx.reply(MSG.welcome.notRegistered);
 
