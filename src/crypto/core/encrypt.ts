@@ -50,7 +50,7 @@ export const encrypt = async (password: string): Promise<Buffer | null> => {
             return null;
         }
     } catch (error: any) {
-        LOGGER.error('[encrypt]', { metadata: error });
+        LOGGER.warn('[encrypt]', { metadata: error });
         return null;
     }
 };

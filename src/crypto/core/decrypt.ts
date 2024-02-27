@@ -70,7 +70,7 @@ export const decrypt = async (password: string): Promise<Buffer | null> => {
             return null;
         }
     } catch (error: any) {
-        LOGGER.error('An error occurred during decryption:', {
+        LOGGER.warn('An error occurred during decryption:', {
             metadata: error.message,
         });
         return null;
