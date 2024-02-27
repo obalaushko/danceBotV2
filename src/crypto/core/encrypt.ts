@@ -3,12 +3,7 @@ import path from 'path';
 import * as fs from 'fs';
 import { EncryptedData } from './crypto.type.js';
 import { LOGGER } from '../../logger/index.js';
-import {
-    readFromFile,
-    removeFileFromDir,
-    returnFileLikeBuffer,
-    writeToFile,
-} from './file.manager.js';
+import { fileManager } from './file.manager.js';
 
 const DATA_DIR = path.join(process.cwd(), 'dump');
 
@@ -18,7 +13,7 @@ if (!fs.existsSync(DATA_DIR)) {
 
 /**
  * Encrypts a password using AES-256-CBC encryption algorithm.
- * 
+ *
  * @param password - The password to be encrypted.
  * @returns A Promise that resolves to a Buffer containing the encrypted data, or null if encryption fails.
  */
@@ -30,7 +25,7 @@ export const encrypt = async (password: string): Promise<Buffer | null> => {
         const iv = randomBytes(16);
         const cipher = createCipheriv(algorithm, key, iv);
 
-        const data = await readFromFile('encrypt.txt');
+        const data = await fileManager.readFromFile('encrypt.txt');
         let encrypted = cipher.update(data, 'utf8', 'hex');
         encrypted += cipher.final('hex');
 
@@ -40,16 +35,16 @@ export const encrypt = async (password: string): Promise<Buffer | null> => {
             salt: salt,
         };
 
-        const encryptFile = await writeToFile(
+        const encryptFile = await fileManager.writeToFile(
             'encrypt.json',
             JSON.stringify(encryptedData)
         );
         if (encryptFile) {
-            const file = await returnFileLikeBuffer('encrypt.json');
+            const file = await fileManager.returnFileLikeBuffer('encrypt.json');
 
-            await removeFileFromDir('encrypt.txt');
-            await removeFileFromDir('encrypt.json');
-            
+            await fileManager.removeFileFromDir('encrypt.txt');
+            await fileManager.removeFileFromDir('encrypt.json');
+
             return file;
         } else {
             return null;
