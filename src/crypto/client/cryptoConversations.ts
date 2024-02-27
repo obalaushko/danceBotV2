@@ -71,7 +71,7 @@ export const cryptoConversations = async (
 
     /**
      * Handles the crypto operation (encrypt or decrypt) based on the given parameters.
-     * 
+     *
      * @param ctx - The BotContext object.
      * @param conversation - The ConverstaionContext object.
      * @param operation - The operation to perform, either 'encrypt' or 'decrypt'.
@@ -147,7 +147,8 @@ export const cryptoConversations = async (
                         isEncrypting,
                         ctx,
                         fileOrText,
-                        password
+                        password,
+                        waitFileOrText
                     );
                 } else {
                     await ctx.reply(CMSG.text.error);
@@ -241,6 +242,9 @@ export const cryptoConversations = async (
                 }
                 await ctx.reply(CMSG.text.removed);
             }, 60 * 1000);
+        } else {
+            await ctx.reply(CMSG.text.error);
+            await waitFileOrText(true);
         }
     };
 
@@ -255,7 +259,8 @@ export const cryptoConversations = async (
         isEncrypting: boolean,
         ctx: BotContext,
         fileOrText: any,
-        password: string
+        password: string,
+        waitFileOrText: Function
     ) => {
         const messageText = fileOrText.message.text;
         const fileName = isEncrypting ? 'encrypt.txt' : 'decrypt.txt';
@@ -307,6 +312,9 @@ export const cryptoConversations = async (
                     }
                     await ctx.reply(CMSG.text.removed);
                 }, 60 * 1000);
+            } else {
+                await ctx.reply(CMSG.text.error);
+                await waitFileOrText(true);
             }
         }
     };

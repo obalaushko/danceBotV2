@@ -25,6 +25,7 @@ const checkJsonCorrectness = async (data: any) => {
         LOGGER.error('An error occurred while checking the JSON file:', {
             metadata: error,
         });
+        return null;
     }
 };
 
@@ -33,14 +34,14 @@ const checkJsonCorrectness = async (data: any) => {
  * @param password - The password used for decryption.
  * @returns A Promise that resolves to the decrypted file as a Buffer, or null if an error occurred.
  */
-export const decrypt = async (password: string) => {
+export const decrypt = async (password: string): Promise<Buffer | null> => {
     try {
         const data = await fileManager.readFromFile('decrypt.json');
         const encryptedData = await checkJsonCorrectness(data);
 
         if (!encryptedData.iv || !encryptedData.encryptedText) {
             LOGGER.error('The file does not match the expected format.');
-            return;
+            return null;
         }
 
         const algorithm = 'aes-256-cbc';
@@ -65,6 +66,8 @@ export const decrypt = async (password: string) => {
             await fileManager.removeFileFromDir('decrypt.txt');
 
             return file;
+        } else {
+            return null;
         }
     } catch (error: any) {
         LOGGER.error('An error occurred during decryption:', {
