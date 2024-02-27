@@ -183,10 +183,13 @@ export const cryptoConversations = async (
     ) => {
         const fileType = fileOrText.message?.document?.mime_type;
 
-        if (
-            (isEncrypting && fileType !== 'text/plain') ||
-            (!isEncrypting && fileType !== 'application/json')
-        ) {
+        const isWrongEncryptingType = isEncrypting && fileType !== 'text/plain';
+        const isWrongDecryptingType =
+            !isEncrypting &&
+            fileType !== 'application/json' &&
+            fileType !== 'application/binary';
+
+        if (isWrongEncryptingType || isWrongDecryptingType) {
             await ctx.reply(CMSG.text.wrongType);
             await waitFileOrText(true);
             return;
