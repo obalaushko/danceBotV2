@@ -1,4 +1,4 @@
-import { Bot, GrammyError, HttpError, MiddlewareFn, session } from 'grammy';
+import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
