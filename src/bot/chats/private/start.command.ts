@@ -17,6 +17,7 @@ export const startCommand = () => {
         const userExists = await getUserById(user.id);
 
         if (!userExists) {
+            LOGGER.info('[registerConversations]', { metadata: user });
             await ctx.conversation.enter('registerConversations');
         } else if (userExists?.role === ROLES.Guest) {
             LOGGER.info('[guestConversations]', { metadata: user });
@@ -37,6 +38,7 @@ export const startCommand = () => {
                 reply_markup: developerMenu,
             });
         } else if (userExists?.role == ROLES.Inactive) {
+            LOGGER.info('[deactivatedAccount]', { metadata: user });
             await ctx.reply(MSG.deactivatedAccount, {
                 reply_markup: returnToGroupMenu,
             });

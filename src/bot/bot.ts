@@ -3,6 +3,7 @@ import { Bot, GrammyError, HttpError, session } from 'grammy';
 import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
+import { hydrate } from '@grammyjs/hydrate';
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types/index.js';
@@ -28,6 +29,9 @@ import {
 } from './chats/index.js';
 import { tasksCron } from '../helpers/tasksCron.js';
 import { autoRetry } from '@grammyjs/auto-retry';
+import { cryptoCommand } from '../crypto/client/command.crypto.js';
+import { hydrateFiles } from '@grammyjs/files';
+import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 dotenv.config();
 
 //Env vars
@@ -67,6 +71,8 @@ try {
 }
 
 bot.use(hydrateReply);
+bot.use(hydrate());
+bot.api.config.use(hydrateFiles(bot.token));
 // bot.api.config.use(throttler);
 bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
 
@@ -105,7 +111,7 @@ bot.use(developerMenu);
 //Inject conversations
 bot.use(conversations());
 bot.use(createConversation(registerConversations));
-// bot.use(createConversation(paymentDetailsConversations));
+bot.use(createConversation(cryptoConversations));
 bot.use(createConversation(changeNameConversations));
 
 tasksCron();
@@ -115,6 +121,9 @@ export const groupChat = bot.chatType(['group', 'supergroup']);
 
 // Group
 groupRequestHears();
+
+// Crypto
+cryptoCommand();
 
 //START COMMAND
 // Private
@@ -133,7 +142,7 @@ bot.catch((err) => {
     const ctx = err.ctx;
     LOGGER.error(
         `[bot-catch][Error while handling update ${ctx.update.update_id}]`,
-        { metadata: err.error }
+        { metadata: err }
     );
     const e = err.error;
 
