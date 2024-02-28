@@ -17,11 +17,13 @@ const toggleChecked = (id: number) => {
 };
 
 markUserMenu
+    .webApp('scan', 'https://172.18.220.84:5173/')
     .dynamic(async () => {
         const users = await getAllActiveUserUsers();
 
         const range = new MenuRange();
         if (users?.length) {
+            range.webApp('scan', 'https://172.18.220.84:5173/');
             users.map((user, index) => {
                 range.text(
                     {
