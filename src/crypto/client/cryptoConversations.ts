@@ -246,7 +246,7 @@ export const cryptoConversations = async (
                 await ctx.reply(CMSG.text.removed);
             }, 60 * 1000);
         } else {
-            await ctx.reply(CMSG.text.error);
+            await ctx.reply(CMSG.text.wrongPassword);
             await waitFileOrText(true);
         }
     };
@@ -316,7 +316,7 @@ export const cryptoConversations = async (
                     await ctx.reply(CMSG.text.removed);
                 }, 60 * 1000);
             } else {
-                await ctx.reply(CMSG.text.error);
+                await ctx.reply(CMSG.text.wrongPassword);
                 await waitFileOrText(true);
             }
         }
