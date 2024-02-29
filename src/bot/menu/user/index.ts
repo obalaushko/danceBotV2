@@ -7,10 +7,8 @@ import {
 } from '../../../mongodb/operations/index.js';
 import { notificationsMenu } from './notificationsMenu.js';
 import { LOGGER } from '../../../logger/index.js';
-import { freezeSubscriptionMenu } from './freezeSubscription.js';
+import { subscriptionMenu } from './subscriptionMenu.js';
 import { returnToGroupMenu } from './returnToGroupMenu.js';
-import { generateQR } from '../../../utils/generateQR.js';
-import { InputFile } from 'grammy';
 import { backAfterQRMenu } from './backAfterQRMenu.js';
 
 export const userMenu = new Menu('user')
@@ -32,10 +30,10 @@ export const userMenu = new Menu('user')
                 return;
             }
             if (user.subscription?.active) {
-                ctx.menu.nav('freezeSubscriptionMenu');
+                ctx.menu.nav('subscriptionMenu');
             } else {
                 if (user.subscription?.freeze?.active) {
-                    ctx.menu.nav('freezeSubscriptionMenu');
+                    ctx.menu.nav('subscriptionMenu');
                 } else {
                     ctx.menu.nav('backToUserMain');
                 }
@@ -60,38 +58,6 @@ export const userMenu = new Menu('user')
         }
     })
     .row()
-    .text(MSG.buttons.user.qr, async (ctx) => {
-        try {
-            const {
-                user: { id },
-            } = await ctx.getAuthor();
-            const user = await getUserById(id);
-
-            const userInfo = {
-                id: user?.userId,
-                username: user?.username || null,
-                fullName: user?.fullName,
-            };
-
-            // Generate string for parsing tg qr scanner
-            const data = `userId:${userInfo.id},username:${userInfo.username},fullName:${userInfo.fullName}`;
-
-            const qr = await generateQR(data);
-
-            if (qr) {
-                await ctx.deleteMessage();
-
-                const photo = new InputFile(qr, 'qrcode.png');
-                await ctx.replyWithPhoto(photo, {
-                    caption: 'Покажіть QR викладачу.',
-                    reply_markup: backAfterQRMenu,
-                });
-            }
-        } catch (error: any) {
-            LOGGER.warn('[userMenu][qr]', { metadata: { error } });
-        }
-    })
-    .row()
     .text(MSG.buttons.user.paymentDetails, async (ctx) => {
         const {
             user: { id, username },
@@ -107,6 +73,6 @@ export const userMenu = new Menu('user')
 
 userMenu.register(backToUserMain);
 userMenu.register(backAfterQRMenu);
-userMenu.register(freezeSubscriptionMenu);
+userMenu.register(subscriptionMenu);
 userMenu.register(notificationsMenu);
 userMenu.register(returnToGroupMenu);

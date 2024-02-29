@@ -1,12 +1,20 @@
 import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants/index.js';
-import { userMenu } from './index.js';
+import { getUserWithSubscriptionById } from '../../../mongodb/operations/users.js';
+import { subscriptionMenu } from './subscriptionMenu.js';
 
 export const backAfterQRMenu = new Menu('backAfterQRMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
-}).text(MSG.buttons.backToMain, async (ctx) => {
-    const { user } = await ctx.getAuthor();
+}).text(MSG.buttons.back, async (ctx) => {
+    const {
+        user: { id },
+    } = await ctx.getAuthor();
 
-    await ctx.deleteMessage();
-    await ctx.reply(MSG.welcome.user(user), { reply_markup: userMenu });
+    const user = await getUserWithSubscriptionById(id);
+    if (user) {
+        await ctx.deleteMessage();
+        await ctx.reply(MSG.user.subscription(user), {
+            reply_markup: subscriptionMenu,
+        });
+    }
 });
