@@ -443,6 +443,7 @@ export const MSG = {
             notificationDisabled: '🔕 Вимкнути',
             freezeSubscription: 'Призупинити абонемент',
             defrostSubscription: 'Відновити абонемент',
+            qr: '🖼️ QR-Код',
             freezeApprove: (frozen: boolean) =>
                 frozen ? '▶️ Відновити' : '⏸ Призупинити',
             returnToGroup: '👥 Поверутися до групу',
@@ -453,6 +454,7 @@ export const MSG = {
             guest: capitalizeFirstLetter(ROLES.Guest),
             inactive: capitalizeFirstLetter(ROLES.Inactive),
         },
+        scanQR: '📷 Сканувати QR',
         backToMain: 'До головного меню',
         back: '<< Назад',
         approve: '✅ Прийняти',

@@ -6,6 +6,9 @@ import {
 } from '../../../mongodb/operations/index.js';
 import { LOGGER } from '../../../logger/index.js';
 
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export const markUserMenu = new Menu('markUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 });
@@ -17,13 +20,16 @@ const toggleChecked = (id: number) => {
 };
 
 markUserMenu
-    .webApp('scan', 'https://172.18.220.84:5173/')
     .dynamic(async () => {
         const users = await getAllActiveUserUsers();
 
         const range = new MenuRange();
         if (users?.length) {
-            range.webApp('scan', 'https://172.18.220.84:5173/');
+            const URL = process.env.WEB_APP_URL || '';
+            if (URL) {
+                range.webApp(MSG.buttons.scanQR, URL).row();
+            }
+
             users.map((user, index) => {
                 range.text(
                     {

@@ -3,7 +3,6 @@ import { addLogSubscriptionChange } from '../operations/changeLog.js';
 import { sendUserNotification } from '../../helpers/notifications.js';
 import { MSG } from '../../constants/messages.js';
 import moment from 'moment-timezone';
-import { ROLES } from '../../constants/global.js';
 
 export interface ISubscription extends Document {
     userId: number;
