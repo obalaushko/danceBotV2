@@ -7,8 +7,9 @@ import {
 } from '../../../mongodb/operations/index.js';
 import { notificationsMenu } from './notificationsMenu.js';
 import { LOGGER } from '../../../logger/index.js';
-import { freezeSubscriptionMenu } from './freezeSubscription.js';
+import { subscriptionMenu } from './subscriptionMenu.js';
 import { returnToGroupMenu } from './returnToGroupMenu.js';
+import { backAfterQRMenu } from './backAfterQRMenu.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
@@ -29,10 +30,10 @@ export const userMenu = new Menu('user')
                 return;
             }
             if (user.subscription?.active) {
-                ctx.menu.nav('freezeSubscriptionMenu');
+                ctx.menu.nav('subscriptionMenu');
             } else {
                 if (user.subscription?.freeze?.active) {
-                    ctx.menu.nav('freezeSubscriptionMenu');
+                    ctx.menu.nav('subscriptionMenu');
                 } else {
                     ctx.menu.nav('backToUserMain');
                 }
@@ -71,6 +72,7 @@ export const userMenu = new Menu('user')
     });
 
 userMenu.register(backToUserMain);
-userMenu.register(freezeSubscriptionMenu);
+userMenu.register(backAfterQRMenu);
+userMenu.register(subscriptionMenu);
 userMenu.register(notificationsMenu);
 userMenu.register(returnToGroupMenu);

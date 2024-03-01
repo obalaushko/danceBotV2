@@ -3,6 +3,7 @@ import { validateEnvs } from './validateEnvs.js';
 import { runBot } from './bot/index.js';
 import { LOGGER } from './logger/index.js';
 import * as dotenv from 'dotenv';
+import { serverInit } from './server/index.js';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const runApp = async () => {
         await connectDb()
             .then(() => {
                 runBot();
+                serverInit();
             })
             .catch((error) => {
                 LOGGER.error(`[runApp][Error on connect db]`, {
