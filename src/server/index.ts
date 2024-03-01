@@ -1,4 +1,4 @@
-import { getAllActiveUserUsers } from './../mongodb/operations/users';
+import { getAllActiveUserUsers } from './../mongodb/operations/users.js';
 import express from 'express';
 import cors from 'cors';
 import { LOGGER } from '../logger/index.js';
