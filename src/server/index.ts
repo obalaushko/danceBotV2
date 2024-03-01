@@ -3,6 +3,11 @@ import express from 'express';
 import cors from 'cors';
 import { LOGGER } from '../logger/index.js';
 import { markLessonAsUsed } from '../mongodb/operations/subscriptions.js';
+
+import * as dotenv from 'dotenv';
+
+dotenv.config();
+
 export const serverInit = async () => {
     const app = express();
 
@@ -77,7 +82,7 @@ export const serverInit = async () => {
         }
     });
 
-    const PORT = 2604;
+    const PORT = process.env.PORT || 2604;
 
     app.listen(PORT, () => {
         LOGGER.info(`Server started on port ${PORT}...`);
