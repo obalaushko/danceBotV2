@@ -46,39 +46,37 @@ markUserMenu
                 );
                 if (index % 2) range.row();
             });
+            range.row();
             checked.size &&
-                range
-                    .text(MSG.buttons.update, async (ctx) => {
-                        const userIds = [...checked];
+                range.text(MSG.buttons.update, async (ctx) => {
+                    const userIds = [...checked];
 
-                        const updateSubscriptions =
-                            await markLessonAsUsed(userIds);
+                    const updateSubscriptions = await markLessonAsUsed(userIds);
 
-                        checked.clear();
-                        if (updateSubscriptions?.length) {
-                            LOGGER.info('[markUser]', {
-                                metadata: updateSubscriptions,
-                            });
+                    checked.clear();
+                    if (updateSubscriptions?.length) {
+                        LOGGER.info('[markUser]', {
+                            metadata: updateSubscriptions,
+                        });
 
-                            const updatedUsers = users.filter((user) =>
-                                updateSubscriptions.some(
-                                    (updateUser) =>
-                                        updateUser.userId === user.userId
-                                )
-                            );
+                        const updatedUsers = users.filter((user) =>
+                            updateSubscriptions.some(
+                                (updateUser) =>
+                                    updateUser.userId === user.userId
+                            )
+                        );
 
-                            ctx.menu.update();
-                            await ctx.editMessageText(
-                                MSG.chooseUserToMark(updatedUsers)
-                            );
-                        } else {
-                            LOGGER.error('[markUser]', {
-                                metadata: updateSubscriptions,
-                            });
-                            await ctx.reply(MSG.errors.failedToUpdate);
-                        }
-                    })
-                    .row();
+                        ctx.menu.update();
+                        await ctx.editMessageText(
+                            MSG.chooseUserToMark(updatedUsers)
+                        );
+                    } else {
+                        LOGGER.error('[markUser]', {
+                            metadata: updateSubscriptions,
+                        });
+                        await ctx.reply(MSG.errors.failedToUpdate);
+                    }
+                });
         }
 
         return range;
