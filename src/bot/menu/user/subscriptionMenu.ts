@@ -13,6 +13,9 @@ import { checkLastFreeze } from '../../../utils/utils.js';
 
 import * as dotenv from 'dotenv';
 import { LOGGER } from '../../../logger/index.js';
+import { generateQR } from '../../../utils/generateQR.js';
+import { InputFile } from 'grammy';
+import { backAfterQRMenu } from './backAfterQRMenu.js';
 dotenv.config();
 
 const ENVS = process.env;
@@ -42,10 +45,10 @@ const freezeSubMenu = new Menu('freezeSubMenu')
                             const user = await getUserWithSubscriptionById(id);
                             if (user) {
                                 if (user.subscription?.active) {
-                                    ctx.menu.nav('freezeSubscriptionMenu');
+                                    ctx.menu.nav('subscriptionMenu');
                                 } else {
                                     if (user.subscription?.freeze?.active) {
-                                        ctx.menu.nav('freezeSubscriptionMenu');
+                                        ctx.menu.nav('subscriptionMenu');
                                     } else {
                                         ctx.menu.nav('backToUserMain');
                                     }
@@ -101,41 +104,77 @@ const freezeSubMenu = new Menu('freezeSubMenu')
         await ctx.editMessageText(MSG.welcome.user(user));
     });
 
-export const freezeSubscriptionMenu = new Menu('freezeSubscriptionMenu')
+export const subscriptionMenu = new Menu('subscriptionMenu')
     .dynamic(async (ctx) => {
-        const { user } = await ctx.getAuthor();
-        const range = new MenuRange();
-        const subscription = await getSubscriptionById(user.id);
-        if (subscription) {
-            range.text(
-                subscription?.freeze?.active
-                    ? MSG.buttons.user.defrostSubscription
-                    : MSG.buttons.user.freezeSubscription,
-                async (ctx) => {
-                    if (subscription?.freeze?.active) {
-                        await ctx.editMessageText(
-                            MSG.user.freeze.frozen(subscription)
-                        );
-                        ctx.menu.nav('freezeSubMenu');
-                    } else {
-                        if (
-                            checkLastFreeze(
-                                subscription?.freeze?.lastDateFreeze
-                            )
-                        ) {
-                            ctx.menu.nav('freezeSubMenu');
-                            await ctx.editMessageText(MSG.user.freeze.main);
-                        } else {
-                            ctx.menu.nav('backToUserMain');
+        try {
+            const { user } = await ctx.getAuthor();
+            const range = new MenuRange();
+            const subscription = await getSubscriptionById(user.id);
+            if (subscription) {
+                const userWithSubscription = await getUserWithSubscriptionById(
+                    user.id
+                );
+
+                if (userWithSubscription?.subscription?.active) {
+                    range.text(MSG.buttons.user.qr, async (ctx) => {
+                        const userInfo = {
+                            id: userWithSubscription?.userId,
+                            username: userWithSubscription?.username || null,
+                            fullName: userWithSubscription?.fullName,
+                        };
+
+                        // Generate string for parsing tg qr scanner
+                        const data = `userId:${userInfo.id},username:${userInfo.username},fullName:${userInfo.fullName}`;
+
+                        const qr = await generateQR(data);
+
+                        if (qr) {
+                            await ctx.deleteMessage();
+
+                            const photo = new InputFile(qr, 'qrcode.png');
+                            await ctx.replyWithPhoto(photo, {
+                                caption: 'Покажіть QR викладачу.',
+                                reply_markup: backAfterQRMenu,
+                            });
+                        }
+                    });
+                }
+
+                range.row();
+
+                range.text(
+                    subscription?.freeze?.active
+                        ? MSG.buttons.user.defrostSubscription
+                        : MSG.buttons.user.freezeSubscription,
+                    async (ctx) => {
+                        if (subscription?.freeze?.active) {
                             await ctx.editMessageText(
-                                MSG.user.freeze.isNotAllowed(subscription)
+                                MSG.user.freeze.frozen(subscription)
                             );
+                            ctx.menu.nav('freezeSubMenu');
+                        } else {
+                            if (
+                                checkLastFreeze(
+                                    subscription?.freeze?.lastDateFreeze
+                                )
+                            ) {
+                                ctx.menu.nav('freezeSubMenu');
+                                await ctx.editMessageText(MSG.user.freeze.main);
+                            } else {
+                                ctx.menu.nav('backToUserMain');
+                                await ctx.editMessageText(
+                                    MSG.user.freeze.isNotAllowed(subscription)
+                                );
+                            }
                         }
                     }
-                }
-            );
+                );
+
+                return range;
+            }
+        } catch (error: any) {
+            LOGGER.warn('[userMenu][qr]', { metadata: { error } });
         }
-        return range;
     })
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
@@ -144,4 +183,4 @@ export const freezeSubscriptionMenu = new Menu('freezeSubscriptionMenu')
         await ctx.editMessageText(MSG.welcome.user(user));
     });
 
-freezeSubscriptionMenu.register(freezeSubMenu);
+subscriptionMenu.register(freezeSubMenu);
