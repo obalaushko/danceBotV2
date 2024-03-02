@@ -136,7 +136,6 @@ export const deleteOldLogs = async (): Promise<void> => {
         await SubscriptionChangeLogModel.deleteMany({
             changeDate: { $lt: twoMonthsAgo },
         });
-        LOGGER.info('[deleteOldLogs], Remove old logs');
     } catch (error: any) {
         LOGGER.error('[deleteOldLogs][error]', {
             metadata: { error: error, stack: error.stack.toString() },
