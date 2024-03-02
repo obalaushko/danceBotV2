@@ -97,7 +97,7 @@ subscriptionSchema.pre('save', function (next) {
             MSG.user.notification.remained0Lessons
         );
     }
-    
+
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
 

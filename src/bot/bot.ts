@@ -8,7 +8,6 @@ import { hydrate } from '@grammyjs/hydrate';
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
 import { BotContext } from './types/index.js';
 import { COMMANDS } from './commands/index.js';
-import * as dotenv from 'dotenv';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
 import { LOGGER } from '../logger/index.js';
@@ -32,17 +31,10 @@ import { autoRetry } from '@grammyjs/auto-retry';
 import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
 import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
-dotenv.config();
-
-//Env vars
-const mode = process.env.NODE_ENV || 'development';
-const BOT_TOKEN =
-    mode === 'production'
-        ? process.env.PRODUCTION_BOT_TOKEN || ''
-        : process.env.DEVELOPMENT_BOT_TOKEN || '';
+import { ENV_VARIABLES } from '../constants/global.js';
 
 //BOT CONFIG
-const bot = new Bot<ParseModeFlavor<BotContext>>(BOT_TOKEN);
+const bot = new Bot<ParseModeFlavor<BotContext>>(ENV_VARIABLES.TOKEN);
 
 bot.api.config.use(
     autoRetry({

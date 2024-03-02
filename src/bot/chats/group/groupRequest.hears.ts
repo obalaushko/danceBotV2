@@ -6,7 +6,6 @@ import { getUserById } from '../../../mongodb/operations/users.js';
 import { groupChat } from '../../bot.js';
 import { userMenu } from '../../menu/index.js';
 
-
 /**
  * Handles group chat join requests and left chat member events.
  */
