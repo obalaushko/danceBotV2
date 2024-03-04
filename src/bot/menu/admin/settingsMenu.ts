@@ -9,6 +9,7 @@ import { setupUserMenu } from './userSetupMenu.js';
 import { SessionContext } from '../../types/index.js';
 import { getGroupedSubscriptionChanges } from '../../../mongodb/operations/changeLog.js';
 import { sendMailingToUsers } from '../../../helpers/notifications.js';
+import { ENV_VARIABLES } from '../../../constants/global.js';
 
 // Users menu
 const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
@@ -138,6 +139,9 @@ export const settingsMenu = new Menu('settingsMenu', {
     //     ctx.menu.nav('mailingMenu');
     //     await ctx.editMessageText(MSG.settings.mailing.main);
     // })
+    .row()
+    .webApp('settings', ENV_VARIABLES.URL + 'settings')
+    .webApp('history', ENV_VARIABLES.URL + 'history')
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();
