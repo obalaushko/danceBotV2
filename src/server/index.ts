@@ -3,6 +3,7 @@ import {
     getAllActiveUserUsers,
     getAllUsers,
     getUserById,
+    getUserWithSubscriptionById,
 } from './../mongodb/operations/users.js';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
@@ -179,7 +180,7 @@ export const serverInit = async () => {
             try {
                 const { userId } = req.query;
 
-                const user = await getUserById(Number(userId));
+                const user = await getUserWithSubscriptionById(Number(userId));
 
                 if (user) {
                     return res.status(200).json(

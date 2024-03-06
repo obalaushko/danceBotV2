@@ -30,6 +30,8 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     totalLessons: {
         type: Number,
         default: 8,
+        min: 0,
+        max: 16,
         required: true,
     },
     usedLessons: {
