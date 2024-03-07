@@ -5,6 +5,7 @@ import {
     getUserById,
     getUserWithSubscriptionById,
     updateUserById,
+    updateUsersToInactive,
 } from '../../mongodb/operations/users.js';
 import { LOGGER } from '../../logger/index.js';
 import { isAccessDenied } from '../../utils/utils.js';
@@ -18,6 +19,8 @@ import {
     deactivateSubscriptions,
     updateSubscriptionById,
 } from '../../mongodb/operations/subscriptions.js';
+import { ROLES } from '../../constants/global.js';
+import { removeUserFromGroup } from '../../helpers/users.js';
 
 export default class UserController {
     /**
@@ -182,6 +185,11 @@ export default class UserController {
 
             if (Object.keys(updatedUserValues).length > 0) {
                 // Update user
+                const roleUser = updatedUserValues.role;
+                if (roleUser === ROLES.Inactive) {
+                    await updateUsersToInactive(userId);
+                    await removeUserFromGroup([userId]);
+                }
                 const updatedUser = await updateUserById(
                     userId,
                     updatedUserValues
@@ -197,7 +205,7 @@ export default class UserController {
                 } else if (activeSubscriptions === false) {
                     await deactivateSubscriptions(userId);
                 }
-                
+
                 const updatedSubscription = await updateSubscriptionById(
                     userId,
                     updatedSubscriptionsValues

@@ -58,8 +58,8 @@ export const userMenu = new Menu('user')
             LOGGER.error('[NotificationsMenu][error]', { metadata: { err } });
         }
     })
-    .row()
-    .webApp('TEST', ENV_VARIABLES.URL)
+    // .row()
+    // .webApp('TEST', ENV_VARIABLES.URL)
     .row()
     .text(MSG.buttons.user.paymentDetails, async (ctx) => {
         const {
