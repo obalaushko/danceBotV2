@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import {
-    RequestBodyScannerApi,
-    ResponseBody,
     errorResponse,
     successResponse,
 } from '../response.js';
@@ -9,6 +7,7 @@ import { LOGGER } from '../../logger/index.js';
 import { isAccessDenied } from '../../utils/utils.js';
 import { getAllActiveUserUsers } from '../../mongodb/operations/users.js';
 import { markLessonAsUsed } from '../../mongodb/operations/subscriptions.js';
+import { RequestBodyScannerApi, ResponseBody } from '../types/index.js';
 
 export default class ScannerController {
     constructor() {}
@@ -24,6 +23,8 @@ export default class ScannerController {
 
             if (userIds) {
                 const users = await getAllActiveUserUsers();
+
+                console.log(userId, userIds)
 
                 if (users) {
                     const matchingUsers = users.filter((user) =>

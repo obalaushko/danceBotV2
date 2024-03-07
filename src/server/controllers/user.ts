@@ -1,17 +1,23 @@
 import { Request, Response } from 'express';
-import {
-    RequestBodyUserInfo,
-    ResponseBody,
-    errorResponse,
-    successResponse,
-} from '../response.js';
+import { errorResponse, successResponse } from '../response.js';
 import {
     getAllUsers,
     getUserById,
     getUserWithSubscriptionById,
+    updateUserById,
 } from '../../mongodb/operations/users.js';
 import { LOGGER } from '../../logger/index.js';
 import { isAccessDenied } from '../../utils/utils.js';
+import {
+    RequestBodyUpdateUser,
+    RequestBodyUserInfo,
+    ResponseBody,
+} from '../types/index.js';
+import {
+    activateSubscriptions,
+    deactivateSubscriptions,
+    updateSubscriptionById,
+} from '../../mongodb/operations/subscriptions.js';
 
 export default class UserController {
     /**
@@ -102,6 +108,114 @@ export default class UserController {
             const { userId } = req.query;
 
             const user = await getUserWithSubscriptionById(Number(userId));
+
+            if (user) {
+                return res.status(200).json(
+                    successResponse({
+                        data: user,
+                    })
+                );
+            } else {
+                return res.status(400).json(
+                    errorResponse({
+                        message: 'User not found!',
+                        error: null,
+                    })
+                );
+            }
+        } catch (error: any) {
+            LOGGER.error('[GET][user-info]', { metadata: error });
+            return res
+                .status(500)
+                .json(errorResponse({ message: error, error }));
+        }
+    }
+
+    async updateUser(
+        req: Request<{}, {}, RequestBodyUpdateUser>,
+        res: Response<ResponseBody>
+    ) {
+        try {
+            const { userId } = req.body;
+
+            // Update user data
+            function getUpdatedValues(body: any) {
+                type ValidKeys = keyof RequestBodyUpdateUser;
+
+                const validKeysUser: ValidKeys[] = [
+                    'firstName',
+                    'fullName',
+                    'notifications',
+                    'role',
+                ];
+                const validKeysSubscription: ValidKeys[] = [
+                    'totalLessons',
+                    'usedLessons',
+                    'dateExpired',
+                    'active',
+                ];
+
+                const filterKeys = (keys: ValidKeys[]) => {
+                    let updatedValues: any = {};
+                    keys.forEach((key) => {
+                        if (body[key] !== undefined) {
+                            updatedValues[key] = body[key];
+                        }
+                    });
+                    return updatedValues;
+                };
+
+                const updatedUserValues = filterKeys(validKeysUser);
+                const updatedSubscriptionsValues = filterKeys(
+                    validKeysSubscription
+                );
+
+                return { updatedUserValues, updatedSubscriptionsValues };
+            }
+
+            // Usage
+            const { updatedSubscriptionsValues, updatedUserValues } =
+                getUpdatedValues(req.body);
+
+            let userUpdated = false;
+            let subscriptionUpdated = false;
+
+            if (Object.keys(updatedUserValues).length > 0) {
+                // Update user
+                const updatedUser = await updateUserById(
+                    userId,
+                    updatedUserValues
+                );
+                userUpdated = updatedUser !== null; // or some other check
+            }
+
+            if (Object.keys(updatedSubscriptionsValues).length > 0) {
+                // Update subscription
+                const activeSubscriptions = updatedSubscriptionsValues.active;
+                if (activeSubscriptions === true) {
+                    await activateSubscriptions(userId);
+                } else if (activeSubscriptions === false) {
+                    await deactivateSubscriptions(userId);
+                }
+                
+                const updatedSubscription = await updateSubscriptionById(
+                    userId,
+                    updatedSubscriptionsValues
+                );
+                subscriptionUpdated = updatedSubscription !== null; // or some other check
+            }
+
+            if (!userUpdated && !subscriptionUpdated) {
+                return res.status(400).json(
+                    errorResponse({
+                        message: 'No data was updated!',
+                        error: null,
+                    })
+                );
+            }
+
+            // Return user
+            const user = await getUserWithSubscriptionById(userId);
 
             if (user) {
                 return res.status(200).json(

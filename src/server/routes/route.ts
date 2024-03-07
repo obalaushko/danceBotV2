@@ -1,11 +1,12 @@
 import { Request, Response, Router } from 'express';
-import {
-    RequestBodyScannerApi,
-    RequestBodyUserInfo,
-    ResponseBody,
-} from '../response.js';
 import ScannerController from '../controllers/scanner.js';
 import UserController from '../controllers/user.js';
+import {
+    RequestBodyScannerApi,
+    RequestBodyUpdateUser,
+    RequestBodyUserInfo,
+    ResponseBody,
+} from '../types/index.js';
 
 const router = Router();
 const scannerController = new ScannerController();
@@ -63,6 +64,14 @@ router.get(
         req: Request<{}, {}, {}, { userId: string }>,
         res: Response<ResponseBody>
     ) => userController.getUserWithSubscriptionById(req, res)
+);
+
+router.post(
+    '/user-update-data',
+    (
+        req: Request<{}, {}, RequestBodyUpdateUser>,
+        res: Response<ResponseBody>
+    ) => userController.updateUser(req, res)
 );
 
 export default router;

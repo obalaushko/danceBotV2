@@ -1,38 +1,9 @@
-type SuccessResponse = {
-    status: 'success';
-    ok: boolean;
-    message?: string;
-    data?: any;
-};
-
-type ErrorResponse = {
-    status: 'error';
-    ok: boolean;
-    message: string;
-    error: any;
-};
-
-export type ResponseBody = SuccessResponse | ErrorResponse;
-
-type SuccessParams = {
-    message?: string;
-    data?: any;
-};
-
-type ErrorParams = {
-    message: string;
-    error: any;
-};
-
-export type RequestBodyScannerApi = {
-    quaryId?: string;
-    userIds?: number[];
-    userId: number;
-};
-
-export type RequestBodyUserInfo = {
-    userId: number;
-};
+import {
+    ErrorParams,
+    ErrorResponse,
+    SuccessParams,
+    SuccessResponse,
+} from './types/index.js';
 
 /**
  * Creates a success response object.
