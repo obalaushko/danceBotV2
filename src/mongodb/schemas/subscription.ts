@@ -110,6 +110,7 @@ subscriptionSchema.pre('save', function (next) {
         } else if (!this.active) {
             this.dateExpired = undefined;
             this.usedLessons = 0;
+            this.totalLessons = 8;
 
             const today = moment().utc();
             this.lastDateUsed = today;
