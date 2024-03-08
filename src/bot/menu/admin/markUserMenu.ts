@@ -23,7 +23,7 @@ markUserMenu
 
         const range = new MenuRange();
         if (users?.length) {
-            if (URL) {
+            if (ENV_VARIABLES.URL) {
                 range.webApp(MSG.buttons.scanQR, ENV_VARIABLES.URL).row();
             }
 

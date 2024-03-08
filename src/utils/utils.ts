@@ -118,17 +118,9 @@ export const hasAdminOrDev = async (userId: number): Promise<boolean> => {
  * @param userId - The ID of the user.
  * @returns A Promise that resolves to void.
  */
-export const isAccessDenied = async (res: Response, userId: number) => {
+export const isAccessDenied = async (userId: number) => {
     const isAdminOrDeveloper = await hasAdminOrDev(userId);
 
-    if (!isAdminOrDeveloper) {
-        console.log(isAdminOrDeveloper + ' - access denied');
-        res.status(403).json(
-            errorResponse({
-                message: 'У доступі відмовлено!',
-                error: null,
-            })
-        );
-    }
+
     return isAdminOrDeveloper;
 }
