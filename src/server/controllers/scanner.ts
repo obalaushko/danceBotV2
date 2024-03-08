@@ -4,7 +4,7 @@ import {
     successResponse,
 } from '../response.js';
 import { LOGGER } from '../../logger/index.js';
-import { isAccessDenied } from '../../utils/utils.js';
+import { hasAdminOrDevRole } from '../../utils/utils.js';
 import { getAllActiveUserUsers } from '../../mongodb/operations/users.js';
 import { markLessonAsUsed } from '../../mongodb/operations/subscriptions.js';
 import { RequestBodyScannerApi, ResponseBody } from '../types/index.js';
@@ -18,7 +18,7 @@ export default class ScannerController {
     ) {
         try {
             const { userId, userIds } = req.body;
-            const accessDenied = await isAccessDenied(userId);
+            const accessDenied = await hasAdminOrDevRole(userId);
             if (!accessDenied) {
                 return res.status(403).json(
                     errorResponse({

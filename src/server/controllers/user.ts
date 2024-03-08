@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import { errorResponse, successResponse } from '../response.js';
 import {
-    getAllUsers,
+    getAllRealUser,
     getUserById,
     getUserWithSubscriptionById,
     updateUserById,
     updateUsersToInactive,
 } from '../../mongodb/operations/users.js';
 import { LOGGER } from '../../logger/index.js';
-import { isAccessDenied } from '../../utils/utils.js';
+import { hasAdminOrDevRole } from '../../utils/utils.js';
 import {
     RequestBodyUpdateUser,
     RequestBodyUserInfo,
@@ -24,7 +24,7 @@ import { removeUserFromGroup } from '../../helpers/users.js';
 
 export default class UserController {
     /**
-     * Retrieves all users.
+     * Retrieves all users except  admin | developer | guest.
      *
      * @param req - The request object.
      * @param res - The response object.
@@ -32,7 +32,7 @@ export default class UserController {
      */
     async getAllUsers(req: Request<{}, {}, {}>, res: Response<ResponseBody>) {
         try {
-            const users = await getAllUsers();
+            const users = await getAllRealUser();
 
             if (users) {
                 return res.status(200).json(
@@ -69,7 +69,7 @@ export default class UserController {
     ) {
         try {
             const { userId } = req.body;
-            const accessDenied = await isAccessDenied(userId);
+            const accessDenied = await hasAdminOrDevRole(userId);
             if (!accessDenied) {
                 return res.status(403).json(
                     errorResponse({

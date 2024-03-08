@@ -1,10 +1,8 @@
-import { Response } from 'express';
 import moment from 'moment-timezone';
 
 import { ROLES } from '../constants/global.js';
 import { LOGGER } from '../logger/index.js';
 import { getUserById } from '../mongodb/operations/users.js';
-import { errorResponse } from '../server/response.js';
 
 /**
  * Checks if a given message is a cancel command.
@@ -97,7 +95,7 @@ export const checkLastFreeze = (dateFreeze: Date | undefined): boolean => {
  * @param userId - The ID of the user to check.
  * @returns A Promise that resolves to a boolean indicating whether the user has admin or developer role.
  */
-export const hasAdminOrDev = async (userId: number): Promise<boolean> => {
+export const hasAdminOrDevRole = async (userId: number): Promise<boolean> => {
     try {
         const user = await getUserById(userId);
         if (user) {
@@ -107,20 +105,8 @@ export const hasAdminOrDev = async (userId: number): Promise<boolean> => {
             return false;
         }
     } catch (error) {
-        LOGGER.error('[checkUserAdminRole]', { metadata: error });
+        LOGGER.error('[hasAdminOrDev]', { metadata: error });
         return false;
     }
 };
 
-/**
- * Checks if the user has access or not.
- * @param res - The response object.
- * @param userId - The ID of the user.
- * @returns A Promise that resolves to void.
- */
-export const isAccessDenied = async (userId: number) => {
-    const isAdminOrDeveloper = await hasAdminOrDev(userId);
-
-
-    return isAdminOrDeveloper;
-}
