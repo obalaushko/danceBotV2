@@ -66,6 +66,13 @@ router.get(
     ) => userController.getUserWithSubscriptionById(req, res)
 );
 
+/**
+ * POST /user-update-data
+ * Updates a user's data.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ */
 router.post(
     '/user-update-data',
     (

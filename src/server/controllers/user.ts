@@ -134,6 +134,12 @@ export default class UserController {
         }
     }
 
+    /**
+     * Updates a user's data and subscription based on the provided request body.
+     * @param req - The request object containing the request body.
+     * @param res - The response object used to send the response.
+     * @returns A JSON response with the updated user data or an error message.
+     */
     async updateUser(
         req: Request<{}, {}, RequestBodyUpdateUser>,
         res: Response<ResponseBody>

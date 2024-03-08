@@ -10,7 +10,6 @@ import { LOGGER } from '../../../logger/index.js';
 import { subscriptionMenu } from './subscriptionMenu.js';
 import { returnToGroupMenu } from './returnToGroupMenu.js';
 import { backAfterQRMenu } from './backAfterQRMenu.js';
-import { ENV_VARIABLES } from '../../../constants/global.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
@@ -58,8 +57,6 @@ export const userMenu = new Menu('user')
             LOGGER.error('[NotificationsMenu][error]', { metadata: { err } });
         }
     })
-    // .row()
-    // .webApp('TEST', ENV_VARIABLES.URL)
     .row()
     .text(MSG.buttons.user.paymentDetails, async (ctx) => {
         const {
