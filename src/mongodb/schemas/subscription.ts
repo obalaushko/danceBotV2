@@ -30,6 +30,8 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     totalLessons: {
         type: Number,
         default: 8,
+        min: 0,
+        max: 16,
         required: true,
     },
     usedLessons: {
@@ -97,7 +99,7 @@ subscriptionSchema.pre('save', function (next) {
             MSG.user.notification.remained0Lessons
         );
     }
-    
+
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
 
@@ -108,6 +110,7 @@ subscriptionSchema.pre('save', function (next) {
         } else if (!this.active) {
             this.dateExpired = undefined;
             this.usedLessons = 0;
+            this.totalLessons = 8;
 
             const today = moment().utc();
             this.lastDateUsed = today;

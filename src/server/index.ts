@@ -1,14 +1,13 @@
-import { getAllActiveUserUsers } from './../mongodb/operations/users.js';
+import { ENV_VARIABLES } from './../constants/global';
 import express from 'express';
 import cors from 'cors';
 import { LOGGER } from '../logger/index.js';
-import { markLessonAsUsed } from '../mongodb/operations/subscriptions.js';
-
-import * as dotenv from 'dotenv';
-
-dotenv.config();
+import router from './routes/route.js';
+import moment from 'moment-timezone';
 
 export const serverInit = async () => {
+    moment.tz.setDefault('Europe/Kiev');
+
     const app = express();
 
     app.use(express.json());
@@ -16,75 +15,9 @@ export const serverInit = async () => {
 
     app.get('/', (req, res) => res.json({ message: 'Server is running' }));
 
-    app.post('/web-data', async (req, res) => {
-        const { quaryId, userIds } = req.body;
-        try {
-            if (userIds) {
-                const users = await getAllActiveUserUsers();
+    app.use('/api', router);
 
-                if (users) {
-                    const matchingUsers = users.filter((user) =>
-                        userIds.includes(user.userId)
-                    );
-
-                    if (matchingUsers.length > 0) {
-                        const updateSubscriptions = await markLessonAsUsed(
-                            matchingUsers.map((user) => user.userId)
-                        );
-
-                        if (updateSubscriptions?.length) {
-                            LOGGER.info('[markUser]', {
-                                metadata: updateSubscriptions,
-                            });
-
-                            if (!users) throw new Error('Users not found!');
-
-                            // const updatedUsers = users.filter((user) =>
-                            //     updateSubscriptions.some(
-                            //         (updateUser) => updateUser.userId === user.userId
-                            //     )
-                            // );
-
-                            // await bot.api.answerWebAppQuery(quaryId, {
-                            //     type: 'article',
-                            //     id: quaryId,
-                            //     title: 'Updated users!',
-                            //     input_message_content: {
-                            //         parse_mode: 'HTML',
-                            //         message_text: MSG.chooseUserToMark(updatedUsers),
-                            //     },
-                            // });
-
-                            return res.status(200).send('ok');
-                        }
-                    } else {
-                        return res.status(400).send('User not found');
-                    }
-                }
-            } else {
-                return res.status(400).send('Bad request');
-            }
-        } catch (error: any) {
-            LOGGER.error('[web-data]', { metadata: error });
-            return res.status(500).json({ error: error });
-        }
-    });
-
-    app.post('/logs', async (req, res) => {
-        try {
-            const { log } = req.body;
-
-            LOGGER.info('LOGS', log);
-            return res.status(200).send('ok');
-        } catch (error: any) {
-            LOGGER.info('LOGS', { metadata: error });
-            return res.status(500).json({ error: error });
-        }
-    });
-
-    const PORT = process.env.PORT || 2604;
-
-    app.listen(PORT, () => {
-        LOGGER.info(`Server started on port ${PORT}...`);
+    app.listen(ENV_VARIABLES.PORT, () => {
+        LOGGER.info(`Server started on port ${ENV_VARIABLES.PORT}...`);
     });
 };

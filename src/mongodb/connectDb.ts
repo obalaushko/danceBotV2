@@ -1,14 +1,12 @@
 import mongoose from 'mongoose';
-import * as dotenv from 'dotenv';
 import { LOGGER } from '../logger/index.js';
+import { ENV_VARIABLES } from '../constants/global.js';
 
-dotenv.config();
-
-const DB = process.env.MONGO_DB || 'mongodb://';
-const USER = process.env.MONGO_DB_USER || '';
-const PASSWORD = encodeURIComponent(process.env.MONGO_DB_PASSWORD || '');
-const DB_NAME = process.env.MONGO_DB_NAME || '';
-const HOST = process.env.MONGO_DB_HOST || 'localhost';
+const DB = ENV_VARIABLES.DB;
+const USER = ENV_VARIABLES.DB_USER;
+const PASSWORD = ENV_VARIABLES.DB_PASSWORD;
+const DB_NAME = ENV_VARIABLES.DB_NAME;
+const HOST = ENV_VARIABLES.DB_HOST;
 
 const dbUrl = `${DB}${USER}:${PASSWORD}@${HOST}/${DB_NAME}`;
 

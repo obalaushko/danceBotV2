@@ -31,7 +31,7 @@ export const messageHears = () => {
 
     /**
      * Updates the notification settings for a user.
-     * 
+     *
      * @param userId - The ID of the user.
      * @param notifications - The new notification setting.
      * @returns A promise that resolves to a string indicating the result of the update.
@@ -51,7 +51,7 @@ export const messageHears = () => {
 
     /**
      * Updates the total number of lessons for a user.
-     * 
+     *
      * @param userId - The ID of the user.
      * @param totalLessons - The new total number of lessons.
      * @returns A promise that resolves to a string indicating the result of the update.
@@ -73,7 +73,7 @@ export const messageHears = () => {
 
     /**
      * Updates the number of used lessons for a user.
-     * 
+     *
      * @param userId - The ID of the user.
      * @param usedLessons - The number of used lessons to update.
      * @returns A promise that resolves to a string indicating the success or failure of the update.
@@ -95,7 +95,7 @@ export const messageHears = () => {
 
     /**
      * Handles role switching based on the received message.
-     * 
+     *
      * @param ctx - The BotContext object.
      * @param message - The message received.
      * @param userId - The ID of the user.

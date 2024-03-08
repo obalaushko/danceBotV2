@@ -4,16 +4,11 @@ import { LOGGER } from '../../logger/index.js';
 import { MSG } from '../../constants/index.js';
 import { addUser, addSubscription } from '../../mongodb/operations/index.js';
 import { isCancel } from '../../utils/utils.js';
-
-import * as dotenv from 'dotenv';
-dotenv.config();
-
-const ENVS = process.env;
-const ADMIN_ID = ENVS.ADMIN_ID || '';
+import { ENV_VARIABLES } from '../../constants/global.js';
 
 /**
  * Registers conversations for the bot.
- * 
+ *
  * @param conversation - The conversation context.
  * @param ctx - The bot context.
  * @returns A promise that resolves when the conversations are registered.
@@ -78,7 +73,10 @@ export const registerConversations = async (
         await ctx.reply(MSG.welcome.noRoleAssigned(newUser));
 
         try {
-            await ctx.api.sendMessage(ADMIN_ID, MSG.approveUser(newUser));
+            await ctx.api.sendMessage(
+                ENV_VARIABLES.ADMIN_ID,
+                MSG.approveUser(newUser)
+            );
         } catch (error) {
             LOGGER.error(
                 `[registerConversations]: Send admin message ${error}`

@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 export const ROLES = {
     Developer: 'developer',
     Admin: 'admin',
@@ -36,3 +39,22 @@ export const formatter = new Intl.DateTimeFormat([], {
     second: '2-digit',
     hour12: false,
 });
+
+const ENVS = process.env;
+export const ENV_VARIABLES = {
+    MODE: ENVS.NODE_ENV || 'development',
+    TOKEN:
+        ENVS.NODE_ENV === 'production'
+            ? ENVS.PRODUCTION_BOT_TOKEN || ''
+            : ENVS.DEVELOPMENT_BOT_TOKEN || '',
+    ADMIN_ID: ENVS.ADMIN_ID || '',
+    URL: ENVS.WEB_APP_URL || '',
+    GROUP_ID: ENVS.GROUP_ID || '',
+    LOGTAIL_TOKEN: ENVS.LOGTAIL_TOKEN || '',
+    DB: ENVS.MONGO_DB || 'mongodb://',
+    DB_USER: ENVS.MONGO_DB_USER || '',
+    DB_PASSWORD: encodeURIComponent(ENVS.MONGO_DB_PASSWORD || ''),
+    DB_NAME: ENVS.MONGO_DB_NAME || '',
+    DB_HOST: ENVS.MONGO_DB_HOST || 'localhost',
+    PORT: ENVS.PORT || 8000,
+};

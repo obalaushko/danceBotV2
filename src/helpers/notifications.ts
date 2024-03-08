@@ -1,14 +1,9 @@
+import { ENV_VARIABLES } from './../constants/global';
 import { IUser } from './../mongodb/schemas/user.js';
 import { bot } from '../bot/bot.js';
 import { LOGGER } from '../logger/index.js';
 import { getAllUserUsers, getUserById } from '../mongodb/operations/index.js';
 import { MSG } from '../constants/index.js';
-
-import * as dotenv from 'dotenv';
-dotenv.config();
-
-const ENVS = process.env;
-const GROUP_ID = ENVS.GROUP_ID || '';
 
 /**
  * Sends a notification to a user.
@@ -38,7 +33,10 @@ export const sendUserNotification = async (userId: number, message: string) => {
 export const sendInviteToGroup = async (users: IUser[]) => {
     try {
         for (const user of users) {
-            const member = await bot.api.getChatMember(GROUP_ID, user.userId);
+            const member = await bot.api.getChatMember(
+                ENV_VARIABLES.GROUP_ID,
+                user.userId
+            );
 
             if (member.status === 'member') {
                 await bot.api.sendMessage(
@@ -47,7 +45,7 @@ export const sendInviteToGroup = async (users: IUser[]) => {
                 );
             } else {
                 const { invite_link } = await bot.api.createChatInviteLink(
-                    GROUP_ID,
+                    ENV_VARIABLES.GROUP_ID,
                     {
                         creates_join_request: true,
                     }

@@ -9,6 +9,7 @@ import { setupUserMenu } from './userSetupMenu.js';
 import { SessionContext } from '../../types/index.js';
 import { getGroupedSubscriptionChanges } from '../../../mongodb/operations/changeLog.js';
 import { sendMailingToUsers } from '../../../helpers/notifications.js';
+import { ENV_VARIABLES } from '../../../constants/global.js';
 
 // Users menu
 const settingUserMenu = new Menu<SessionContext>('settingUserMenu', {
@@ -123,10 +124,7 @@ mailingMenu.register(confirmMailingMenu);
 export const settingsMenu = new Menu('settingsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
-    .text(MSG.buttons.settings.users, async (ctx) => {
-        ctx.menu.nav('settingUserMenu');
-        await ctx.editMessageText(MSG.settings.users);
-    })
+    .webApp(MSG.buttons.settings.users, ENV_VARIABLES.URL + 'settings')
     .text(MSG.buttons.settings.history, async (ctx) => {
         const history = await getGroupedSubscriptionChanges();
 
@@ -138,6 +136,9 @@ export const settingsMenu = new Menu('settingsMenu', {
     //     ctx.menu.nav('mailingMenu');
     //     await ctx.editMessageText(MSG.settings.mailing.main);
     // })
+
+    // .row()
+    // .webApp('history', ENV_VARIABLES.URL + 'history')
     .row()
     .text(MSG.buttons.backToMain, async (ctx) => {
         const { user } = await ctx.getAuthor();

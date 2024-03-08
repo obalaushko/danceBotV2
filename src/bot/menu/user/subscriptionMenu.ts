@@ -1,3 +1,4 @@
+import { ENV_VARIABLES } from './../../../constants/global';
 import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants/messages.js';
 import {
@@ -11,15 +12,10 @@ import {
 } from '../../../mongodb/operations/subscriptions.js';
 import { checkLastFreeze } from '../../../utils/utils.js';
 
-import * as dotenv from 'dotenv';
 import { LOGGER } from '../../../logger/index.js';
 import { generateQR } from '../../../utils/generateQR.js';
 import { InputFile } from 'grammy';
 import { backAfterQRMenu } from './backAfterQRMenu.js';
-dotenv.config();
-
-const ENVS = process.env;
-const ADMIN_ID = ENVS.ADMIN_ID || '';
 
 const freezeSubMenu = new Menu('freezeSubMenu')
     .dynamic(async (ctx) => {
@@ -73,7 +69,7 @@ const freezeSubMenu = new Menu('freezeSubMenu')
                             const user = await getUserById(freeze.userId);
                             if (user) {
                                 await ctx.api.sendMessage(
-                                    ADMIN_ID,
+                                    ENV_VARIABLES.ADMIN_ID,
                                     MSG.frozenUser(user)
                                 );
                             }

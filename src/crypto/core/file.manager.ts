@@ -32,7 +32,9 @@ class FileManager {
                     return false;
                 }
             } else {
-                LOGGER.error('[checkFolderExists][access]', { metadata: error });
+                LOGGER.error('[checkFolderExists][access]', {
+                    metadata: error,
+                });
                 return false;
             }
         }
@@ -49,7 +51,10 @@ class FileManager {
             const exist = await this.checkFolderExists();
             if (!exist) throw new Error('Folder does not exist');
 
-            await fs.promises.writeFile(path.join(this.DATA_DIR, filename), data);
+            await fs.promises.writeFile(
+                path.join(this.DATA_DIR, filename),
+                data
+            );
             LOGGER.info('[writeToFile][success]', { metadata: filename });
             return true;
         } catch (error) {
@@ -59,24 +64,28 @@ class FileManager {
     }
 
     /**
-        * Reads data from a file.
-        * @param filename - The name of the file to read.
-        * @returns A promise that resolves with the contents of the file as a string.
-        * @throws An error if the folder does not exist or if there is an error reading the file.
-        */
+     * Reads data from a file.
+     * @param filename - The name of the file to read.
+     * @returns A promise that resolves with the contents of the file as a string.
+     * @throws An error if the folder does not exist or if there is an error reading the file.
+     */
     public async readFromFile(filename: string): Promise<string> {
         const exist = await this.checkFolderExists();
         if (!exist) throw new Error('Folder does not exist');
 
         return new Promise<string>((resolve, reject) => {
-            fs.readFile(path.join(this.DATA_DIR, filename), 'utf8', (err, data) => {
-                if (err) {
-                    LOGGER.error('[readFromFile]', { metadata: err });
-                    reject(err);
-                } else {
-                    resolve(data);
+            fs.readFile(
+                path.join(this.DATA_DIR, filename),
+                'utf8',
+                (err, data) => {
+                    if (err) {
+                        LOGGER.error('[readFromFile]', { metadata: err });
+                        reject(err);
+                    } else {
+                        resolve(data);
+                    }
                 }
-            });
+            );
         });
     }
 

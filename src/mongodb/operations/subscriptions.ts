@@ -5,7 +5,7 @@ import { checkLastFreeze } from '../../utils/utils.js';
 
 /**
  * Adds a subscription to the database.
- * 
+ *
  * @param {Object} subscriptionData - The subscription data.
  * @param {string} subscriptionData.userId - The ID of the user.
  * @param {number} subscriptionData.totalLessons - The total number of lessons in the subscription.
@@ -77,7 +77,7 @@ export const getSubscriptionById = async (
 
 /**
  * Updates a subscription by its ID.
- * 
+ *
  * @param userId - The ID of the user.
  * @param update - The partial subscription object containing the fields to update.
  * @returns A promise that resolves to the updated subscription, or null if the subscription does not exist or an error occurs.
@@ -104,7 +104,7 @@ export const updateSubscriptionById = async (
 
 /**
  * Activates subscriptions for the specified user(s).
- * 
+ *
  * @param userId - The ID of the user or an array of user IDs.
  * @returns A promise that resolves to an array of updated subscriptions, or null if no subscriptions were found.
  */
@@ -274,7 +274,7 @@ export const getSubscriptionStatuses = async (
 
 /**
  * Freezes a subscription by user ID.
- * 
+ *
  * @param userId - The ID of the user.
  * @returns A Promise that resolves to the frozen subscription if successful, or null if the subscription does not exist or freezing is not allowed.
  */
@@ -321,7 +321,7 @@ export const freezeSubscriptionByUserId = async (
 
 /**
  * Defrosts a subscription by user ID.
- * 
+ *
  * @param userId - The ID of the user.
  * @returns A promise that resolves to the defrosted subscription, or null if the subscription does not exist.
  */

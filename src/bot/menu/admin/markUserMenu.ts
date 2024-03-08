@@ -1,3 +1,4 @@
+import { ENV_VARIABLES } from './../../../constants/global';
 import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants/index.js';
 import {
@@ -5,9 +6,6 @@ import {
     markLessonAsUsed,
 } from '../../../mongodb/operations/index.js';
 import { LOGGER } from '../../../logger/index.js';
-
-import * as dotenv from 'dotenv';
-dotenv.config();
 
 export const markUserMenu = new Menu('markUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
@@ -25,9 +23,8 @@ markUserMenu
 
         const range = new MenuRange();
         if (users?.length) {
-            const URL = process.env.WEB_APP_URL || '';
             if (URL) {
-                range.webApp(MSG.buttons.scanQR, URL).row();
+                range.webApp(MSG.buttons.scanQR, ENV_VARIABLES.URL).row();
             }
 
             users.map((user, index) => {

@@ -10,7 +10,7 @@ import moment from 'moment-timezone';
 
 /**
  * Adds a log entry for a subscription change.
- * 
+ *
  * @param userId - The ID of the user.
  * @param subscriptionId - The ID of the subscription.
  * @param changeType - The type of change.
@@ -37,8 +37,8 @@ export const addLogSubscriptionChange = async (
     }
 };
 
-// ! Deprecated
 /**
+ * @deprecated
  * Retrieves grouped subscription change logs.
  * @returns A promise that resolves to an array of grouped change logs or null if an error occurs.
  */
@@ -136,7 +136,6 @@ export const deleteOldLogs = async (): Promise<void> => {
         await SubscriptionChangeLogModel.deleteMany({
             changeDate: { $lt: twoMonthsAgo },
         });
-        LOGGER.info('[deleteOldLogs], Remove old logs');
     } catch (error: any) {
         LOGGER.error('[deleteOldLogs][error]', {
             metadata: { error: error, stack: error.stack.toString() },

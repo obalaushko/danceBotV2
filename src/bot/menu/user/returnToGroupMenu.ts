@@ -1,3 +1,4 @@
+import { ENV_VARIABLES } from './../../../constants/global';
 import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants/messages.js';
 import {
@@ -5,12 +6,7 @@ import {
     updateInactiveToGuest,
 } from '../../../mongodb/operations/users.js';
 
-import * as dotenv from 'dotenv';
 import { LOGGER } from '../../../logger/index.js';
-dotenv.config();
-
-const ENVS = process.env;
-const ADMIN_ID = ENVS.ADMIN_ID || '';
 
 export const returnToGroupMenu = new Menu('returnToGroupMenu').text(
     MSG.buttons.user.returnToGroup,
@@ -30,7 +26,7 @@ export const returnToGroupMenu = new Menu('returnToGroupMenu').text(
 
             try {
                 await ctx.api.sendMessage(
-                    ADMIN_ID,
+                    ENV_VARIABLES.ADMIN_ID,
                     MSG.returnOldUser(updateUser)
                 );
             } catch (error) {

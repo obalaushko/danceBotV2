@@ -5,7 +5,7 @@ import { IUser, UserModel } from '../schemas/user.js';
 
 /**
  * Adds a new user to the database.
- * 
+ *
  * @param {Object} user - The user object containing the user details.
  * @param {string} user.userId - The unique identifier of the user.
  * @param {string} user.username - The username of the user.
@@ -143,7 +143,7 @@ export const getUsersByUserIds = async (
 
 /**
  * Updates a user by their ID.
- * 
+ *
  * @param userId - The ID of the user to update.
  * @param update - The partial user object containing the fields to update.
  * @returns A Promise that resolves to the updated user object, or null if the user does not exist or an error occurs.
@@ -228,7 +228,7 @@ export const getAllUserUsers = async (): Promise<IUser[] | null> => {
 
 /**
  * Approves the users with the specified user IDs.
- * 
+ *
  * @param userIds - An array of user IDs to approve.
  * @returns A promise that resolves to an array of approved users, or null if no users were approved.
  */
@@ -349,7 +349,7 @@ export const getUserWithPaymentDetails = async (
 
 /**
  * Retrieves all users that can be set as inactive.
- * 
+ *
  * @returns A promise that resolves to an array of IUser objects or null if an error occurs.
  */
 export const getAllCanBeSetIncactiveUsers = async (): Promise<
@@ -371,7 +371,7 @@ export const getAllCanBeSetIncactiveUsers = async (): Promise<
 
 /**
  * Retrieves all users that can be deleted.
- * 
+ *
  * @returns A promise that resolves to an array of IUser objects or null if an error occurs.
  */
 export const getAllCanBeDeletedUsers = async (): Promise<IUser[] | null> => {
@@ -431,7 +431,7 @@ export const updateUsersToInactive = async (
 
 /**
  * Updates the role of an inactive user to "Guest" and enables notifications.
- * 
+ *
  * @param userId - The ID of the user to update.
  * @returns A Promise that resolves to the updated user object if found, or null if not found or an error occurred.
  */
@@ -461,7 +461,7 @@ export const updateInactiveToGuest = async (
 
 /**
  * Deletes users from the database.
- * 
+ *
  * @param userId - The ID or an array of IDs of the users to be deleted.
  * @param adminId - The ID of the admin performing the deletion.
  * @returns A promise that resolves to a boolean indicating whether the deletion was successful.
