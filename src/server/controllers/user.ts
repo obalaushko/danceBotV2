@@ -69,8 +69,15 @@ export default class UserController {
     ) {
         try {
             const { userId } = req.body;
-            const accessDenied = await isAccessDenied(res, userId);
-            if (!accessDenied) return;
+            const accessDenied = await isAccessDenied(userId);
+            if (!accessDenied) {
+                return res.status(403).json(
+                    errorResponse({
+                        message: 'У доступі відмовлено!',
+                        error: null,
+                    })
+                );
+            }
 
             const user = await getUserById(userId);
 

@@ -39,14 +39,14 @@ router.get('/users', (req: Request<{}, {}, {}>, res: Response<ResponseBody>) =>
 );
 
 /**
- * POST /user-info
+ * POST /admin-info
  * Retrieves a user by ID.
  *
  * @param req - The request object.
  * @param res - The response object.
  */
 router.post(
-    '/user-info',
+    '/admin-info',
     (req: Request<{}, {}, RequestBodyUserInfo>, res: Response<ResponseBody>) =>
         userController.getUserById(req, res)
 );
