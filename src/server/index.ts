@@ -1,4 +1,4 @@
-import { ENV_VARIABLES } from './../constants/global';
+import { ENV_VARIABLES } from './../constants/global.js';
 import express from 'express';
 import cors from 'cors';
 import { LOGGER } from '../logger/index.js';

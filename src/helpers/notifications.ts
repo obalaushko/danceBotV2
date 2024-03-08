@@ -1,4 +1,4 @@
-import { ENV_VARIABLES } from './../constants/global';
+import { ENV_VARIABLES } from './../constants/global.js';
 import { IUser } from './../mongodb/schemas/user.js';
 import { bot } from '../bot/bot.js';
 import { LOGGER } from '../logger/index.js';
