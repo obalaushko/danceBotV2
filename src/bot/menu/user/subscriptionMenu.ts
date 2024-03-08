@@ -1,4 +1,4 @@
-import { ENV_VARIABLES } from './../../../constants/global';
+import { ENV_VARIABLES } from './../../../constants/global.js';
 import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants/messages.js';
 import {

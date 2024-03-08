@@ -1,4 +1,4 @@
-import { ENV_VARIABLES } from './../constants/global';
+import { ENV_VARIABLES } from './../constants/global.js';
 import { createLogger, format, transports } from 'winston';
 
 import { Logtail } from '@logtail/node';
