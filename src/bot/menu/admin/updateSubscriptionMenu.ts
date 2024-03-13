@@ -38,23 +38,23 @@ activateSubscriptionMenu
 
         const range = new MenuRange();
         if (users?.length) {
-            users.map((user) => {
-                range
-                    .text(
-                        {
-                            text: checkedActive.has(user.userId)
-                                ? `✔️ ${user.fullName!}`
-                                : user.fullName!,
-                            payload: user.userId.toString(),
-                        },
-                        (ctx) => {
-                            toggleCheckedActive(Number(ctx.match));
+            users.map((user, index) => {
+                range.text(
+                    {
+                        text: checkedActive.has(user.userId)
+                            ? `✔️ ${user.fullName!}`
+                            : user.fullName!,
+                        payload: user.userId.toString(),
+                    },
+                    (ctx) => {
+                        toggleCheckedActive(Number(ctx.match));
 
-                            ctx.menu.update();
-                        }
-                    )
-                    .row();
+                        ctx.menu.update();
+                    }
+                );
+                if (index % 2) range.row();
             });
+            range.row();
             checkedActive.size &&
                 range.text(MSG.buttons.update, async (ctx) => {
                     const userIds = [...checkedActive];
@@ -98,24 +98,23 @@ deactivateSubscriptionMenu
 
         const range = new MenuRange();
         if (users?.length) {
-            users.map((user) => {
-                range
-                    .text(
-                        {
-                            text: checkedDeactive.has(user.userId)
-                                ? `✔️ ${user.fullName!}`
-                                : user.fullName!,
-                            payload: user.userId.toString(),
-                        },
-                        (ctx) => {
-                            toggleCheckedDeactive(Number(ctx.match));
+            users.map((user, index) => {
+                range.text(
+                    {
+                        text: checkedDeactive.has(user.userId)
+                            ? `✔️ ${user.fullName!}`
+                            : user.fullName!,
+                        payload: user.userId.toString(),
+                    },
+                    (ctx) => {
+                        toggleCheckedDeactive(Number(ctx.match));
 
-                            ctx.menu.update();
-                        }
-                    )
-                    .row();
+                        ctx.menu.update();
+                    }
+                );
+                if (index % 2) range.row();
             });
-
+            range.row();
             checkedDeactive.size &&
                 range.text(MSG.buttons.update, async (ctx) => {
                     const userIds = [...checkedDeactive];

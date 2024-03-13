@@ -125,7 +125,13 @@ export const subscriptionMenu = new Menu('subscriptionMenu')
                         const qr = await generateQR(data);
 
                         if (qr) {
-                            await ctx.deleteMessage();
+                            try {
+                                await ctx.deleteMessage();
+                            } catch (error) {
+                                LOGGER.warn('[userMenu][delete MSG][qr]', {
+                                    metadata: { error },
+                                });
+                            }
 
                             const photo = new InputFile(qr, 'qrcode.png');
                             await ctx.replyWithPhoto(photo, {

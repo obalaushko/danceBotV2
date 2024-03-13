@@ -192,6 +192,26 @@ export const getAllUsers = async (): Promise<IUser[] | null> => {
     }
 };
 
+export const getAllRealUser = async (): Promise<IUser[] | null> => {
+    try {
+        const users = await UserModel.find({
+            role: { $nin: [ROLES.Developer, ROLES.Admin, ROLES.Guest] },
+        })
+            .populate({
+                path: 'subscription',
+                select: '-_id',
+            })
+            .exec();
+
+        return users;
+    } catch (error: any) {
+        LOGGER.error('[getAllRealUser][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
 /**
  * Retrieves all guest users from the database.
  * @returns A promise that resolves to an array of guest users or null if an error occurs.

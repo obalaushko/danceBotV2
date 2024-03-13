@@ -8,6 +8,8 @@ import { ROLES } from '../../../constants/global.js';
 
 /**
  * Handles various message hears in private chats.
+ * @deprecated
+ * Now we use WEB interface for the admin panel.
  */
 export const messageHears = () => {
     /**

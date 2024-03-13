@@ -4,9 +4,10 @@ import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 import { hydrate } from '@grammyjs/hydrate';
+import { freeStorage } from "@grammyjs/storage-free";
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
-import { BotContext } from './types/index.js';
+import { BotContext, SessionData } from './types/index.js';
 import { COMMANDS } from './commands/index.js';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
@@ -32,6 +33,7 @@ import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
 import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 import { ENV_VARIABLES } from '../constants/global.js';
+// import { ignoreOld } from 'grammy-middlewares';
 
 //BOT CONFIG
 const bot = new Bot<ParseModeFlavor<BotContext>>(ENV_VARIABLES.TOKEN);
@@ -71,7 +73,11 @@ bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
 // Session
 bot.use(
     session({
-        initial: () => ({}),
+        initial: () => ({
+            editedActions: null,
+            editedUserId: null,
+        }),
+        storage: freeStorage<SessionData>(bot.token),
     })
 );
 
