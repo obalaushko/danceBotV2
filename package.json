@@ -66,6 +66,7 @@
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "grammy": "^1.19.1",
+        "grammy-middlewares": "^1.0.11",
         "module-alias": "^2.2.3",
         "moment-timezone": "^0.5.43",
         "mongoose": "^7.6.1",

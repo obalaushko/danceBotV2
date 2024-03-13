@@ -32,6 +32,7 @@ import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
 import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 import { ENV_VARIABLES } from '../constants/global.js';
+// import { ignoreOld } from 'grammy-middlewares';
 
 //BOT CONFIG
 const bot = new Bot<ParseModeFlavor<BotContext>>(ENV_VARIABLES.TOKEN);
