@@ -2,6 +2,7 @@ import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants/index.js';
 import { getUserWithSubscriptionById } from '../../../mongodb/operations/users.js';
 import { subscriptionMenu } from './subscriptionMenu.js';
+import { LOGGER } from '../../../logger/index.js';
 
 export const backAfterQRMenu = new Menu('backAfterQRMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
@@ -12,7 +13,11 @@ export const backAfterQRMenu = new Menu('backAfterQRMenu', {
 
     const user = await getUserWithSubscriptionById(id);
     if (user) {
-        await ctx.deleteMessage();
+        try {
+            await ctx.deleteMessage();
+        } catch (error) {
+            LOGGER.warn('[backAfterQRMenu][delete MSG]', { metadata: error });
+        }
         await ctx.reply(MSG.user.subscription(user), {
             reply_markup: subscriptionMenu,
         });

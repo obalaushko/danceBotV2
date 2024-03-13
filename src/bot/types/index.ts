@@ -6,6 +6,16 @@ import {
 } from '@grammyjs/conversations';
 import { FileFlavor } from '@grammyjs/files';
 
+/**
+ * Represents the possible actions for the dance bot.
+ * It can be one of the following:
+ * - 'Role': Represents an action related to roles.
+ * - 'Notifications': Represents an action related to notifications.
+ * - 'TotalLessons': Represents an action related to total lessons.
+ * - 'UsedLessons': Represents an action related to used lessons.
+ * - null: Represents no action.
+ * @deprecated
+ */
 export type Action =
     | 'Role'
     | 'Notifications'
@@ -13,7 +23,7 @@ export type Action =
     | 'UsedLessons'
     | null;
 
-interface SessionData {
+export interface SessionData {
     editedUserId: number | null;
     editedActions: Action;
 }
