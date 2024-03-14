@@ -2,7 +2,7 @@ import { bot } from '../bot/bot.js';
 import { ENV_VARIABLES } from '../constants/global.js';
 
 import { LOGGER } from '../logger/index.js';
-import { UserModel } from '../mongodb/schemas/user.js';
+import { getAllUserUsers } from '../mongodb/operations/users.js';
 
 /**
  * Removes users from a group.
@@ -40,7 +40,9 @@ export const removeUserFromGroup = async (userIds: number[]) => {
  */
 export const checkAndUpdateTelegramUser = async () => {
     try {
-        const users = await UserModel.find();
+        const users = await getAllUserUsers();
+        if (!users?.length) return;
+
         for (const user of users) {
             const {
                 user: { id, first_name, username },
