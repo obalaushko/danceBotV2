@@ -14,7 +14,12 @@ export const backAfterQRMenu = new Menu('backAfterQRMenu', {
     const user = await getUserWithSubscriptionById(id);
     if (user) {
         try {
-            await ctx.deleteMessage();
+            ctx.chat &&
+                ctx.msg &&
+                (await ctx.api.deleteMessage(
+                    ctx.chat?.id,
+                    ctx.msg?.message_id
+                ));
         } catch (error) {
             LOGGER.warn('[backAfterQRMenu][delete MSG]', { metadata: error });
         }

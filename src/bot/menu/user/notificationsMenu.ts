@@ -1,4 +1,4 @@
-import { Menu } from '@grammyjs/menu';
+import { Menu, MenuRange } from '@grammyjs/menu';
 import { MSG } from '../../../constants/index.js';
 import {
     getUserById,
@@ -9,42 +9,42 @@ import { LOGGER } from '../../../logger/index.js';
 export const notificationsMenu = new Menu('notificationsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
-    .text(MSG.buttons.user.notificationActivate, async (ctx) => {
-        const {
-            user: { id, username },
-        } = await ctx.getAuthor();
+    .dynamic(async (ctx) => {
+        try {
+            const {
+                user: { id },
+            } = await ctx.getAuthor();
 
-        LOGGER.debug('[NotificationsMenu][notificationActivate]', {
-            metadata: { id, username },
-        });
+            const range = new MenuRange();
 
-        const user = await getUserById(id);
+            const user = await getUserById(id);
 
-        if (user?.notifications) return;
+            const notificationStatus = user?.notifications || false;
+            const buttonText = notificationStatus
+                ? MSG.buttons.user.notificationDisabled
+                : MSG.buttons.user.notificationActivate;
 
-        const updateUser = await updateUserById(id, { notifications: true }); // enable
+            range.text(
+                {
+                    text: buttonText,
+                },
+                async (ctx) => {
+                    const updateUser = await updateUserById(id, {
+                        notifications: !notificationStatus,
+                    });
+                    if (updateUser) {
+                        await ctx.editMessageText(
+                            MSG.user.notification.main(updateUser)
+                        );
+                    } else {
+                        await ctx.editMessageText(MSG.errors.unknownError);
+                    }
+                }
+            );
 
-        if (updateUser) {
-            await ctx.editMessageText(MSG.user.notification.main(updateUser));
-        }
-    })
-    .text(MSG.buttons.user.notificationDisabled, async (ctx) => {
-        const {
-            user: { id, username },
-        } = await ctx.getAuthor();
-
-        LOGGER.debug('[NotificationsMenu][notificationDisabled]', {
-            metadata: { id, username },
-        });
-
-        const user = await getUserById(id);
-
-        if (!user?.notifications) return;
-
-        const updateUser = await updateUserById(id, { notifications: false }); // disable
-
-        if (updateUser) {
-            await ctx.editMessageText(MSG.user.notification.main(updateUser));
+            return range;
+        } catch (error) {
+            LOGGER.error('[notificationsMenu] Error', { metadata: error });
         }
     })
     .row()

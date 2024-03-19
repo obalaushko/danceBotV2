@@ -2,7 +2,7 @@ import { bot } from '../bot/bot.js';
 import { ENV_VARIABLES } from '../constants/global.js';
 
 import { LOGGER } from '../logger/index.js';
-import { UserModel } from '../mongodb/schemas/user.js';
+import { getAllUserUsers } from '../mongodb/operations/users.js';
 
 /**
  * Removes users from a group.
@@ -29,18 +29,17 @@ export const removeUserFromGroup = async (userIds: number[]) => {
 };
 
 /**
- * Checks and updates the Telegram users in the database.
- * Retrieves the users from the UserModel and updates their first name and username
- * based on the information obtained from the Telegram API.
- * If the update is successful, the changes are saved to the database.
- * If the update fails, a warning message is logged.
- * If an error occurs during the process, an error message is logged.
+ * Checks and updates the Telegram user information.
+ * Retrieves all users and updates their first name and username if available.
+ * Saves the updated user information.
  * @requires
  * BOT must be admin in the group
  */
 export const checkAndUpdateTelegramUser = async () => {
     try {
-        const users = await UserModel.find();
+        const users = await getAllUserUsers();
+        if (!users?.length) return;
+
         for (const user of users) {
             const {
                 user: { id, first_name, username },
