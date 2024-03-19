@@ -26,6 +26,8 @@ export type Action =
 export interface SessionData {
     editedUserId: number | null;
     editedActions: Action;
+    spamCounter: number;
+    blackList: number[];
 }
 export type SessionContext = Context & SessionFlavor<SessionData>;
 export type HydrateContext = HydrateFlavor<SessionContext>;

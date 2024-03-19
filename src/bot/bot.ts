@@ -4,10 +4,9 @@ import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 import { hydrate } from '@grammyjs/hydrate';
-import { freeStorage } from "@grammyjs/storage-free";
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
-import { BotContext, SessionData } from './types/index.js';
+import { BotContext } from './types/index.js';
 import { COMMANDS } from './commands/index.js';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
@@ -24,7 +23,6 @@ import {
     changeNameCommand,
     helpCommand,
     groupRequestHears,
-    messageHears,
     startCommand,
 } from './chats/index.js';
 import { tasksCron } from '../helpers/tasksCron.js';
@@ -33,6 +31,8 @@ import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
 import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 import { ENV_VARIABLES } from '../constants/global.js';
+import { addToBlacklist, loadBlacklist } from '../utils/blackList.js';
+import { banCommand } from './chats/private/ban.command.js';
 // import { ignoreOld } from 'grammy-middlewares';
 
 //BOT CONFIG
@@ -73,13 +73,38 @@ bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
 // Session
 bot.use(
     session({
-        initial: () => ({
-            editedActions: null,
-            editedUserId: null,
-        }),
-        storage: freeStorage<SessionData>(bot.token),
+        initial: () => ({ spamCounter: 0 }),
     })
 );
+
+// Loading blacklist
+bot.use(async (ctx, next) => {
+    if (!ctx.session.blackList) {
+        ctx.session.blackList = await loadBlacklist();
+    }
+    if (ctx.from && ctx.session.blackList.includes(ctx.from.id)) {
+        // User is in blacklist, ignore their messages
+        return;
+    }
+
+    // Pass control to the next middleware
+    await next();
+});
+
+// Add spammers to the blacklist
+bot.use(async (ctx, next) => {
+    if (ctx.session.spamCounter >= 3) {
+        ctx.from && addToBlacklist(ctx.from.id);
+        ctx.session.spamCounter = 0;
+        await ctx.reply(MSG.spamWarning);
+
+        ctx.session.blackList = await loadBlacklist();
+        return;
+    }
+
+    // Pass control to the next middleware
+    await next();
+});
 
 // Limit
 bot.use(
@@ -92,6 +117,17 @@ bot.use(
         onLimitExceeded: async (ctx) => {
             if (ctx.chat?.type === 'private') {
                 await ctx.reply(MSG.tooManyRequest);
+                ctx.session.spamCounter += 1;
+
+                if (ctx.session.spamCounter > 0) {
+                    // Avoid negative values
+                    setTimeout(
+                        () => {
+                            ctx.session.spamCounter -= 1;
+                        },
+                        1000 * 60 * 60
+                    );
+                }
             }
         },
 
@@ -131,9 +167,7 @@ cancelCommand();
 changeNameCommand();
 helpCommand();
 aboutCommand();
-
-// listener message must be last
-messageHears();
+banCommand();
 
 //CRASH HANDLER
 bot.catch((err) => {
