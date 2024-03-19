@@ -115,18 +115,27 @@ export const subscriptionMenu = new Menu('subscriptionMenu')
                     range.text(MSG.buttons.user.qr, async (ctx) => {
                         const userInfo = {
                             id: userWithSubscription?.userId,
-                            username: userWithSubscription?.username || null,
-                            fullName: userWithSubscription?.fullName,
+                            username: userWithSubscription?.username || '',
+                            fullName: userWithSubscription?.fullName || '',
                         };
 
                         // Generate string for parsing tg qr scanner
-                        const data = `userId:${userInfo.id},username:${userInfo.username},fullName:${userInfo.fullName}`;
+                        const data = `userId:${encodeURIComponent(
+                            userInfo.id
+                        )};username:${encodeURIComponent(
+                            userInfo.username
+                        )};fullName:${encodeURIComponent(userInfo.fullName)}`;
 
                         const qr = await generateQR(data);
 
                         if (qr) {
                             try {
-                                await ctx.deleteMessage();
+                                ctx.chat &&
+                                    ctx.msg &&
+                                    (await ctx.api.deleteMessage(
+                                        ctx.chat?.id,
+                                        ctx.msg?.message_id
+                                    ));
                             } catch (error) {
                                 LOGGER.warn('[userMenu][delete MSG][qr]', {
                                     metadata: { error },
