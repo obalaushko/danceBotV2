@@ -1,3 +1,4 @@
+import { globalSession } from '../../../constants/global.js';
 import {
     addToBlacklist,
     clearBlacklist,
@@ -32,7 +33,10 @@ export const banCommand = () => {
             const accessRights = await hasAdminOrDevRole(user.id);
             if (!accessRights) return;
 
-            await addToBlacklist(userId);
+            const updateBlacklist = await addToBlacklist(userId);
+            if (updateBlacklist) {
+                globalSession.blackList = updateBlacklist;
+            }
 
             await ctx.reply(`User ${userId} has been added to the blacklist.`);
         }
@@ -59,7 +63,11 @@ export const banCommand = () => {
             const accessRights = await hasAdminOrDevRole(user.id);
             if (!accessRights) return;
 
-            await removeFromBlacklist(userId);
+            const updateBlacklist = await removeFromBlacklist(userId);
+
+            if (updateBlacklist) {
+                globalSession.blackList = updateBlacklist;
+            }
 
             await ctx.reply(
                 `User ${userId} has been removed from the blacklist.`
@@ -71,7 +79,7 @@ export const banCommand = () => {
         const { user } = await ctx.getAuthor();
         const accessRights = await hasAdminOrDevRole(user.id);
         if (!accessRights) return;
-        
+
         const list = await loadBlacklist();
         await ctx.reply(
             `The blacklist contains the following users: ${list.join(', ')}`
@@ -84,6 +92,7 @@ export const banCommand = () => {
         if (!accessRights) return;
 
         await clearBlacklist();
+        globalSession.blackList = await loadBlacklist();
 
         await ctx.reply(`The blacklist has been cleared.`);
     });

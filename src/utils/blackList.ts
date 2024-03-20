@@ -11,8 +11,8 @@ export const addToBlacklist = async (
     userId: number
 ): Promise<number[] | undefined> => {
     let blackList = [];
-    
-    if (String(userId) === ENV_VARIABLES.ADMIN_ID) return;
+
+    if (userId === ENV_VARIABLES.ADMIN_ID) return;
 
     try {
         const data = await fileManager.readFromFile('blackList.json');
@@ -34,6 +34,8 @@ export const addToBlacklist = async (
             JSON.stringify(blackList, null, 4)
         );
         LOGGER.info(`User ${userId} added to the blacklist.`);
+
+        return blackList;
     } catch (err) {
         LOGGER.error(`[addToBlacklist] Error writing file: `, {
             metadata: err,
@@ -105,6 +107,8 @@ export const removeFromBlacklist = async (
             JSON.stringify(blackList, null, 4)
         );
         LOGGER.info(`User ${userId} removed from the blacklist.`);
+
+        return blackList;
     } catch (err) {
         LOGGER.error(`[removeFromBlacklist] Error writing file: `, {
             metadata: err,

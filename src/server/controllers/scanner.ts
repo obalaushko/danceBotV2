@@ -1,8 +1,5 @@
 import { Request, Response } from 'express';
-import {
-    errorResponse,
-    successResponse,
-} from '../response.js';
+import { errorResponse, successResponse } from '../response.js';
 import { LOGGER } from '../../logger/index.js';
 import { hasAdminOrDevRole } from '../../utils/utils.js';
 import { getAllActiveUserUsers } from '../../mongodb/operations/users.js';
@@ -31,7 +28,7 @@ export default class ScannerController {
             if (userIds) {
                 const users = await getAllActiveUserUsers();
 
-                console.log(userId, userIds)
+                console.log(userId, userIds);
 
                 if (users) {
                     const matchingUsers = users.filter((user) =>

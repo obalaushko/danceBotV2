@@ -47,9 +47,9 @@ export const ENV_VARIABLES = {
         ENVS.NODE_ENV === 'production'
             ? ENVS.PRODUCTION_BOT_TOKEN || ''
             : ENVS.DEVELOPMENT_BOT_TOKEN || '',
-    ADMIN_ID: ENVS.ADMIN_ID || '',
+    ADMIN_ID: Number(ENVS.ADMIN_ID) || 0,
     URL: ENVS.WEB_APP_URL || '',
-    GROUP_ID: ENVS.GROUP_ID || '',
+    GROUP_ID: Number(ENVS.GROUP_ID) || 0,
     LOGTAIL_TOKEN: ENVS.LOGTAIL_TOKEN || '',
     DB: ENVS.MONGO_DB || 'mongodb://',
     DB_USER: ENVS.MONGO_DB_USER || '',
@@ -57,4 +57,12 @@ export const ENV_VARIABLES = {
     DB_NAME: ENVS.MONGO_DB_NAME || '',
     DB_HOST: ENVS.MONGO_DB_HOST || 'localhost',
     PORT: ENVS.PORT || 8000,
+};
+
+interface IGlobalSession {
+    blackList: number[];
+}
+
+export const globalSession: IGlobalSession = {
+    blackList: [],
 };

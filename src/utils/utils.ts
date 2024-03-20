@@ -65,7 +65,7 @@ export const pluralizeWord = (number: number) => {
 
 /**
  * Capitalizes the first letter of a given string.
- * 
+ *
  * @param text - The string to capitalize.
  * @returns The input string with the first letter capitalized.
  */
@@ -109,4 +109,3 @@ export const hasAdminOrDevRole = async (userId: number): Promise<boolean> => {
         return false;
     }
 };
-
