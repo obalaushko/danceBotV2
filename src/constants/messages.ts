@@ -220,6 +220,9 @@ export const MSG = {
 
             return text;
         },
+        /**
+         * @deprecated
+         */
         setupUser: (user: IUser) => {
             const {
                 userId,
@@ -236,6 +239,9 @@ export const MSG = {
                 username ? username : 'null'
             }\nfirstName: ${firstName}\n[role: ${role}]\napproved: ${approved}\n[notifications: ${notifications}]\ninviteLink: ${inviteLink}\nsubscription: {\n\tactive: ${subscription?.active}\n\t[totalLessons: ${subscription?.totalLessons}]\n\t[usedLessons: ${subscription?.usedLessons}]\n\tremainedLessons: ${subscription?.remainedLessons}\n\tfirstActivation: ${subscription?.firstActivation}\n\tdataExpired: ${subscription?.dateExpired}\n}</code>`;
         },
+        /**
+         * @deprecated
+         */
         setup: {
             role: '⚠️ Не використовуйте цю функцію без необхідності.\n\nВиберіть нову роль для учня відмінну від існуючої.\n\nРоль <b>Admin</b> позбавить учня можливостей оновлювати абонемент, та зробить його адміністратором.\n\nРоль <b>Guest</b> позбавить учня можливості оновлювати абонемент, він залишиться у групі, але не матиме доступу до свого абонементу.\n\nРоль <b>Inactive</b> обмежує використання бота для користувача.\n\nРоль <b>User</b> дозволяє отримувати дані про абонемент, та бути учасником групи <i>(якщо запрошення отримано)</i>',
             notifications: 'Активуйте або ж деактивуйте сповіщення для учня.',
@@ -245,10 +251,16 @@ export const MSG = {
                 'Змініть кількість використаних занять в абонементі для цього учня.\nЯкщо ви не хочете щоб юзер дізнався про ці зміни, тимчасово вимкніть сповіщення цьому учню.\n⚠️ Використаних занять повинно бути менше ніж загальна кількість.',
             cancel: 'Операцію скасовано, щоб повернутися до головного меню скористайтеся командою /start.',
         },
+        /**
+         * @deprecated
+         */
         updateRole: {
             success: (user: IUser) =>
                 `Користувач <b>${user.fullName}</b>, отримав роль <code>${user.role}</code>.`,
         },
+        /**
+         * @deprecated
+         */
         updateNotifications: {
             success: (user: IUser) =>
                 `Користувач <b>${
@@ -257,10 +269,16 @@ export const MSG = {
                     user.notifications ? 'увімкнено' : 'вимкнуто'
                 }</b>`,
         },
+        /**
+         * @deprecated
+         */
         totalLessons: {
             success: (subscription: ISubscription) =>
                 `Користувач, отримав нове значення загальної кількості занять в абонементі: <b>${subscription.totalLessons}</b>`,
         },
+        /**
+         * @deprecated
+         */
         usedLessons: {
             success: (subscription: ISubscription) =>
                 `Користувач, отримав нове значення використаних занять в абонементі: <b>${subscription.usedLessons}</b>`,
