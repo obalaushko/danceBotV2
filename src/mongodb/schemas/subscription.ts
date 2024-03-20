@@ -30,7 +30,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     totalLessons: {
         type: Number,
         default: 8,
-        min: 0,
+        min: 1,
         max: 16,
         required: true,
     },
@@ -55,6 +55,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     },
     lastDateUsed: {
         type: Date,
+        default: moment().utc(),
     },
     freeze: {
         lastDateFreeze: {
@@ -90,11 +91,11 @@ subscriptionSchema.methods.setChangeLog = async (
     await addLogSubscriptionChange(userId, subscriptionId, changeType);
 };
 
-subscriptionSchema.pre('save', function (next) {
+subscriptionSchema.pre('save', async function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
 
-        sendUserNotification(
+        await sendUserNotification(
             this.userId,
             MSG.user.notification.remained0Lessons
         );
@@ -102,6 +103,7 @@ subscriptionSchema.pre('save', function (next) {
 
     let changeType: string = 'create';
     const subscriptionId: string = this._id ? this._id.toString() : '';
+    const today = moment().utc();
 
     if (this.isModified('active')) {
         if (this.active) {
@@ -112,13 +114,13 @@ subscriptionSchema.pre('save', function (next) {
             this.usedLessons = 0;
             this.totalLessons = 8;
 
-            const today = moment().utc();
             this.lastDateUsed = today;
         }
 
         changeType = this.active ? 'activation' : 'deactivation';
     } else if (this.isModified('usedLessons')) {
         changeType = 'markUser';
+        this.lastDateUsed = today;
     }
 
     this.setChangeLog(this.userId, subscriptionId, changeType);
@@ -126,7 +128,7 @@ subscriptionSchema.pre('save', function (next) {
     this.remainedLessons = this.totalLessons - this.usedLessons;
 
     if (this.remainedLessons === 2) {
-        sendUserNotification(
+        await sendUserNotification(
             this.userId,
             MSG.user.notification.remained2Lessons
         );

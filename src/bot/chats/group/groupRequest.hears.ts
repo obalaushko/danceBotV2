@@ -1,4 +1,4 @@
-import { ROLES } from '../../../constants/global.js';
+import { ENV_VARIABLES, ROLES } from '../../../constants/global.js';
 import { MSG } from '../../../constants/messages.js';
 import { LOGGER } from '../../../logger/index.js';
 import { updateUsersToInactive } from '../../../mongodb/operations/index.js';
@@ -79,6 +79,8 @@ export const groupRequestHears = () => {
 
     groupChat.on(':left_chat_member', async (ctx) => {
         const user = ctx.message.left_chat_member;
+        if (user.is_bot) return;
+
         LOGGER.info('[left_chat_member]', { metadata: user });
 
         try {
@@ -98,6 +100,20 @@ export const groupRequestHears = () => {
             }
         } catch (error) {
             LOGGER.error('[Inactive]', { metadata: error });
+        }
+    });
+
+    groupChat.on(':new_chat_members:me', async (ctx) => {
+        try {
+            const chatInfo = await ctx.getChat();
+
+            if (chatInfo.id !== ENV_VARIABLES.GROUP_ID) {
+                await ctx.api.leaveChat(chatInfo.id);
+            }
+        } catch (err) {
+            LOGGER.error('Error in message:new_chat_members:me', {
+                metadata: err,
+            });
         }
     });
 };

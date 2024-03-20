@@ -1,59 +1,59 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "npm",
-			"script": "dev",
-			"problemMatcher": [],
-			"label": "npm: dev",
-			"detail": "NODE_ENV=development nodemon --exec node --loader ts-node/esm --ignore 'dump/*' ./src/index.ts",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		},
-		{
-			"type": "npm",
-			"script": "format:check",
-			"problemMatcher": [],
-			"label": "npm: format:check",
-			"detail": "prettier --check ."
-		},
-		{
-			"type": "npm",
-			"script": "build",
-			"group": "build",
-			"problemMatcher": [],
-			"label": "npm: build",
-			"detail": "tsc"
-		},
-		{
-			"type": "npm",
-			"script": "start",
-			"problemMatcher": [],
-			"label": "npm: start",
-			"detail": "NODE_ENV=production node ./dist/index.js"
-		},
-		{
-			"type": "npm",
-			"script": "format:write",
-			"problemMatcher": [],
-			"label": "npm: format:write",
-			"detail": "prettier --write ."
-		},
-		{
-			"type": "npm",
-			"script": "lint:check",
-			"problemMatcher": [],
-			"label": "npm: lint:check",
-			"detail": "eslint ."
-		},
-		{
-			"type": "npm",
-			"script": "lint:fix",
-			"problemMatcher": [],
-			"label": "npm: lint:fix",
-			"detail": "eslint --fix ."
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "dev",
+            "problemMatcher": [],
+            "label": "npm: dev",
+            "detail": "NODE_ENV=development nodemon --exec node --loader ts-node/esm --ignore 'dump/*' ./src/index.ts",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "npm",
+            "script": "format:check",
+            "problemMatcher": [],
+            "label": "npm: format:check",
+            "detail": "prettier --check ."
+        },
+        {
+            "type": "npm",
+            "script": "build",
+            "group": "build",
+            "problemMatcher": [],
+            "label": "npm: build",
+            "detail": "tsc"
+        },
+        {
+            "type": "npm",
+            "script": "start",
+            "problemMatcher": [],
+            "label": "npm: start",
+            "detail": "NODE_ENV=production node ./dist/index.js"
+        },
+        {
+            "type": "npm",
+            "script": "format:write",
+            "problemMatcher": [],
+            "label": "npm: format:write",
+            "detail": "prettier --write ."
+        },
+        {
+            "type": "npm",
+            "script": "lint:check",
+            "problemMatcher": [],
+            "label": "npm: lint:check",
+            "detail": "eslint ."
+        },
+        {
+            "type": "npm",
+            "script": "lint:fix",
+            "problemMatcher": [],
+            "label": "npm: lint:fix",
+            "detail": "eslint --fix ."
+        }
+    ]
 }

@@ -1,13 +1,19 @@
+/**
+ * This file contains the implementation of a Telegram bot using the 'grammy' library.
+ * It sets up the bot, configures various middleware, and defines the bot's behavior.
+ * The bot handles commands, conversations, rate limiting, session management, and error handling.
+ * It also includes menu functionality, blacklist management, and cron tasks.
+ * The file exports the configured bot instance.
+ */
 import { Bot, GrammyError, HttpError, session } from 'grammy';
 // import { apiThrottler } from '@grammyjs/transformer-throttler';
 import { limit } from '@grammyjs/ratelimiter';
 import { hydrateReply, parseMode } from '@grammyjs/parse-mode';
 import type { ParseModeFlavor } from '@grammyjs/parse-mode';
 import { hydrate } from '@grammyjs/hydrate';
-import { freeStorage } from "@grammyjs/storage-free";
 
 // import { globalConfig, groupConfig, outConfig } from './limitsConfig';
-import { BotContext, SessionData } from './types/index.js';
+import { BotContext } from './types/index.js';
 import { COMMANDS } from './commands/index.js';
 
 import { conversations, createConversation } from '@grammyjs/conversations';
@@ -24,7 +30,6 @@ import {
     changeNameCommand,
     helpCommand,
     groupRequestHears,
-    messageHears,
     startCommand,
 } from './chats/index.js';
 import { tasksCron } from '../helpers/tasksCron.js';
@@ -32,7 +37,9 @@ import { autoRetry } from '@grammyjs/auto-retry';
 import { cryptoCommand } from '../crypto/client/command.crypto.js';
 import { hydrateFiles } from '@grammyjs/files';
 import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
-import { ENV_VARIABLES } from '../constants/global.js';
+import { ENV_VARIABLES, globalSession } from '../constants/global.js';
+import { addToBlacklist, loadBlacklist } from '../utils/blackList.js';
+import { banCommand } from './chats/private/ban.command.js';
 // import { ignoreOld } from 'grammy-middlewares';
 
 //BOT CONFIG
@@ -73,13 +80,39 @@ bot.api.config.use(parseMode('HTML')); // Sets default parse_mode for ctx.reply
 // Session
 bot.use(
     session({
-        initial: () => ({
-            editedActions: null,
-            editedUserId: null,
-        }),
-        storage: freeStorage<SessionData>(bot.token),
+        initial: () => ({ spamCounter: 0 }),
     })
 );
+
+// Blacklist
+bot.use(async (ctx, next) => {
+    if (ctx.chat?.type === 'private') {
+        if (!globalSession.blackList.length) {
+            globalSession.blackList = await loadBlacklist();
+        }
+        if (ctx.from && globalSession.blackList.includes(ctx.from.id)) {
+            // User is in blacklist, ignore their messages
+            return;
+        }
+
+        // Add spammers to the blacklist
+        if (ctx.session.spamCounter >= 3) {
+            const { user } = await ctx.getAuthor();
+            if (user.id) {
+                const updateBlacklist = await addToBlacklist(user.id);
+                ctx.session.spamCounter = 0;
+                await ctx.reply(MSG.spamWarning);
+
+                if (updateBlacklist) {
+                    globalSession.blackList = updateBlacklist;
+                    return;
+                }
+            }
+        }
+    }
+
+    await next();
+});
 
 // Limit
 bot.use(
@@ -92,6 +125,17 @@ bot.use(
         onLimitExceeded: async (ctx) => {
             if (ctx.chat?.type === 'private') {
                 await ctx.reply(MSG.tooManyRequest);
+                ctx.session.spamCounter += 1;
+
+                if (ctx.session.spamCounter > 0) {
+                    // Avoid negative values
+                    setTimeout(
+                        () => {
+                            ctx.session.spamCounter -= 1;
+                        },
+                        1000 * 60 * 60
+                    );
+                }
             }
         },
 
@@ -131,9 +175,7 @@ cancelCommand();
 changeNameCommand();
 helpCommand();
 aboutCommand();
-
-// listener message must be last
-messageHears();
+banCommand();
 
 //CRASH HANDLER
 bot.catch((err) => {
