@@ -127,15 +127,15 @@ bot.use(
                 await ctx.reply(MSG.tooManyRequest);
                 ctx.session.spamCounter += 1;
 
-                if (ctx.session.spamCounter > 0) {
-                    // Avoid negative values
-                    setTimeout(
-                        () => {
+                // Avoid negative values
+                setTimeout(
+                    () => {
+                        if (ctx.session.spamCounter > 0) {
                             ctx.session.spamCounter -= 1;
-                        },
-                        1000 * 60 * 60
-                    );
-                }
+                        }
+                    },
+                    1000 * 60 * 60
+                );
             }
         },
 
