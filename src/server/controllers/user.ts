@@ -30,7 +30,10 @@ export default class UserController {
      * @param res - The response object.
      * @returns A JSON response with the list of users or an error message.
      */
-    async getAllUsers(req: Request<object, object, object>, res: Response<ResponseBody>) {
+    async getAllUsers(
+        req: Request<object, object, object>,
+        res: Response<ResponseBody>
+    ) {
         try {
             const users = await getAllRealUser();
 
@@ -181,7 +184,9 @@ export default class UserController {
             };
 
             const updatedUserValues = filterKeys(validKeysUser);
-            const updatedSubscriptionsValues = filterKeys(validKeysSubscription);
+            const updatedSubscriptionsValues = filterKeys(
+                validKeysSubscription
+            );
 
             let userUpdated = false;
             let subscriptionUpdated = false;

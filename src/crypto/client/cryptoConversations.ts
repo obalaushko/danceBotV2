@@ -263,7 +263,7 @@ export const cryptoConversations = async (
         ctx: BotContext,
         fileOrText: any,
         password: string,
-        waitFileOrText: (arg: boolean) => void,
+        waitFileOrText: (arg: boolean) => void
     ) => {
         const messageText = fileOrText.message.text;
         const fileName = isEncrypting ? 'encrypt.txt' : 'decrypt.txt';

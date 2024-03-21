@@ -34,8 +34,10 @@ router.post(
  * @param req - The request object.
  * @param res - The response object.
  */
-router.get('/users', (req: Request<object, object, object>, res: Response<ResponseBody>) =>
-    userController.getAllUsers(req, res)
+router.get(
+    '/users',
+    (req: Request<object, object, object>, res: Response<ResponseBody>) =>
+        userController.getAllUsers(req, res)
 );
 
 /**
@@ -47,8 +49,10 @@ router.get('/users', (req: Request<object, object, object>, res: Response<Respon
  */
 router.post(
     '/admin-info',
-    (req: Request<object, object, RequestBodyUserInfo>, res: Response<ResponseBody>) =>
-        userController.getUserById(req, res)
+    (
+        req: Request<object, object, RequestBodyUserInfo>,
+        res: Response<ResponseBody>
+    ) => userController.getUserById(req, res)
 );
 
 /**
