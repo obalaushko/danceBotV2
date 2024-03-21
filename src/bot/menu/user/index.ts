@@ -10,6 +10,7 @@ import { LOGGER } from '../../../logger/index.js';
 import { subscriptionMenu } from './subscriptionMenu.js';
 import { returnToGroupMenu } from './returnToGroupMenu.js';
 import { backAfterQRMenu } from './backAfterQRMenu.js';
+import { aboutMenu } from './aboutMenu.js';
 
 export const userMenu = new Menu('user')
     .text(MSG.buttons.user.showSubscription, async (ctx) => {
@@ -76,3 +77,4 @@ userMenu.register(backAfterQRMenu);
 userMenu.register(subscriptionMenu);
 userMenu.register(notificationsMenu);
 userMenu.register(returnToGroupMenu);
+userMenu.register(aboutMenu);
