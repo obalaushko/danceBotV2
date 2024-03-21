@@ -100,11 +100,11 @@ bot.use(async (ctx, next) => {
             const { user } = await ctx.getAuthor();
             if (user.id) {
                 const updateBlacklist = await addToBlacklist(user.id);
-                ctx.session.spamCounter = 0;
-                await ctx.reply(MSG.spamWarning);
 
                 if (updateBlacklist) {
+                    await ctx.reply(MSG.spamWarning);
                     globalSession.blackList = updateBlacklist;
+                    ctx.session.spamCounter = 0;
                     return;
                 }
             }
