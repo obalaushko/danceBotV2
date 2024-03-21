@@ -18,9 +18,9 @@ export const aboutCommand = () => {
         try {
             const user = await getUserById(id);
             if (user?.role === ROLES.Admin || user?.role === ROLES.Developer) {
-                
+                //
             } else if (user?.role === ROLES.User) {
-
+                //
             } else {
                 await ctx.reply(MSG.about);
             }
