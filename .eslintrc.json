@@ -17,7 +17,6 @@
         "es2021": true,
         "node": true
     },
-    "exclude": ["jest.config.cjs"],
     "rules": {
         "no-console": "error",
         "@typescript-eslint/no-floating-promises": 0,

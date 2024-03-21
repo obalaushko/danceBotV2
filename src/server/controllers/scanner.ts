@@ -10,7 +10,7 @@ export default class ScannerController {
     constructor() {}
 
     async updateLessonUsage(
-        req: Request<{}, {}, RequestBodyScannerApi>,
+        req: Request<object, object, RequestBodyScannerApi>,
         res: Response<ResponseBody>
     ) {
         try {
@@ -27,8 +27,6 @@ export default class ScannerController {
 
             if (userIds) {
                 const users = await getAllActiveUserUsers();
-
-                console.log(userId, userIds);
 
                 if (users) {
                     const matchingUsers = users.filter((user) =>

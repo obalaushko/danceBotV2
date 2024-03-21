@@ -22,7 +22,7 @@ const userController = new UserController();
 router.post(
     '/web-data',
     (
-        req: Request<{}, {}, RequestBodyScannerApi>,
+        req: Request<object, object, RequestBodyScannerApi>,
         res: Response<ResponseBody>
     ) => scannerController.updateLessonUsage(req, res)
 );
@@ -34,7 +34,7 @@ router.post(
  * @param req - The request object.
  * @param res - The response object.
  */
-router.get('/users', (req: Request<{}, {}, {}>, res: Response<ResponseBody>) =>
+router.get('/users', (req: Request<object, object, object>, res: Response<ResponseBody>) =>
     userController.getAllUsers(req, res)
 );
 
@@ -47,7 +47,7 @@ router.get('/users', (req: Request<{}, {}, {}>, res: Response<ResponseBody>) =>
  */
 router.post(
     '/admin-info',
-    (req: Request<{}, {}, RequestBodyUserInfo>, res: Response<ResponseBody>) =>
+    (req: Request<object, object, RequestBodyUserInfo>, res: Response<ResponseBody>) =>
         userController.getUserById(req, res)
 );
 
@@ -61,7 +61,7 @@ router.post(
 router.get(
     '/user-info',
     (
-        req: Request<{}, {}, {}, { userId: string }>,
+        req: Request<object, object, object, { userId: string }>,
         res: Response<ResponseBody>
     ) => userController.getUserWithSubscriptionById(req, res)
 );
@@ -76,7 +76,7 @@ router.get(
 router.post(
     '/user-update-data',
     (
-        req: Request<{}, {}, RequestBodyUpdateUser>,
+        req: Request<object, object, RequestBodyUpdateUser>,
         res: Response<ResponseBody>
     ) => userController.updateUser(req, res)
 );
