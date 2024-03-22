@@ -6,7 +6,7 @@ export interface IHistory extends Document {
     action: string;
     oldValue?: any;
     newValue?: any;
-    timestamp?: Date;
+    timestamp: Date;
 }
 
 const HistorySchema: Schema = new Schema<IHistory>({

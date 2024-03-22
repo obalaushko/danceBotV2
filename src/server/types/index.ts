@@ -45,3 +45,8 @@ export type RequestBodyUpdateUser = {
     usedLessons?: number;
     active?: boolean;
 };
+
+export type RequestBodyGetAllHistory = {
+    page?: number;
+    pageSize?: number;
+}

@@ -2,15 +2,18 @@ import { Request, Response, Router } from 'express';
 import ScannerController from '../controllers/scanner.js';
 import UserController from '../controllers/user.js';
 import {
+    RequestBodyGetAllHistory,
     RequestBodyScannerApi,
     RequestBodyUpdateUser,
     RequestBodyUserInfo,
     ResponseBody,
 } from '../types/index.js';
+import HistoryController from '../controllers/history.js';
 
 const router = Router();
 const scannerController = new ScannerController();
 const userController = new UserController();
+const historyController = new HistoryController();
 
 /**
  * POST /web-data
@@ -83,6 +86,21 @@ router.post(
         req: Request<object, object, RequestBodyUpdateUser>,
         res: Response<ResponseBody>
     ) => userController.updateUser(req, res)
+);
+
+/**
+ * GET /history-all
+ * Retrieves all history.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+router.get(
+    '/history-all',
+    (
+        req: Request<object, object, RequestBodyGetAllHistory>,
+        res: Response<ResponseBody>
+    ) => historyController.getAllHistory(req, res)
 );
 
 export default router;
