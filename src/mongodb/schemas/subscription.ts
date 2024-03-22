@@ -1,5 +1,4 @@
-import { Document, Schema, Model, model, Types } from 'mongoose';
-import { addLogSubscriptionChange } from '../operations/changeLog.js';
+import { Document, Schema, Model, model } from 'mongoose';
 import { sendUserNotification } from '../../helpers/notifications.js';
 import { MSG } from '../../constants/messages.js';
 import moment from 'moment-timezone';
@@ -86,14 +85,6 @@ subscriptionSchema.methods.setExpirationDate = function () {
     this.dateExpired = expirationDate.toDate();
 };
 
-subscriptionSchema.methods.setChangeLog = async (
-    userId: number,
-    subscriptionId: Types.ObjectId,
-    changeType: string
-) => {
-    await addLogSubscriptionChange(userId, subscriptionId, changeType);
-};
-
 subscriptionSchema.pre('save', async function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
@@ -116,12 +107,13 @@ subscriptionSchema.pre('save', async function (next) {
             this.totalLessons = 8;
 
             this.lastDateUsed = today;
-            setTimeout(async () => { // write to history after 1 second
+            setTimeout(async () => {
+                // write to history after 1 second
                 await recordHistory({
                     userId: this.userId,
                     action: actionsHistory.deactivateSubscription,
                 });
-            }, 1000)
+            }, 1000);
         }
     } else if (this.isModified('usedLessons')) {
         this.lastDateUsed = today;
