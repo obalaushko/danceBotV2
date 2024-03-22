@@ -23,7 +23,7 @@ export default class HistoryController {
                             pageSize,
                             length: history.length,
                             list: history,
-                        }
+                        },
                     })
                 );
             } else {

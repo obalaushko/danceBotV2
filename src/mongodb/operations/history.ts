@@ -56,11 +56,10 @@ export const getUserHistory = async (userId: string): Promise<IHistory[]> => {
 };
 
 /**
- * Retrieves all history records from the database.
- *
+ * Retrieves all history items with pagination and groups them by date and user.
  * @param page - The page number to retrieve (default: 1).
- * @param pageSize - The number of records per page (default: 10).
- * @returns A promise that resolves to an array of history records.
+ * @param pageSize - The number of items per page (default: 20).
+ * @returns A promise that resolves to an array of grouped history items.
  */
 export const getAllHistory = async (
     page: number = 1,
@@ -73,41 +72,47 @@ export const getAllHistory = async (
             .skip(skip)
             .limit(pageSize);
 
-        const groupedHistory: Record<string, any[]> = {}; // Об'єкт для групування історії по днях
+        const groupedHistory: Record<string, any> = {}; // Object for grouping history
 
-        // Групуємо історію по днях
+        // Group history by date and users
         history.forEach((item: IHistory) => {
-            const date = item.timestamp.toDateString(); // Отримуємо дату в форматі 'YYYY-MM-DD'
+            const date = item.timestamp.toDateString(); // Get date in 'YYYY-MM-DD' format
             if (!groupedHistory[date]) {
-                groupedHistory[date] = [];
+                groupedHistory[date] = {};
             }
-            groupedHistory[date].push(item);
+            const userIdString = item.userId.toString(); // Convert userId to string
+            if (!groupedHistory[date][userIdString]) {
+                groupedHistory[date][userIdString] = {
+                    user: {
+                        userId: item.userId,
+                        fullName: '', // If user's name is not needed, this can be removed
+                    },
+                    historyItems: [],
+                };
+            }
+            groupedHistory[date][userIdString].historyItems.push({
+                action: item.action,
+                timestamp: item.timestamp,
+            });
         });
 
-        // Отримуємо інформацію про користувачів та формуємо остаточні дані
+        // Get user information and form the final data
         const result = [];
         for (const date in groupedHistory) {
-            if (date in groupedHistory) {
-                const historyItems = groupedHistory[date];
-                const usersInfo = await Promise.all(
-                    historyItems.map(async (historyItem: IHistory) => {
-                        const user = await getUserByMongoId(historyItem.userId);
-                        if (!user) return null;
-                        return {
-                            user: {
-                                userId: user.userId,
-                                fullName: user.fullName,
-                            },
-                            action: historyItem.action,
-                            timestamp: historyItem.timestamp,
-                        };
-                    })
-                );
-                result.push({
-                    date,
-                    usersInfo,
-                });
+            const usersData = groupedHistory[date];
+            const usersInfo = [];
+            for (const userId in usersData) {
+                const userData = usersData[userId];
+                const user = await getUserByMongoId(userId); // Update getUserByMongoId to accept string parameter
+                if (user) {
+                    userData.user.fullName = user.fullName ?? '';
+                    usersInfo.push(userData);
+                }
             }
+            result.push({
+                date,
+                usersInfo,
+            });
         }
 
         return result;

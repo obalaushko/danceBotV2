@@ -105,7 +105,7 @@ export const getUserById = async (userId: number): Promise<IUser | null> => {
  * @param id - The ID of the user to retrieve.
  * @returns A Promise that resolves to the retrieved user or null if not found.
  */
-export const getUserByMongoId = async (id: ObjectId): Promise<IUser | null> => {
+export const getUserByMongoId = async (id: ObjectId | string): Promise<IUser | null> => {
     try {
         const user = await UserModel.findOne({ _id: id }).exec();
         if (user) {
