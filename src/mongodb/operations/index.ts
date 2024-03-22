@@ -1,5 +1,3 @@
-export { createPaymentDetails, getPaymentDetailsExist } from './payments.js';
-
 export {
     addLogSubscriptionChange,
     getGroupedSubscriptionChangeLogs,

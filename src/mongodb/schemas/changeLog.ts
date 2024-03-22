@@ -5,6 +5,8 @@ export interface IChangeLog extends Document {
     subscriptionId: Types.ObjectId;
     changeType: string;
     changeDate: Date;
+    oldValue: any;
+    newValue: any;
 }
 
 export interface GroupedChanges {
@@ -28,7 +30,8 @@ const subscriptionChangeLogSchema = new Schema({
         type: Date, // Дата, коли сталася зміна
         required: true,
     },
-    // Інші поля для запису деталей зміни, якщо потрібно
+    oldValue: Schema.Types.Mixed,
+    newValue: Schema.Types.Mixed,
 });
 
 export const SubscriptionChangeLogModel: Model<IChangeLog> = model<IChangeLog>(

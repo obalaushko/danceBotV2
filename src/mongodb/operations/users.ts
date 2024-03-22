@@ -1,7 +1,8 @@
-import { ROLES } from '../../constants/global.js';
+import { ROLES, actionsHistory } from '../../constants/global.js';
 import { MSG } from '../../constants/messages.js';
 import { LOGGER } from '../../logger/index.js';
 import { IUser, UserModel } from '../schemas/user.js';
+import { recordHistory } from './history.js';
 
 /**
  * Adds a new user to the database.
@@ -57,6 +58,10 @@ export const addUser = async ({
         const savedUser = await newUser.save();
 
         if (savedUser?.id) {
+            await recordHistory({
+                userId: savedUser.userId,
+                action: actionsHistory.create,
+            });
             LOGGER.info('[addUser][success]', { metadata: { savedUser } });
         } else {
             LOGGER.error('[addUser][error]', {
@@ -268,6 +273,10 @@ export const approveUsers = async (
                 await user.save();
 
                 updatedUsers.push(user);
+                await recordHistory({
+                    userId: user.userId,
+                    action: actionsHistory.approveUser,
+                });
             }
         }
 
@@ -433,6 +442,12 @@ export const updateUsersToInactive = async (
             const users = await UserModel.find({
                 userId: { $in: userIdArray },
             });
+            for (const user of users) {
+                await recordHistory({
+                    userId: user.userId,
+                    action: actionsHistory.moveToInactive,
+                });
+            }
 
             LOGGER.info('[updateUsersToInactive][success]', {
                 metadata: { users },
@@ -466,6 +481,11 @@ export const updateInactiveToGuest = async (
             user.notifications = true;
 
             await user.save();
+
+            await recordHistory({
+                userId: user.userId,
+                action: actionsHistory.moveToActive,
+            });
 
             return user;
         }

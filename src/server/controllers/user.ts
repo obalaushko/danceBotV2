@@ -17,10 +17,12 @@ import {
 import {
     activateSubscriptions,
     deactivateSubscriptions,
+    getSubscriptionById,
     updateSubscriptionById,
 } from '../../mongodb/operations/subscriptions.js';
-import { ROLES } from '../../constants/global.js';
+import { ROLES, actionsHistory } from '../../constants/global.js';
 import { removeUserFromGroup } from '../../helpers/users.js';
+import { recordHistory } from '../../mongodb/operations/history.js';
 
 export default class UserController {
     /**
@@ -198,10 +200,32 @@ export default class UserController {
                     await updateUsersToInactive(userId);
                     await removeUserFromGroup([userId]);
                 }
+                const userInfo = await getUserById(userId);
                 const updatedUser = await updateUserById(
                     userId,
                     updatedUserValues
                 );
+                for (const key in updatedUserValues) {
+                    let actionsName = '';
+                    switch (key) {
+                        case 'fullName':
+                            actionsName = actionsHistory.changeName;
+                            break;
+                        case 'notifications':
+                            actionsName = actionsHistory.updateNotification;
+                            break;
+                        default:
+                            break;
+                    }
+                    actionsName &&
+                        userInfo &&
+                        (await recordHistory({
+                            userId: userId,
+                            action: actionsName,
+                            oldValue: (userInfo as any)[key],
+                            newValue: updatedUserValues[key],
+                        }));
+                }
                 userUpdated = updatedUser !== null; // or some other check
             }
 
@@ -213,11 +237,34 @@ export default class UserController {
                 } else if (activeSubscriptions === false) {
                     await deactivateSubscriptions(userId);
                 }
-
+                const subscriptionInfo = await getSubscriptionById(userId);
                 const updatedSubscription = await updateSubscriptionById(
                     userId,
                     updatedSubscriptionsValues
                 );
+                for (const key in updatedSubscriptionsValues) {
+                    let actionsName = '';
+                    switch (key) {
+                        case 'totalLessons':
+                            actionsName = actionsHistory.updateTotalLessons;
+                            break;
+                        case 'dateExpired':
+                            actionsName = actionsHistory.updateDateExpired;
+                            break;
+                        case 'usedLessons':
+                            actionsName = actionsHistory.updateUsedLessons;
+                            break;
+                        default:
+                            break;
+                    }
+                    actionsName &&
+                        (await recordHistory({
+                            userId: userId,
+                            action: actionsName,
+                            oldValue: (subscriptionInfo as any)[key],
+                            newValue: updatedSubscriptionsValues[key],
+                        }));
+                }
                 subscriptionUpdated = updatedSubscription !== null; // or some other check
             }
 

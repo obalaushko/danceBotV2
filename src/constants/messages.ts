@@ -1,6 +1,4 @@
 import { BANKS, ROLES } from './index.js';
-
-import { IBank } from '../mongodb/schemas/payment.js';
 import { IUser } from '../mongodb/schemas/user.js';
 import {
     capitalizeFirstLetter,
@@ -184,19 +182,6 @@ export const MSG = {
     payments: {
         static: 'Реквізити для оплати:\n🏦 Monobank <i>(Антонюк Дарія Сергіївна)</i>\n💳 <code>5375 4114 2851 4959</code>\nАбонемент на 8 занять: <b>600 грн</b>\nОдне заняття: <b>100 грн</b>',
         updatedStatic: '', // dynamic
-        main: (paymentDetails: IBank | null) => {
-            let text = 'Ви можете оновити реквізити\n';
-
-            if (paymentDetails?.details) {
-                paymentDetails?.details.forEach((banks) => {
-                    text += `Ваші реквізити:\nБанк: <b>${banks.name}</b> - <code>${banks.card}</code>`;
-                });
-            } else {
-                text =
-                    'У вас немає банківських реквізитів, щоб створити використайте команду /updatePaymentDetails.';
-            }
-            return text;
-        },
         createBank: `Щоб створити реквізити введіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,
         createCard: `Щоб створити реквізити введіть номер карти у форматі: <code>4444 4444 4444 4444</code>`,
         wrongEnterBank: `Ведіть назву банку у форматі: <b>${BANKS.PrivatBank}/${BANKS.MonoBank}</b>`,

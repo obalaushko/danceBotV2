@@ -2,6 +2,8 @@ import moment from 'moment-timezone';
 import { LOGGER } from '../../logger/index.js';
 import { ISubscription, SubscriptionModel } from '../schemas/subscription.js';
 import { checkLastFreeze } from '../../utils/utils.js';
+import { recordHistory } from './history.js';
+import { actionsHistory } from '../../constants/global.js';
 
 /**
  * Adds a subscription to the database.
@@ -131,6 +133,10 @@ export const activateSubscriptions = async (
 
             await subscription.save();
             updatedSubscriptions.push(subscription);
+            await recordHistory({
+                userId: subscription.userId,
+                action: actionsHistory.activateSubscription,
+            });
         }
 
         return updatedSubscriptions;
@@ -167,8 +173,11 @@ export const deactivateSubscriptions = async (
             subscription.active = false;
             await subscription.save();
             updatedSubscriptions.push(subscription);
+            await recordHistory({
+                userId: subscription.userId,
+                action: actionsHistory.deactivateSubscription,
+            });
         }
-
         return updatedSubscriptions;
     } catch (error: any) {
         LOGGER.error('[deactivateSubscriptions][error]', {
@@ -203,6 +212,10 @@ export const markLessonAsUsed = async (
                 subscription.usedLessons! += 1;
                 await subscription.save();
                 updatedSubscriptions.push(subscription);
+                await recordHistory({
+                    userId: subscription.userId,
+                    action: actionsHistory.markUser,
+                });
             }
         }
 
@@ -308,6 +321,10 @@ export const freezeSubscriptionByUserId = async (
             LOGGER.info('[freezeSubscriptionByUserId][success]', {
                 metadata: subscription,
             });
+            await recordHistory({
+                userId: subscription.userId,
+                action: actionsHistory.freezeSubscription,
+            });
             return subscription;
         }
         return null;
@@ -368,7 +385,10 @@ export const defrostSubscriptionByUserId = async (
             LOGGER.info('[defrostSubscriptionByUserId][success]', {
                 metadata: subscription,
             });
-
+            await recordHistory({
+                userId: subscription.userId,
+                action: actionsHistory.defrostSubscription,
+            });
             return subscription;
         }
         return null;

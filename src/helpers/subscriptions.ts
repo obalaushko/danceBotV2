@@ -11,6 +11,8 @@ import { defrostSubscriptionByUserId } from '../mongodb/operations/subscriptions
 import { getUserById } from '../mongodb/operations/users.js';
 
 import { removeUserFromGroup } from './users.js';
+import { recordHistory } from '../mongodb/operations/history.js';
+import { actionsHistory } from '../constants/global.js';
 
 /**
  * Checks and deactivates subscriptions for all users.
@@ -29,6 +31,13 @@ export const checkAndDeactivateSubscriptions = async () => {
                 if (currentUtcDate > subscription.dateExpired) {
                     subscription.active = false; // Deactivate the subscription if the expiration date has passed
                     await subscription.save(); // Save the updated subscription
+
+                    await recordHistory({
+                        userId: subscription.userId,
+                        action: actionsHistory.dateExpired,
+                        oldValue: subscription.dateExpired,
+                        newValue: null,
+                    });
                     if (user.notifications) {
                         await sendUserNotification(
                             user.userId,
