@@ -15,14 +15,14 @@ export default class HistoryController {
 
             const history = await getAllHistory(page, pageSize);
 
-            if (history.length) {
+            if (history.list.length) {
                 return res.status(200).json(
                     successResponse({
                         data: {
                             page,
                             pageSize,
-                            length: history.length,
-                            list: history,
+                            totalPage: history.totalPages,
+                            list: [...history.list],
                         },
                     })
                 );

@@ -64,7 +64,7 @@ export const getUserHistory = async (userId: string): Promise<IHistory[]> => {
 export const getAllHistory = async (
     page: number = 1,
     pageSize: number = 20
-): Promise<any[]> => {
+): Promise<{ list: any[]; totalPages: number }> => {
     try {
         const skip = (page - 1) * pageSize;
         const history = await HistoryModel.find()
@@ -76,7 +76,11 @@ export const getAllHistory = async (
 
         // Group history by date and users
         history.forEach((item: IHistory) => {
-            const date = item.timestamp.toDateString(); // Get date in 'YYYY-MM-DD' format
+            const date = item.timestamp.toLocaleDateString('uk-UA', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
             if (!groupedHistory[date]) {
                 groupedHistory[date] = {};
             }
@@ -92,6 +96,8 @@ export const getAllHistory = async (
             }
             groupedHistory[date][userIdString].historyItems.push({
                 action: item.action,
+                oldValue: item.oldValue,
+                newValue: item.newValue,
                 timestamp: item.timestamp,
             });
         });
@@ -114,12 +120,12 @@ export const getAllHistory = async (
                 usersInfo,
             });
         }
-
-        return result;
+        const totalPages = Math.ceil(result.length / pageSize);
+        return { list: result, totalPages };
     } catch (error: any) {
         LOGGER.error('[getAllHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
-        return [];
+        return { list: [], totalPages: 0 };
     }
 };
