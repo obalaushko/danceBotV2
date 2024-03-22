@@ -28,6 +28,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     userId: {
         type: Number,
         required: true,
+        index: true,
     },
     totalLessons: {
         type: Number,
