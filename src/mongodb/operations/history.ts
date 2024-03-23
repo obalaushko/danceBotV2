@@ -48,7 +48,7 @@ export const getUserHistory = async (
 ): Promise<{ list: any[]; totalPages: number }> => {
     try {
         const user = await getUserById(userId);
-        
+
         if (!user) return { list: [], totalPages: 0 };
 
         const skip = (page - 1) * pageSize;

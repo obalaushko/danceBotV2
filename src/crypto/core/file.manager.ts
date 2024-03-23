@@ -24,8 +24,13 @@ class FileManager {
                 try {
                     await fs.promises.access(filePath);
                 } catch (fileError) {
-                    if ((fileError as NodeJS.ErrnoException).code === 'ENOENT') {
-                        await fs.promises.writeFile(filePath, JSON.stringify([]));
+                    if (
+                        (fileError as NodeJS.ErrnoException).code === 'ENOENT'
+                    ) {
+                        await fs.promises.writeFile(
+                            filePath,
+                            JSON.stringify([])
+                        );
                     } else {
                         LOGGER.error('[checkFolderExists][fileAccess]', {
                             metadata: fileError,
