@@ -1,7 +1,9 @@
-import { ROLES } from '../../constants/global.js';
+import { ObjectId } from 'mongoose';
+import { ROLES, actionsHistory } from '../../constants/global.js';
 import { MSG } from '../../constants/messages.js';
 import { LOGGER } from '../../logger/index.js';
 import { IUser, UserModel } from '../schemas/user.js';
+import { recordHistory } from './history.js';
 
 /**
  * Adds a new user to the database.
@@ -57,6 +59,10 @@ export const addUser = async ({
         const savedUser = await newUser.save();
 
         if (savedUser?.id) {
+            await recordHistory({
+                userId: savedUser.userId,
+                action: actionsHistory.create,
+            });
             LOGGER.info('[addUser][success]', { metadata: { savedUser } });
         } else {
             LOGGER.error('[addUser][error]', {
@@ -78,9 +84,9 @@ export const addUser = async ({
  * @param id - The ID of the user.
  * @returns A Promise that resolves to the user object if found, or null if not found.
  */
-export const getUserById = async (id: number): Promise<IUser | null> => {
+export const getUserById = async (userId: number): Promise<IUser | null> => {
     try {
-        const user = await UserModel.findOne({ userId: id }).exec();
+        const user = await UserModel.findOne({ userId: userId }).exec();
         if (user) {
             return user;
         } else {
@@ -88,6 +94,29 @@ export const getUserById = async (id: number): Promise<IUser | null> => {
         }
     } catch (error: any) {
         LOGGER.error('[getUserById][error]', {
+            metadata: { error: error, stack: error.stack.toString() },
+        });
+        return null;
+    }
+};
+
+/**
+ * Retrieves a user from the MongoDB database based on their ID.
+ * @param id - The ID of the user to retrieve.
+ * @returns A Promise that resolves to the retrieved user or null if not found.
+ */
+export const getUserByMongoId = async (
+    id: ObjectId | string
+): Promise<IUser | null> => {
+    try {
+        const user = await UserModel.findOne({ _id: id }).exec();
+        if (user) {
+            return user;
+        } else {
+            return null;
+        }
+    } catch (error: any) {
+        LOGGER.error('[getUserByMongoId][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
         return null;
@@ -268,6 +297,10 @@ export const approveUsers = async (
                 await user.save();
 
                 updatedUsers.push(user);
+                await recordHistory({
+                    userId: user.userId,
+                    action: actionsHistory.approveUser,
+                });
             }
         }
 
@@ -433,6 +466,12 @@ export const updateUsersToInactive = async (
             const users = await UserModel.find({
                 userId: { $in: userIdArray },
             });
+            for (const user of users) {
+                await recordHistory({
+                    userId: user.userId,
+                    action: actionsHistory.moveToInactive,
+                });
+            }
 
             LOGGER.info('[updateUsersToInactive][success]', {
                 metadata: { users },
@@ -466,6 +505,11 @@ export const updateInactiveToGuest = async (
             user.notifications = true;
 
             await user.save();
+
+            await recordHistory({
+                userId: user.userId,
+                action: actionsHistory.moveToActive,
+            });
 
             return user;
         }

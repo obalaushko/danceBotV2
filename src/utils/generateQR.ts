@@ -1,4 +1,5 @@
 import QRCode from 'qrcode';
+import { LOGGER } from '../logger/index.js';
 
 /**
  * Generates a QR code as a buffer from the given text.
@@ -14,7 +15,7 @@ export const generateQR = async (text: string): Promise<Buffer | null> => {
             return null;
         }
     } catch (err) {
-        console.error(err);
+        LOGGER.error('[generateQR]', { metadata: err });
         return null;
     }
 };

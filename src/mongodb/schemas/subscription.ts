@@ -1,8 +1,9 @@
-import { Document, Schema, Model, model, Types } from 'mongoose';
-import { addLogSubscriptionChange } from '../operations/changeLog.js';
+import { Document, Schema, Model, model } from 'mongoose';
 import { sendUserNotification } from '../../helpers/notifications.js';
 import { MSG } from '../../constants/messages.js';
 import moment from 'moment-timezone';
+import { recordHistory } from '../operations/history.js';
+import { actionsHistory } from '../../constants/global.js';
 
 export interface ISubscription extends Document {
     userId: number;
@@ -26,6 +27,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
     userId: {
         type: Number,
         required: true,
+        index: true,
     },
     totalLessons: {
         type: Number,
@@ -83,14 +85,6 @@ subscriptionSchema.methods.setExpirationDate = function () {
     this.dateExpired = expirationDate.toDate();
 };
 
-subscriptionSchema.methods.setChangeLog = async (
-    userId: number,
-    subscriptionId: Types.ObjectId,
-    changeType: string
-) => {
-    await addLogSubscriptionChange(userId, subscriptionId, changeType);
-};
-
 subscriptionSchema.pre('save', async function (next) {
     if (this.usedLessons >= this.totalLessons) {
         this.active = false;
@@ -101,8 +95,6 @@ subscriptionSchema.pre('save', async function (next) {
         );
     }
 
-    let changeType: string = 'create';
-    const subscriptionId: string = this._id ? this._id.toString() : '';
     const today = moment().utc();
 
     if (this.isModified('active')) {
@@ -115,15 +107,17 @@ subscriptionSchema.pre('save', async function (next) {
             this.totalLessons = 8;
 
             this.lastDateUsed = today;
+            setTimeout(async () => {
+                // write to history after 1 second
+                await recordHistory({
+                    userId: this.userId,
+                    action: actionsHistory.deactivateSubscription,
+                });
+            }, 1000);
         }
-
-        changeType = this.active ? 'activation' : 'deactivation';
     } else if (this.isModified('usedLessons')) {
-        changeType = 'markUser';
         this.lastDateUsed = today;
     }
-
-    this.setChangeLog(this.userId, subscriptionId, changeType);
 
     this.remainedLessons = this.totalLessons - this.usedLessons;
 

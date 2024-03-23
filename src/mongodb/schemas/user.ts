@@ -1,7 +1,6 @@
 import { Document, Schema, Model, model, SchemaTypes } from 'mongoose';
 import { ROLES } from '../../constants/global.js';
 import { ISubscription } from './subscription.js';
-import { IBank } from './payment.js';
 
 export interface IUser extends Document {
     userId: number;
@@ -12,7 +11,6 @@ export interface IUser extends Document {
     fullName?: string;
     approved?: boolean;
     notifications?: boolean;
-    paymentDetails?: IBank | null;
     inviteLink?: string | null;
 }
 
@@ -21,6 +19,7 @@ export const userSchema: Schema = new Schema<IUser>({
         type: Number,
         required: true,
         unique: true,
+        index: true,
     },
     username: {
         type: String,
@@ -51,10 +50,6 @@ export const userSchema: Schema = new Schema<IUser>({
     notifications: {
         type: Boolean,
         default: true,
-    },
-    paymentDetails: {
-        type: SchemaTypes.ObjectId,
-        ref: 'PaymentDetails',
     },
     inviteLink: {
         type: String,

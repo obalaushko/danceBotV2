@@ -1,5 +1,9 @@
+import { ROLES } from '../../../constants/global.js';
 import { MSG } from '../../../constants/messages.js';
+import { LOGGER } from '../../../logger/index.js';
+import { getUserById } from '../../../mongodb/operations/users.js';
 import { privateChat } from '../../bot.js';
+import { aboutMenu } from '../../menu/user/aboutMenu.js';
 
 /**
  * Defines the 'about' command for private chats.
@@ -8,11 +12,21 @@ import { privateChat } from '../../bot.js';
 export const aboutCommand = () => {
     privateChat.command('about', async (ctx) => {
         const {
-            user: { is_bot },
+            user: { id, is_bot },
         } = await ctx.getAuthor();
 
         if (is_bot) return;
-
-        await ctx.reply(MSG.about);
+        try {
+            const user = await getUserById(id);
+            if (user?.role === ROLES.Admin || user?.role === ROLES.Developer) {
+                await ctx.reply(MSG.about.admin, { reply_markup: aboutMenu });
+            } else if (user?.role === ROLES.User) {
+                await ctx.reply(MSG.about.user, { reply_markup: aboutMenu });
+            } else {
+                await ctx.reply(MSG.about.general);
+            }
+        } catch (error) {
+            LOGGER.error('[aboutCommand]', { metadata: error });
+        }
     });
 };

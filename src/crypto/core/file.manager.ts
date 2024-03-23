@@ -16,9 +16,29 @@ class FileManager {
      * Checks if the folder exists.
      * @returns A promise that resolves to a boolean indicating whether the folder exists or not.
      */
-    private async checkFolderExists(): Promise<boolean> {
+    private async checkFolderExists(filename?: string): Promise<boolean> {
         try {
             await fs.promises.access(this.DATA_DIR);
+            if (filename) {
+                const filePath = path.join(this.DATA_DIR, filename);
+                try {
+                    await fs.promises.access(filePath);
+                } catch (fileError) {
+                    if (
+                        (fileError as NodeJS.ErrnoException).code === 'ENOENT'
+                    ) {
+                        await fs.promises.writeFile(
+                            filePath,
+                            JSON.stringify([])
+                        );
+                    } else {
+                        LOGGER.error('[checkFolderExists][fileAccess]', {
+                            metadata: fileError,
+                        });
+                        return false;
+                    }
+                }
+            }
             return true;
         } catch (error: any) {
             if (error.code === 'ENOENT') {
@@ -48,7 +68,7 @@ class FileManager {
      */
     public async writeToFile(filename: string, data: string): Promise<boolean> {
         try {
-            const exist = await this.checkFolderExists();
+            const exist = await this.checkFolderExists(filename);
             if (!exist) throw new Error('Folder does not exist');
 
             await fs.promises.writeFile(
@@ -70,7 +90,7 @@ class FileManager {
      * @throws An error if the folder does not exist or if there is an error reading the file.
      */
     public async readFromFile(filename: string): Promise<string> {
-        const exist = await this.checkFolderExists();
+        const exist = await this.checkFolderExists(filename);
         if (!exist) throw new Error('Folder does not exist');
 
         return new Promise<string>((resolve, reject) => {
@@ -96,7 +116,7 @@ class FileManager {
      * @throws An error if the folder does not exist or if there was an error reading the file.
      */
     public async returnFileLikeBuffer(filename: string): Promise<Buffer> {
-        const exist = await this.checkFolderExists();
+        const exist = await this.checkFolderExists(filename);
         if (!exist) throw new Error('Folder does not exist');
 
         return new Promise<Buffer>((resolve, reject) => {
@@ -118,7 +138,7 @@ class FileManager {
      */
     public async removeFileFromDir(filename: string): Promise<boolean> {
         try {
-            const exist = await this.checkFolderExists();
+            const exist = await this.checkFolderExists(filename);
             if (!exist) throw new Error('Folder does not exist');
 
             const filePath = path.join(this.DATA_DIR, filename);

@@ -2,8 +2,10 @@ import { BotContext, ConverstaionContext } from '../types/index.js';
 
 import { LOGGER } from '../../logger/index.js';
 import { MSG } from '../../constants/index.js';
-import { updateUserById } from '../../mongodb/operations/index.js';
+import { getUserById, updateUserById } from '../../mongodb/operations/index.js';
 import { isCancel } from '../../utils/utils.js';
+import { recordHistory } from '../../mongodb/operations/history.js';
+import { actionsHistory } from '../../constants/global.js';
 
 /**
  * Changes the name of the user in a conversation.
@@ -48,6 +50,9 @@ export const changeNameConversations = async (
             }
         }
     }
+    const oldFullName = await conversation.external(
+        async () => await getUserById(user.id)
+    );
 
     LOGGER.info(`[changeNameConversations] Ім'я та Прізвище: ${fullName}`);
 
@@ -60,6 +65,12 @@ export const changeNameConversations = async (
             })
     );
     if (updateFullName) {
+        await recordHistory({
+            userId: user.id,
+            action: actionsHistory.changeName,
+            oldValue: oldFullName?.fullName,
+            newValue: updateFullName.fullName,
+        });
         await ctx.reply(MSG.updatedFullName(updateFullName), {
             parse_mode: 'MarkdownV2',
         });

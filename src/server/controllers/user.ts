@@ -17,10 +17,12 @@ import {
 import {
     activateSubscriptions,
     deactivateSubscriptions,
+    getSubscriptionById,
     updateSubscriptionById,
 } from '../../mongodb/operations/subscriptions.js';
-import { ROLES } from '../../constants/global.js';
+import { ROLES, actionsHistory } from '../../constants/global.js';
 import { removeUserFromGroup } from '../../helpers/users.js';
+import { recordHistory } from '../../mongodb/operations/history.js';
 
 export default class UserController {
     /**
@@ -30,7 +32,10 @@ export default class UserController {
      * @param res - The response object.
      * @returns A JSON response with the list of users or an error message.
      */
-    async getAllUsers(req: Request<{}, {}, {}>, res: Response<ResponseBody>) {
+    async getAllUsers(
+        req: Request<object, object, object>,
+        res: Response<ResponseBody>
+    ) {
         try {
             const users = await getAllRealUser();
 
@@ -64,7 +69,7 @@ export default class UserController {
      * @returns A JSON response with the user data if found, or an error response if the user is not found.
      */
     async getUserById(
-        req: Request<{}, {}, RequestBodyUserInfo>,
+        req: Request<object, object, RequestBodyUserInfo>,
         res: Response<ResponseBody>
     ) {
         try {
@@ -111,7 +116,7 @@ export default class UserController {
      * @returns A JSON response with the user data if found, or an error response if not found.
      */
     async getUserWithSubscriptionById(
-        req: Request<{}, {}, {}, { userId: string }>,
+        req: Request<object, object, object, { userId: string }>,
         res: Response<ResponseBody>
     ) {
         try {
@@ -148,50 +153,42 @@ export default class UserController {
      * @returns A JSON response with the updated user data or an error message.
      */
     async updateUser(
-        req: Request<{}, {}, RequestBodyUpdateUser>,
+        req: Request<object, object, RequestBodyUpdateUser>,
         res: Response<ResponseBody>
     ) {
         try {
             const { userId } = req.body;
 
             // Update user data
-            function getUpdatedValues(body: any) {
-                type ValidKeys = keyof RequestBodyUpdateUser;
+            type ValidKeys = keyof RequestBodyUpdateUser;
 
-                const validKeysUser: ValidKeys[] = [
-                    'firstName',
-                    'fullName',
-                    'notifications',
-                    'role',
-                ];
-                const validKeysSubscription: ValidKeys[] = [
-                    'totalLessons',
-                    'usedLessons',
-                    'dateExpired',
-                    'active',
-                ];
+            const validKeysUser: ValidKeys[] = [
+                'firstName',
+                'fullName',
+                'notifications',
+                'role',
+            ];
+            const validKeysSubscription: ValidKeys[] = [
+                'totalLessons',
+                'usedLessons',
+                'dateExpired',
+                'active',
+            ];
 
-                const filterKeys = (keys: ValidKeys[]) => {
-                    let updatedValues: any = {};
-                    keys.forEach((key) => {
-                        if (body[key] !== undefined) {
-                            updatedValues[key] = body[key];
-                        }
-                    });
-                    return updatedValues;
-                };
+            const filterKeys = (keys: ValidKeys[]) => {
+                const updatedValues: any = {};
+                keys.forEach((key) => {
+                    if (req.body[key] !== undefined) {
+                        updatedValues[key] = req.body[key];
+                    }
+                });
+                return updatedValues;
+            };
 
-                const updatedUserValues = filterKeys(validKeysUser);
-                const updatedSubscriptionsValues = filterKeys(
-                    validKeysSubscription
-                );
-
-                return { updatedUserValues, updatedSubscriptionsValues };
-            }
-
-            // Usage
-            const { updatedSubscriptionsValues, updatedUserValues } =
-                getUpdatedValues(req.body);
+            const updatedUserValues = filterKeys(validKeysUser);
+            const updatedSubscriptionsValues = filterKeys(
+                validKeysSubscription
+            );
 
             let userUpdated = false;
             let subscriptionUpdated = false;
@@ -203,10 +200,32 @@ export default class UserController {
                     await updateUsersToInactive(userId);
                     await removeUserFromGroup([userId]);
                 }
+                const userInfo = await getUserById(userId);
                 const updatedUser = await updateUserById(
                     userId,
                     updatedUserValues
                 );
+                for (const key in updatedUserValues) {
+                    let actionsName = '';
+                    switch (key) {
+                        case 'fullName':
+                            actionsName = actionsHistory.changeName;
+                            break;
+                        case 'notifications':
+                            actionsName = actionsHistory.updateNotification;
+                            break;
+                        default:
+                            break;
+                    }
+                    actionsName &&
+                        userInfo &&
+                        (await recordHistory({
+                            userId: userId,
+                            action: actionsName,
+                            oldValue: (userInfo as any)[key],
+                            newValue: updatedUserValues[key],
+                        }));
+                }
                 userUpdated = updatedUser !== null; // or some other check
             }
 
@@ -218,11 +237,34 @@ export default class UserController {
                 } else if (activeSubscriptions === false) {
                     await deactivateSubscriptions(userId);
                 }
-
+                const subscriptionInfo = await getSubscriptionById(userId);
                 const updatedSubscription = await updateSubscriptionById(
                     userId,
                     updatedSubscriptionsValues
                 );
+                for (const key in updatedSubscriptionsValues) {
+                    let actionsName = '';
+                    switch (key) {
+                        case 'totalLessons':
+                            actionsName = actionsHistory.updateTotalLessons;
+                            break;
+                        case 'dateExpired':
+                            actionsName = actionsHistory.updateDateExpired;
+                            break;
+                        case 'usedLessons':
+                            actionsName = actionsHistory.updateUsedLessons;
+                            break;
+                        default:
+                            break;
+                    }
+                    actionsName &&
+                        (await recordHistory({
+                            userId: userId,
+                            action: actionsName,
+                            oldValue: (subscriptionInfo as any)[key],
+                            newValue: updatedSubscriptionsValues[key],
+                        }));
+                }
                 subscriptionUpdated = updatedSubscription !== null; // or some other check
             }
 

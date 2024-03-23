@@ -2,15 +2,19 @@ import { Request, Response, Router } from 'express';
 import ScannerController from '../controllers/scanner.js';
 import UserController from '../controllers/user.js';
 import {
+    RequestBodyGetAllHistory,
+    RequestBodyGetHistoryById,
     RequestBodyScannerApi,
     RequestBodyUpdateUser,
     RequestBodyUserInfo,
     ResponseBody,
 } from '../types/index.js';
+import HistoryController from '../controllers/history.js';
 
 const router = Router();
 const scannerController = new ScannerController();
 const userController = new UserController();
+const historyController = new HistoryController();
 
 /**
  * POST /web-data
@@ -22,7 +26,7 @@ const userController = new UserController();
 router.post(
     '/web-data',
     (
-        req: Request<{}, {}, RequestBodyScannerApi>,
+        req: Request<object, object, RequestBodyScannerApi>,
         res: Response<ResponseBody>
     ) => scannerController.updateLessonUsage(req, res)
 );
@@ -34,8 +38,10 @@ router.post(
  * @param req - The request object.
  * @param res - The response object.
  */
-router.get('/users', (req: Request<{}, {}, {}>, res: Response<ResponseBody>) =>
-    userController.getAllUsers(req, res)
+router.get(
+    '/users',
+    (req: Request<object, object, object>, res: Response<ResponseBody>) =>
+        userController.getAllUsers(req, res)
 );
 
 /**
@@ -47,8 +53,10 @@ router.get('/users', (req: Request<{}, {}, {}>, res: Response<ResponseBody>) =>
  */
 router.post(
     '/admin-info',
-    (req: Request<{}, {}, RequestBodyUserInfo>, res: Response<ResponseBody>) =>
-        userController.getUserById(req, res)
+    (
+        req: Request<object, object, RequestBodyUserInfo>,
+        res: Response<ResponseBody>
+    ) => userController.getUserById(req, res)
 );
 
 /**
@@ -61,7 +69,7 @@ router.post(
 router.get(
     '/user-info',
     (
-        req: Request<{}, {}, {}, { userId: string }>,
+        req: Request<object, object, object, { userId: string }>,
         res: Response<ResponseBody>
     ) => userController.getUserWithSubscriptionById(req, res)
 );
@@ -76,9 +84,36 @@ router.get(
 router.post(
     '/user-update-data',
     (
-        req: Request<{}, {}, RequestBodyUpdateUser>,
+        req: Request<object, object, RequestBodyUpdateUser>,
         res: Response<ResponseBody>
     ) => userController.updateUser(req, res)
+);
+
+/**
+ * GET /history-all
+ * Retrieves all history.
+ *
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+router.get(
+    '/history-all',
+    (
+        req: Request<object, object, RequestBodyGetAllHistory>,
+        res: Response<ResponseBody>
+    ) => historyController.getAllHistory(req, res)
+);
+
+router.post(
+    '/history-user',
+    (
+        req: Request<
+            RequestBodyGetHistoryById,
+            object,
+            RequestBodyGetHistoryById
+        >,
+        res: Response<ResponseBody>
+    ) => historyController.getHistoryById(req, res)
 );
 
 export default router;
