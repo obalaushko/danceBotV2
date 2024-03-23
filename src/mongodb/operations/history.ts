@@ -44,7 +44,7 @@ export const recordHistory = async (historyData: {
 export const getUserHistory = async (
     userId: number,
     page: number = 1,
-    pageSize: number = 20
+    pageSize: number = 10
 ): Promise<{ list: any[]; totalPages: number }> => {
     try {
         const user = await getUserById(userId);
