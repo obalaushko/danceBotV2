@@ -49,4 +49,9 @@ export type RequestBodyUpdateUser = {
 export type RequestBodyGetAllHistory = {
     page?: number;
     pageSize?: number;
-}
+};
+export type RequestBodyGetHistoryById = {
+    userId: number;
+    page?: number;
+    pageSize?: number;
+};

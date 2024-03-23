@@ -41,17 +41,67 @@ export const recordHistory = async (historyData: {
  * @param userId - The ID of the user.
  * @returns A promise that resolves to an array of user history objects.
  */
-export const getUserHistory = async (userId: string): Promise<IHistory[]> => {
+export const getUserHistory = async (
+    userId: number,
+    page: number = 1,
+    pageSize: number = 20
+): Promise<{ list: any[]; totalPages: number }> => {
     try {
-        const history = await HistoryModel.find({ userId }).sort({
-            timestamp: -1,
+        const user = await getUserById(userId);
+        
+        if (!user) return { list: [], totalPages: 0 };
+
+        const skip = (page - 1) * pageSize;
+        const history = await HistoryModel.find({ userId: user._id })
+            .sort({ timestamp: -1 })
+            .skip(skip)
+            .limit(pageSize);
+
+        const groupedHistory: Record<string, any> = {}; // Object for grouping history
+
+        // Group history by date
+        history.forEach((item: IHistory) => {
+            const date = item.timestamp.toLocaleDateString('uk-UA', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+            if (!groupedHistory[date]) {
+                groupedHistory[date] = {
+                    user: {
+                        userId: item.userId,
+                        fullName: '', // If user's name is not needed, this can be removed
+                    },
+                    historyItems: [],
+                };
+            }
+            groupedHistory[date].historyItems.push({
+                action: item.action,
+                oldValue: item.oldValue,
+                newValue: item.newValue,
+                timestamp: item.timestamp,
+            });
         });
-        return history;
+
+        // Get user information and form the final data
+        const result = [];
+        for (const date in groupedHistory) {
+            const userData = groupedHistory[date];
+            if (user) {
+                userData.user.fullName = user.fullName ?? '';
+                result.push({
+                    date,
+                    usersInfo: [userData],
+                });
+            }
+        }
+        const totalPages = Math.ceil(result.length / pageSize);
+        return { list: result, totalPages };
     } catch (error: any) {
         LOGGER.error('[getUserHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
         });
-        return [];
+        return { list: [], totalPages: 0 };
     }
 };
 

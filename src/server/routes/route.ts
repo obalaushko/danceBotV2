@@ -3,6 +3,7 @@ import ScannerController from '../controllers/scanner.js';
 import UserController from '../controllers/user.js';
 import {
     RequestBodyGetAllHistory,
+    RequestBodyGetHistoryById,
     RequestBodyScannerApi,
     RequestBodyUpdateUser,
     RequestBodyUserInfo,
@@ -101,6 +102,18 @@ router.get(
         req: Request<object, object, RequestBodyGetAllHistory>,
         res: Response<ResponseBody>
     ) => historyController.getAllHistory(req, res)
+);
+
+router.post(
+    '/history-user',
+    (
+        req: Request<
+            RequestBodyGetHistoryById,
+            object,
+            RequestBodyGetHistoryById
+        >,
+        res: Response<ResponseBody>
+    ) => historyController.getHistoryById(req, res)
 );
 
 export default router;
