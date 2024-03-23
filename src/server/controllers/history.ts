@@ -34,7 +34,7 @@ export default class HistoryController {
                     })
                 );
             } else {
-                return res.status(400).json(
+                return res.status(200).json(
                     errorResponse({
                         message: 'History not found!',
                         error: null,
@@ -58,7 +58,7 @@ export default class HistoryController {
         res: Response<ResponseBody>
     ) {
         try {
-            const { userId, page = 1, pageSize = 20 } = req.body;
+            const { userId, page = 1, pageSize = 10 } = req.body;
 
             const history = await getUserHistory(userId, page, pageSize);
 
@@ -74,7 +74,7 @@ export default class HistoryController {
                     })
                 );
             } else {
-                return res.status(404).json(
+                return res.status(200).json(
                     errorResponse({
                         message: 'User history not found!',
                         error: null,

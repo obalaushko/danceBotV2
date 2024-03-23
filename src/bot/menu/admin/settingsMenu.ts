@@ -1,6 +1,5 @@
 import { Menu } from '@grammyjs/menu';
 import { MSG } from '../../../constants/index.js';
-import { getGroupedSubscriptionChanges } from '../../../mongodb/operations/changeLog.js';
 import { sendMailingToUsers } from '../../../helpers/notifications.js';
 import { ENV_VARIABLES } from '../../../constants/global.js';
 
@@ -58,12 +57,7 @@ export const settingsMenu = new Menu('settingsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
     .webApp(MSG.buttons.settings.users, ENV_VARIABLES.URL + 'settings')
-    .text(MSG.buttons.settings.history, async (ctx) => {
-        const history = await getGroupedSubscriptionChanges();
-
-        ctx.menu.nav('settingHistoryMenu');
-        await ctx.editMessageText(MSG.settings.history(history));
-    })
+    .webApp(MSG.buttons.settings.history, ENV_VARIABLES.URL + 'history')
     // .row()
     // .text(MSG.buttons.settings.mailing.main, async (ctx) => {
     //     ctx.menu.nav('mailingMenu');
