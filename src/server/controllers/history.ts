@@ -18,7 +18,7 @@ export default class HistoryController {
     ) {
         try {
             const page = Number(req.query.page) || 1;
-            const pageSize = Number(req.query.pageSize) || 20;
+            const pageSize = Number(req.query.pageSize) || 10;
 
             const history = await getAllHistory(page, pageSize);
 
