@@ -29,14 +29,15 @@ export const checkAndDeactivateSubscriptions = async () => {
                 const currentUtcDate = moment.utc().toDate();
 
                 if (currentUtcDate > subscription.dateExpired) {
+                    const remaidLessons = subscription.remainedLessons;
                     subscription.active = false; // Deactivate the subscription if the expiration date has passed
                     await subscription.save(); // Save the updated subscription
 
                     await recordHistory({
                         userId: subscription.userId,
                         action: actionsHistory.dateExpired,
-                        oldValue: subscription.dateExpired,
-                        newValue: null,
+                        oldValue: `Невикористані заняття: ${remaidLessons}`,
+                        newValue: 'Абонемент анульовано',
                     });
                     if (user.notifications) {
                         await sendUserNotification(
