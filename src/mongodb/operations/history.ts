@@ -51,11 +51,9 @@ export const getUserHistory = async (
 
         if (!user) return { list: [], totalPages: 0 };
 
-        const skip = (page - 1) * pageSize;
-        const history = await HistoryModel.find({ userId: user._id })
-            .sort({ timestamp: -1 })
-            .skip(skip)
-            .limit(pageSize);
+        const history = await HistoryModel.find({ userId: user._id }).sort({
+            timestamp: -1,
+        });
 
         const groupedHistory: Record<string, any> = {}; // Object for grouping history
 
@@ -95,8 +93,13 @@ export const getUserHistory = async (
                 });
             }
         }
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const slicedResult = result.slice(startIndex, endIndex);
+
         const totalPages = Math.ceil(result.length / pageSize);
-        return { list: result, totalPages };
+        return { list: slicedResult, totalPages };
     } catch (error: any) {
         LOGGER.error('[getUserHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
@@ -113,14 +116,10 @@ export const getUserHistory = async (
  */
 export const getAllHistory = async (
     page: number = 1,
-    pageSize: number = 20
+    pageSize: number = 10
 ): Promise<{ list: any[]; totalPages: number }> => {
     try {
-        const skip = (page - 1) * pageSize;
-        const history = await HistoryModel.find()
-            .sort({ timestamp: -1 })
-            .skip(skip)
-            .limit(pageSize);
+        const history = await HistoryModel.find().sort({ timestamp: -1 });
 
         const groupedHistory: Record<string, any> = {}; // Object for grouping history
 
@@ -170,8 +169,13 @@ export const getAllHistory = async (
                 usersInfo,
             });
         }
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        const slicedResult = result.slice(startIndex, endIndex);
+
         const totalPages = Math.ceil(result.length / pageSize);
-        return { list: result, totalPages };
+        return { list: slicedResult, totalPages };
     } catch (error: any) {
         LOGGER.error('[getAllHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
