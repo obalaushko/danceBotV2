@@ -19,9 +19,13 @@ export const aboutCommand = () => {
         try {
             const user = await getUserById(id);
             if (user?.role === ROLES.Admin || user?.role === ROLES.Developer) {
-                await ctx.reply(MSG.about.admin, { reply_markup: aboutAdminMenu });
+                await ctx.reply(MSG.about.admin, {
+                    reply_markup: aboutAdminMenu,
+                });
             } else if (user?.role === ROLES.User) {
-                await ctx.reply(MSG.about.user, { reply_markup: aboutUserMenu });
+                await ctx.reply(MSG.about.user, {
+                    reply_markup: aboutUserMenu,
+                });
             } else {
                 await ctx.reply(MSG.about.general);
             }

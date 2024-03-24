@@ -4,7 +4,6 @@ import {
     checkAndDefrostSubscriptions,
     checkLastDayOfUsage,
 } from './subscriptions.js';
-import { deleteOldLogs } from '../mongodb/operations/changeLog.js';
 import { checkAndUpdateTelegramUser } from './users.js';
 
 /**
@@ -17,17 +16,6 @@ export const tasksCron = async () => {
             await checkAndDeactivateSubscriptions();
             await checkAndDefrostSubscriptions();
             await checkLastDayOfUsage();
-        },
-        {
-            scheduled: true,
-            timezone: 'Europe/Kiev',
-        }
-    );
-
-    cron.schedule(
-        '0 0 * * *',
-        async function () {
-            await deleteOldLogs();
         },
         {
             scheduled: true,

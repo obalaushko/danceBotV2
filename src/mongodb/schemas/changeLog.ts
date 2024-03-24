@@ -1,5 +1,8 @@
 import { Schema, model, Types, Document, Model } from 'mongoose';
 
+/**
+ * @deprecated use HistoryModel
+ */
 export interface IChangeLog extends Document {
     userId: number;
     subscriptionId: Types.ObjectId;
@@ -34,6 +37,9 @@ const subscriptionChangeLogSchema = new Schema({
     newValue: Schema.Types.Mixed,
 });
 
+/**
+ * @deprecated use HistoryModel
+ */
 export const SubscriptionChangeLogModel: Model<IChangeLog> = model<IChangeLog>(
     'SubscriptionChangeLog',
     subscriptionChangeLogSchema
