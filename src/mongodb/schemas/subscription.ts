@@ -81,7 +81,7 @@ const subscriptionSchema: Schema = new Schema<ISubscription>({
 
 subscriptionSchema.methods.setExpirationDate = function () {
     const today = moment().utc();
-    const expirationDate = today.add(40, 'days');
+    const expirationDate = today.add(39, 'days'); // today + 39 days = 40 days
     this.dateExpired = expirationDate.toDate();
 };
 
