@@ -9,6 +9,8 @@ import { getUserById } from './users.js';
 import moment from 'moment-timezone';
 
 /**
+ * @deprecated use HistoryModel
+ *
  * Adds a log entry for a subscription change.
  *
  * @param userId - The ID of the user.
@@ -38,43 +40,8 @@ export const addLogSubscriptionChange = async (
 };
 
 /**
- * @deprecated
- * Retrieves grouped subscription change logs.
- * @returns A promise that resolves to an array of grouped change logs or null if an error occurs.
- */
-export const getGroupedSubscriptionChangeLogs = async (): Promise<
-    IChangeLog[] | null
-> => {
-    try {
-        const groupedLogs = await SubscriptionChangeLogModel.aggregate([
-            {
-                $group: {
-                    _id: {
-                        date: {
-                            $dateToString: {
-                                format: '%Y-%m-%d',
-                                date: '$changeDate',
-                            },
-                        },
-                    },
-                    changes: {
-                        $push: { userId: '$userId', changeType: '$changeType' },
-                    },
-                },
-            },
-            { $sort: { '_id.date': -1 } },
-        ]);
-
-        return groupedLogs;
-    } catch (error: any) {
-        LOGGER.error('[getGroupedSubscriptionChangeLogs][error]', {
-            metadata: { error: error, stack: error.stack.toString() },
-        });
-        return null;
-    }
-};
-
-/**
+ * @deprecated use HistoryModel
+ *
  * Retrieves grouped subscription changes from the database.
  * @returns A Promise that resolves to an object containing grouped changes, or null if an error occurs.
  */
@@ -125,6 +92,8 @@ export const getGroupedSubscriptionChanges =
     };
 
 /**
+ * @deprecated use HistoryModel
+ *
  * Deletes old logs from the subscription change log collection.
  * Logs that are older than two months will be removed.
  * @returns A Promise that resolves to void.
