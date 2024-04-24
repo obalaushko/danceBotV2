@@ -4,7 +4,7 @@ import { ENV_VARIABLES } from '../../../constants/global.js';
 
 export const aboutUserMenu = new Menu('aboutUserMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
-}).webApp(MSG.buttons.user.openWebApp, ENV_VARIABLES.URL + 'user/about');
+}).webApp(MSG.buttons.user.openWebApp, ENV_VARIABLES.URL + 'user/history');
 export const aboutAdminMenu = new Menu('aboutAdminMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 }).webApp(MSG.buttons.user.openWebApp, ENV_VARIABLES.URL + 'about');
