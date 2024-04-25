@@ -36,6 +36,7 @@ const freezeSubMenu = new Menu('freezeSubMenu')
                 },
                 async (ctx) => {
                     if (frozen) {
+                        // TODO Add confirm
                         const defrost = await defrostSubscriptionByUserId(id);
                         if (defrost) {
                             const user = await getUserWithSubscriptionById(id);
@@ -59,6 +60,7 @@ const freezeSubMenu = new Menu('freezeSubMenu')
                             }
                         }
                     } else {
+                        // TODO Add confirm
                         const freeze = await freezeSubscriptionByUserId(id);
                         if (freeze) {
                             ctx.menu.update();
