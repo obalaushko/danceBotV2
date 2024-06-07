@@ -54,6 +54,14 @@ export const sendInviteToGroup = async (users: IUser[]) => {
                 user.inviteLink = invite_link;
                 await user.save();
 
+                await bot.api.unbanChatMember(
+                    ENV_VARIABLES.GROUP_ID,
+                    user.userId,
+                    {
+                        only_if_banned: true,
+                    }
+                );
+
                 await bot.api.sendMessage(
                     user.userId,
                     MSG.inviteToGroup(invite_link)

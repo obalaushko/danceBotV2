@@ -3,6 +3,7 @@ import { ENV_VARIABLES } from '../constants/global.js';
 
 import { LOGGER } from '../logger/index.js';
 import { getAllUserUsers } from '../mongodb/operations/users.js';
+import { hasAdminOrDevRole } from '../utils/utils.js';
 
 /**
  * Removes users from a group.
@@ -11,21 +12,21 @@ import { getAllUserUsers } from '../mongodb/operations/users.js';
  * @param userIds - An array of user IDs to be removed from the group.
  */
 export const removeUserFromGroup = async (userIds: number[]) => {
-    const { type } = await bot.api.getChat(ENV_VARIABLES.GROUP_ID);
-
-    userIds.forEach(async (id) => {
+    for (const id of userIds) {
         try {
-            if (type === 'supergroup') {
-                await bot.api.unbanChatMember(ENV_VARIABLES.GROUP_ID, id);
-            } else {
-                await bot.api.banChatMember(ENV_VARIABLES.GROUP_ID, id);
-            }
+            const admin = await hasAdminOrDevRole(id);
+            if (admin) return;
+
+            await bot.api.banChatMember(ENV_VARIABLES.GROUP_ID, id);
         } catch (err) {
-            LOGGER.error('[removeUserFromGroup] Failed remove from group', {
-                metadata: err,
-            });
+            LOGGER.error(
+                `[removeUserFromGroup] Failed remove from group (${id})`,
+                {
+                    metadata: err,
+                }
+            );
         }
-    });
+    }
 };
 
 /**
