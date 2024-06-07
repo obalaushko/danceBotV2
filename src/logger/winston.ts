@@ -1,5 +1,12 @@
 import { ENV_VARIABLES } from './../constants/global.js';
-import { createLogger, format, transports } from 'winston';
+import {
+    createLogger,
+    format,
+    transports,
+    LogEntry as WinstonLogEntry,
+    LoggerOptions,
+    Logger as WinstonLogger,
+} from 'winston';
 
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';
@@ -7,21 +14,33 @@ import { LogtailTransport } from '@logtail/winston';
 const logtail = new Logtail(ENV_VARIABLES.LOGTAIL_TOKEN);
 
 const { combine, timestamp, colorize, printf } = format;
-// const errorsFormat = errors({ stack: true });
-const consoleFormat = printf(({ level, message, timestamp, metadata }) => {
-    return `${timestamp} ${level}: ${message} ${
-        metadata ? JSON.stringify(metadata, null, 2) : ''
-    }`;
-});
 
-const logger = createLogger({
+interface Metadata {
+    [key: string]: any;
+}
+
+interface LogEntry extends WinstonLogEntry {
+    metadata?: Metadata;
+}
+
+const consoleFormat = printf(
+    ({ level, message, timestamp, metadata }: LogEntry) => {
+        return `${timestamp} ${level}: ${message} ${
+            metadata ? JSON.stringify(metadata, null, 2) : ''
+        }`;
+    }
+);
+
+const loggerOptions: LoggerOptions = {
     transports: [
         new transports.File({
             level: 'error',
             filename: 'app-error.log',
         }),
     ],
-});
+};
+
+const logger: WinstonLogger = createLogger(loggerOptions);
 
 if (ENV_VARIABLES.MODE === 'production') {
     try {
@@ -46,13 +65,5 @@ if (ENV_VARIABLES.MODE === 'development') {
         })
     );
 }
-// else if (mode === 'production') {
-//     logger.add(
-//         new transports.Console({
-//             level: 'info',
-//             format: combine(timestamp(), json(), errorsFormat),
-//         })
-//     );
-// }
 
 export { logger };

@@ -106,6 +106,9 @@ export const checkLastDayOfUsage = async () => {
                 await subscription.save();
             } else if (diffDays === 80) {
                 // Send notification if it hasn't been sent yet
+                LOGGER.info('[Notification] Last 10 days', {
+                    metadata: { subscription },
+                });
                 await sendUserNotification(
                     subscription.userId,
                     MSG.user.notification.lastDayOfUsage
