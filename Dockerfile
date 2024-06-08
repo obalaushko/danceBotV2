@@ -13,7 +13,7 @@ ARG NODE_VERSION=20.9.0
 FROM node:${NODE_VERSION}-alpine as base
 
 # Set working directory for all build stages.
-WORKDIR /usr/src
+WORKDIR /usr/src/app
 
 
 ################################################################################
@@ -61,12 +61,12 @@ COPY package.json .
 
 # Copy the production dependencies from the deps stage and also
 # the built application from the build stage into the image.
-COPY --from=deps /usr/src/node_modules ./node_modules
-COPY --from=build /usr/src/dist ./dist
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
 
 # Create the dump directory as root user and set permissions.
 USER root
-RUN mkdir -p /usr/src/dump && chmod -R 777 /usr/src/dump
+RUN mkdir -p /usr/src/app/dump && chmod -R 777 /usr/src/app/dump
 
 # Switch back to the node user.
 USER node
