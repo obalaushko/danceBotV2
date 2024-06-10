@@ -16,7 +16,7 @@
         "format:write": "prettier --write .",
         "lint:check": "eslint .",
         "lint:fix": "eslint --fix .",
-        "prepare": "husky install"
+        "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky install; fi"
     },
     "_moduleAliases": {
         "@utils": "./dist/utils",
