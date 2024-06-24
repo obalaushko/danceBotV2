@@ -116,4 +116,12 @@ router.post(
     ) => historyController.getHistoryById(req, res)
 );
 
+router.post(
+    '/payment-reminder',
+    (
+        req: Request<object, object, RequestBodyUserInfo>,
+        res: Response<ResponseBody>
+    ) => userController.paymentReminder(req, res)
+);
+
 export default router;

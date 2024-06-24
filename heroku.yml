@@ -1,0 +1,6 @@
+build:
+    docker:
+        web: Dockerfile
+release:
+    command:
+        - npm run migrate # Якщо у вас є команди міграції або інші команди, які потрібно виконати при деплої

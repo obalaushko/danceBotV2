@@ -23,6 +23,8 @@ import {
 import { ROLES, actionsHistory } from '../../constants/global.js';
 import { removeUserFromGroup } from '../../helpers/users.js';
 import { recordHistory } from '../../mongodb/operations/history.js';
+import { sendUserNotification } from '../../helpers/notifications.js';
+import { MSG } from '../../constants/messages.js';
 
 export default class UserController {
     /**
@@ -296,6 +298,45 @@ export default class UserController {
             }
         } catch (error: any) {
             LOGGER.error('[GET][user-info]', { metadata: error });
+            return res
+                .status(500)
+                .json(errorResponse({ message: error, error }));
+        }
+    }
+
+    /**
+     * Sends a payment reminder notification to a user.
+     *
+     * @param req - The request object containing the user ID in the request body.
+     * @param res - The response object to send the result back to the client.
+     * @returns A JSON response indicating the success or failure of sending the notification.
+     */
+    async paymentReminder(
+        req: Request<object, object, RequestBodyUpdateUser>,
+        res: Response<ResponseBody>
+    ) {
+        try {
+            const { userId } = req.body;
+            const sendingMsg = await sendUserNotification(
+                userId,
+                MSG.user.notification.paymentRemaider
+            );
+            if (sendingMsg) {
+                return res.status(200).json(
+                    successResponse({
+                        data: 'Notification sent',
+                    })
+                );
+            } else {
+                return res.status(400).json(
+                    errorResponse({
+                        message: 'Failed to send notification!',
+                        error: null,
+                    })
+                );
+            }
+        } catch (error: any) {
+            LOGGER.error('[POST][Payment Reminder]', { metadata: error });
             return res
                 .status(500)
                 .json(errorResponse({ message: error, error }));

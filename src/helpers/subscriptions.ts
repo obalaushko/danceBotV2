@@ -39,12 +39,10 @@ export const checkAndDeactivateSubscriptions = async () => {
                         oldValue: `Невикористані заняття: ${remaidLessons}`,
                         newValue: 'Абонемент анульовано',
                     });
-                    if (user.notifications) {
-                        await sendUserNotification(
-                            user.userId,
-                            MSG.user.notification.expired
-                        );
-                    }
+                    await sendUserNotification(
+                        user.userId,
+                        MSG.user.notification.expired
+                    );
                     LOGGER.info(
                         `[checkAndDeactivateSubscriptions] Subscription expired for ${user.userId}, ${user.fullName}`
                     );
