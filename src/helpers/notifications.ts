@@ -7,20 +7,33 @@ import { MSG } from '../constants/index.js';
 
 /**
  * Sends a notification to a user.
+ *
  * @param userId - The ID of the user to send the notification to.
- * @param message - The message to be sent as the notification.
+ * @param message - The message to include in the notification.
+ * @returns A promise that resolves to a boolean indicating whether the notification was sent successfully.
  */
-export const sendUserNotification = async (userId: number, message: string) => {
+export const sendUserNotification = async (
+    userId: number,
+    message: string
+): Promise<boolean> => {
     const owner = await getUserById(userId);
     try {
         if (owner && owner.notifications) {
             await bot.api.sendMessage(userId, message);
+            return true;
+        } else {
+            LOGGER.warn(
+                `[sendUserNotification] Failed to write to user. ${userId} - user not found or notifications disabled`,
+                { metadata: owner }
+            );
+            return false;
         }
     } catch (err) {
         LOGGER.error(
             `[sendUserNotification] Failed to write to user. ${userId}`,
             { metadata: err }
         );
+        return false;
     }
 };
 
