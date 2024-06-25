@@ -317,6 +317,28 @@ export default class UserController {
     ) {
         try {
             const { userId } = req.body;
+            try {
+                const subscription = await getSubscriptionById(userId);
+
+                // Check if user has an active subscription before sending the notification
+                if (subscription?.active) {
+                    return res.status(200).json(
+                        errorResponse({
+                            message: 'Не можливо надіслати учню з активним абонементом!',
+                            error: null,
+                        })
+                    );
+                }
+
+            } catch (error) {
+                return res.status(400).json(
+                    errorResponse({
+                        message: 'User not found!',
+                        error: null,
+                    })
+                );
+            }
+            
             const sendingMsg = await sendUserNotification(
                 userId,
                 MSG.user.notification.paymentRemaider
@@ -328,9 +350,9 @@ export default class UserController {
                     })
                 );
             } else {
-                return res.status(400).json(
+                return res.status(200).json(
                     errorResponse({
-                        message: 'Failed to send notification!',
+                        message: 'Помилка надсилання! Увімкніть сповіщення і спробуйте ще раз.',
                         error: null,
                     })
                 );
