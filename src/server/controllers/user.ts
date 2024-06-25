@@ -48,7 +48,7 @@ export default class UserController {
                     })
                 );
             } else {
-                return res.status(400).json(
+                return res.status(200).json(
                     errorResponse({
                         message: 'Users not found!',
                         error: null,
