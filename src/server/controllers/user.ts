@@ -324,12 +324,12 @@ export default class UserController {
                 if (subscription?.active) {
                     return res.status(200).json(
                         errorResponse({
-                            message: 'Не можливо надіслати учню з активним абонементом!',
+                            message:
+                                'Не можливо надіслати учню з активним абонементом!',
                             error: null,
                         })
                     );
                 }
-
             } catch (error) {
                 return res.status(400).json(
                     errorResponse({
@@ -338,7 +338,7 @@ export default class UserController {
                     })
                 );
             }
-            
+
             const sendingMsg = await sendUserNotification(
                 userId,
                 MSG.user.notification.paymentRemaider
@@ -352,7 +352,8 @@ export default class UserController {
             } else {
                 return res.status(200).json(
                     errorResponse({
-                        message: 'Помилка надсилання! Увімкніть сповіщення і спробуйте ще раз.',
+                        message:
+                            'Помилка надсилання! Увімкніть сповіщення і спробуйте ще раз.',
                         error: null,
                     })
                 );
