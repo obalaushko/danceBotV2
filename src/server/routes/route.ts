@@ -32,13 +32,13 @@ router.post(
 );
 
 /**
- * GET /users
+ * POST /users
  * Retrieves all users.
  *
  * @param req - The request object.
  * @param res - The response object.
  */
-router.get(
+router.post(
     '/users',
     (req: Request<object, object, object>, res: Response<ResponseBody>) =>
         userController.getAllUsers(req, res)
