@@ -56,7 +56,7 @@ export const ENV_VARIABLES = {
     DB_PASSWORD: encodeURIComponent(ENVS.MONGO_DB_PASSWORD || ''),
     DB_NAME: ENVS.MONGO_DB_NAME || '',
     DB_HOST: ENVS.MONGO_DB_HOST || 'localhost',
-    PORT: ENVS.PORT || 8000,
+    PORT: ENVS.PORT || 5555,
 };
 
 interface IGlobalSession {
