@@ -72,7 +72,7 @@ RUN mkdir -p /usr/src/app/dump && chmod -R 777 /usr/src/app/dump
 USER node
 
 # Expose the port that the application listens on.
-EXPOSE 8000
+EXPOSE 5554
 
 # Run the application.
 CMD npm start
