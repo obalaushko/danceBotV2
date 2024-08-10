@@ -1,23 +1,19 @@
-### Building and running your application
+# Docker Guide for Telegram Dance Bot
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+This guide provides instructions on how to build, run, and manage the Telegram Dance Bot using Docker. It also outlines the CI/CD process that automatically updates the bot on the server whenever changes are pushed to the `main` branch.
 
-Your application will be available at http://localhost:8000.
+## Prerequisites
 
-### Deploying your application to the cloud
+Before you begin, ensure that you have the following installed:
 
-First, build your image, e.g.: `docker build -t myapp .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t myapp .`.
+-   Docker: [Install Docker](https://docs.docker.com/get-docker/)
+-   Docker Compose: [Install Docker Compose](https://docs.docker.com/compose/install/)
+-   Git: [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-Then, push it to your registry, e.g. `docker push myregistry.com/myapp`.
+## Building the Docker Image
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+To build the Docker image locally, run the following command from the root directory of the project:
 
-### References
-
--   [Docker's Node.js guide](https://docs.docker.com/language/nodejs/)
+```bash
+docker build -t your-dockerhub-username/telegram-dance-bot:latest .
+```
