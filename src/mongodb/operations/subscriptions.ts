@@ -173,10 +173,6 @@ export const deactivateSubscriptions = async (
             subscription.active = false;
             await subscription.save();
             updatedSubscriptions.push(subscription);
-            await recordHistory({
-                userId: subscription.userId,
-                action: actionsHistory.deactivateSubscription,
-            });
         }
         return updatedSubscriptions;
     } catch (error: any) {
