@@ -134,7 +134,9 @@ bot.use(
                     () => {
                         if (ctx.session.spamCounter > 0) {
                             ctx.session.spamCounter -= 1;
-                            LOGGER.info('Decrease spamCounter', { metadata: ctx.chat });
+                            LOGGER.info('Decrease spamCounter', {
+                                metadata: ctx.chat,
+                            });
                         }
                     },
                     1000 * 60 * 60
