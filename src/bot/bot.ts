@@ -127,11 +127,16 @@ bot.use(
                 await ctx.reply(MSG.tooManyRequest);
                 ctx.session.spamCounter += 1;
 
+                LOGGER.warn('Increase spamCounter', { metadata: ctx.chat });
+
                 // Avoid negative values
                 setTimeout(
                     () => {
                         if (ctx.session.spamCounter > 0) {
                             ctx.session.spamCounter -= 1;
+                            LOGGER.info('Decrease spamCounter', {
+                                metadata: ctx.chat,
+                            });
                         }
                     },
                     1000 * 60 * 60

@@ -50,20 +50,19 @@ if (ENV_VARIABLES.MODE === 'production') {
         console.error(err);
     }
 }
-if (ENV_VARIABLES.MODE === 'development') {
-    logger.add(
-        new transports.Console({
-            level: 'debug',
-            format: combine(
-                colorize({
-                    colors: { info: 'blue', error: 'red' },
-                    level: true,
-                }),
-                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                consoleFormat
-            ),
-        })
-    );
-}
+
+logger.add(
+    new transports.Console({
+        level: 'debug',
+        format: combine(
+            colorize({
+                colors: { info: 'blue', error: 'red' },
+                level: true,
+            }),
+            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            consoleFormat
+        ),
+    })
+);
 
 export { logger };

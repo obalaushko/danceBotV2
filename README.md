@@ -1,36 +1,106 @@
-# danceBotV2
+# Dance Bot - Telegram Subscription Manager
 
-![Проста блок-схема](/Dance_bot_diagram.jpeg 'Проста блок-схема')
+This is a **Telegram bot** built with [grammY](https://grammy.dev/), **TypeScript**, and **MongoDB** using **mongoose** as the ORM. The bot is designed to manage subscriptions for students, allowing teachers (administrators) to track who attends classes, when payments were made, and students can monitor their subscription status.
 
--   Користувач починає розмову з ботом.
--   Бот створює користувача в базі даних з дефолтними полями.
--   Бот пропонує користувачеві зареєструватися.
--   Якщо користувач існує в базі даних, він вводить ім'я та прізвище + додаткову інформація про себе.
--   Бот перевіряє роль користувача.
--   Якщо роль користувача guest, бот пропонує адміністратору схвалити користувача.
--   Бот показує відповідну клавіатуру.
+## Features
 
-## Гість може виконувати такі дії:
+-   Admin panel for teachers to manage and track student attendance and payments.
+-   Students can view their subscription status, class attendance, and remaining lessons.
+-   Built with **grammY** framework for handling Telegram API interactions.
+-   MongoDB is used for data storage with **mongoose** as the ORM.
 
--   Зареєструватися та чекати відповіді від адміністратора
+## Prerequisites
 
-## Розробник може виконувати такі дії:
+To run this project, you need to have the following installed on your machine:
 
--   Вибрати роль під якою він хоче зайти
+-   **Node.js** version 20.9.0 or higher.
+-   **MongoDB** instance for database storage.
 
-## Користувач може виконувати такі дії:
+## Installation
 
--   Переглянути кількість уроків.
--   Отримати реквізити для опалти, або оплатити через телеграм
--   Увімкнути\Вимкнути сповіщення коли залишається 1 урок в абонементі
+1. Clone this repository:
+    ```bash
+    git clone https://github.com/yourusername/dance-bot-grammy.git
+    cd dance-bot-grammy
+    ```
+2. Install dependencies:
 
-## Адміністратор може виконувати такі дії:
+    ```bash
+    npm install
+    ```
 
--   Переглянути список очікуючих користувачів.
--   Переглянути всіх користувачів і їхній статус
--   Оновити дані юзера, додати нотатки
--   Відмітити юзера який прийшов на заняття
--   Видалити юзера
+3. Copy the example environment file and update the variables with your own values:
 
-Telegram bot (grammY)
-https://github.com/DDiscua/telegramBot
+    ```bash
+    cp .env.example .env
+    ```
+
+4. Build the TypeScript project:
+    ```bash
+    npm run build
+    ```
+
+## Running the Project
+
+To run the project, there are two main environments:
+
+### Development
+
+For running the bot in a development environment, use the following command:
+
+```bash
+npm run dev
+```
+
+### Production
+
+To start the bot in production mode, build the project first and then run:
+
+```bash
+npm run build
+npm start
+```
+
+## Docker Setup
+
+You can also run the project using Docker. Make sure you have Docker installed on your machine.
+
+1. Build the Docker image:
+
+    ```bash
+    docker build -t dance-bot-grammy .
+    ```
+
+2. Run the Docker container:
+    ```bash
+    docker run --env-file .env -p 3000:3000 dance-bot-grammy
+    ```
+
+## Scripts
+
+Here are some useful npm scripts available for this project:
+
+-   **Start the bot:** `npm start`
+-   **Development mode:** `npm run dev`
+-   **Build the project:** `npm run build`
+-   **Run tests:** `npm run test`
+-   **Check code formatting:** `npm run format:check`
+-   **Fix code formatting:** `npm run format:write`
+-   **Check linting:** `npm run lint:check`
+-   **Fix linting issues:** `npm run lint:fix`
+
+## Environment Variables
+
+The project uses the following environment variables:
+
+| Variable    | Description                           |
+| ----------- | ------------------------------------- |
+| `BOT_TOKEN` | Telegram bot token from BotFather     |
+| `MONGO_URI` | MongoDB connection string             |
+| `LOG_LEVEL` | Set the log level (info, debug, etc.) |
+
+For a complete list of environment variables, refer to the `.env.example` file.
+
+## License
+
+This project is licensed under the ISC License.
