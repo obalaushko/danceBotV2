@@ -20,6 +20,7 @@ export const sendUserNotification = async (
     try {
         if (owner && owner.notifications) {
             await bot.api.sendMessage(userId, message);
+            LOGGER.info(`[sendUserNotification] Success to write to user. ${userId}`)
             return true;
         } else {
             LOGGER.warn(
