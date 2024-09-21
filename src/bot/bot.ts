@@ -40,10 +40,21 @@ import { cryptoConversations } from '../crypto/client/cryptoConversations.js';
 import { ENV_VARIABLES, globalSession } from '../constants/global.js';
 import { addToBlacklist, loadBlacklist } from '../utils/blackList.js';
 import { banCommand } from './chats/private/ban.command.js';
+import { isDbConnected } from '../mongodb/connectDb.js';
 // import { ignoreOld } from 'grammy-middlewares';
 
 //BOT CONFIG
 const bot = new Bot<ParseModeFlavor<BotContext>>(ENV_VARIABLES.TOKEN);
+
+bot.use(async (ctx, next) => {
+    if (!isDbConnected()) {
+        await ctx.reply(
+            'Вибачте, виникли проблеми з базою даних. Спробуйте пізніше.'
+        );
+    } else {
+        return next();
+    }
+});
 
 bot.api.config.use(
     autoRetry({
@@ -183,7 +194,7 @@ aboutCommand();
 banCommand();
 
 //CRASH HANDLER
-bot.catch((err) => {
+bot.catch(async (err) => {
     const ctx = err.ctx;
     LOGGER.error(
         `[bot-catch][Error while handling update ${ctx.update.update_id}]`,
@@ -199,6 +210,39 @@ bot.catch((err) => {
                 stack: e.stack,
             }
         );
+
+        // Add error handling for the outdated callback request
+        if (
+            e.error_code === 400 &&
+            e.description.includes('query is too old')
+        ) {
+            LOGGER.warn(
+                `[bot-catch][GrammyError][Old query detected for update ${ctx.update.update_id}]`
+            );
+
+            try {
+                await ctx.reply(
+                    'Це меню вже неактивне. Будь ласка, повторіть вашу дію або оновіть меню за допомогою команди /start.'
+                );
+            } catch (replyError) {
+                if (replyError instanceof Error) {
+                    LOGGER.error(
+                        `[bot-catch][ReplyError][Error while sending reply for old query]`,
+                        {
+                            metadata: replyError.message,
+                            stack: replyError.stack,
+                        }
+                    );
+                } else {
+                    LOGGER.error(
+                        `[bot-catch][ReplyError][Unknown error type while sending reply]`,
+                        {
+                            metadata: replyError,
+                        }
+                    );
+                }
+            }
+        }
     } else if (e instanceof HttpError) {
         LOGGER.error(
             `[bot-catch][HttpError][Error in request ${ctx.update.update_id}]`,
