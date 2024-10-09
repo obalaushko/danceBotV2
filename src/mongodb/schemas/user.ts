@@ -8,7 +8,7 @@ export interface IUser extends Document {
     username?: string;
     firstName?: string;
     subscription?: ISubscription | null;
-    fullName?: string;
+    fullName: string;
     approved?: boolean;
     notifications?: boolean;
     inviteLink?: string | null;

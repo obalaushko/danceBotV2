@@ -1,5 +1,7 @@
+import moment from 'moment-timezone';
 import { LOGGER } from '../../logger/index.js';
-import { HistoryModel, IHistory } from '../schemas/history.js';
+import { DailyHistoryModel, IDailyHistory } from '../schemas/dailyHistory.js';
+import { IHistory } from '../schemas/history.js';
 import { getUserById, getUserByMongoId } from './users.js';
 
 /**
@@ -8,26 +10,73 @@ import { getUserById, getUserByMongoId } from './users.js';
  * @returns A Promise that resolves to the created history record, or null if an error occurs.
  */
 export const recordHistory = async (historyData: {
-    userId: number;
+    userId: number; // Telegram user ID (numeric)
     action: string;
     oldValue?: any;
     newValue?: any;
-}): Promise<IHistory | null> => {
+}): Promise<IHistory | IDailyHistory | null> => {
     try {
         const { userId, action, oldValue, newValue } = historyData;
+
+        // We get the user by numeric userId (Telegram ID)
         const user = await getUserById(userId);
         if (!user) return null;
 
-        const history = new HistoryModel({
-            userId: user.id,
-            action,
-            oldValue,
-            newValue,
-        });
+        const today = moment.utc().format('DD.MM.YYYY');
 
-        await history.save();
+        // We are looking for a `DailyHistory` entry for the current day
+        let dailyHistory = await DailyHistoryModel.findOne({ date: today });
 
-        return history;
+        //If there is no record, create a new one
+        if (!dailyHistory) {
+            dailyHistory = new DailyHistoryModel({
+                date: today,
+                users: [
+                    {
+                        userId: user._id,
+                        fullName: user.fullName,
+                        actions: [
+                            {
+                                action,
+                                oldValue,
+                                newValue,
+                                timestamp: moment.utc().toDate(),
+                            },
+                        ],
+                    },
+                ],
+            });
+        } else {
+            const userHistory = dailyHistory.users.find(
+                (u) => u.userId.toString() === user._id.toString()
+            );
+
+            if (userHistory) {
+                userHistory.actions.push({
+                    action,
+                    oldValue,
+                    newValue,
+                    timestamp: moment.utc().toDate(),
+                });
+            } else {
+                dailyHistory.users.push({
+                    userId: user._id,
+                    fullName: user.fullName,
+                    actions: [
+                        {
+                            action,
+                            oldValue,
+                            newValue,
+                            timestamp: moment.utc().toDate(),
+                        },
+                    ],
+                });
+            }
+        }
+
+        await dailyHistory.save();
+
+        return dailyHistory;
     } catch (error: any) {
         LOGGER.error('[recordHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
@@ -42,64 +91,47 @@ export const recordHistory = async (historyData: {
  * @returns A promise that resolves to an array of user history objects.
  */
 export const getUserHistory = async (
-    userId: number,
+    userId: number, // Telegram ID
     page: number = 1,
     pageSize: number = 10
 ): Promise<{ list: any[]; totalPages: number }> => {
     try {
         const user = await getUserById(userId);
-
         if (!user) return { list: [], totalPages: 0 };
 
-        const history = await HistoryModel.find({ userId: user._id }).sort({
-            timestamp: -1,
-        });
+        const history = await DailyHistoryModel.find({
+            'users.userId': user._id,
+        })
+            .sort({ date: -1 })
+            .skip((page - 1) * pageSize)
+            .limit(pageSize);
 
-        const groupedHistory: Record<string, any> = {}; // Object for grouping history
-
-        // Group history by date
-        history.forEach((item: IHistory) => {
-            const date = item.timestamp.toLocaleDateString('uk-UA', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            });
-            if (!groupedHistory[date]) {
-                groupedHistory[date] = {
+        const result = history
+            .map((dayHistory) => {
+                const userActions = dayHistory.users.find(
+                    (u) => u.userId.toString() === user._id.toString()
+                );
+                return {
+                    date: dayHistory.date,
                     user: {
-                        userId: item.userId,
-                        fullName: '', // If user's name is not needed, this can be removed
+                        userId: user._id,
+                        fullName: user.fullName,
                     },
-                    historyItems: [],
+                    historyItems: userActions ? userActions.actions : [],
                 };
-            }
-            groupedHistory[date].historyItems.push({
-                action: item.action,
-                oldValue: item.oldValue,
-                newValue: item.newValue,
-                timestamp: item.timestamp,
-            });
-        });
+            })
+            .sort(
+                (a, b) =>
+                    moment(b.date, 'DD.MM.YYYY').toDate().getTime() -
+                    moment(a.date, 'DD.MM.YYYY').toDate().getTime()
+            );
 
-        // Get user information and form the final data
-        const result = [];
-        for (const date in groupedHistory) {
-            const userData = groupedHistory[date];
-            if (user) {
-                userData.user.fullName = user.fullName ?? '';
-                result.push({
-                    date,
-                    usersInfo: [userData],
-                });
-            }
-        }
-
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const slicedResult = result.slice(startIndex, endIndex);
-
-        const totalPages = Math.ceil(result.length / pageSize);
-        return { list: slicedResult, totalPages };
+        const totalPages = Math.ceil(
+            (await DailyHistoryModel.countDocuments({
+                'users.userId': user._id,
+            })) / pageSize
+        );
+        return { list: result, totalPages };
     } catch (error: any) {
         LOGGER.error('[getUserHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
@@ -119,63 +151,49 @@ export const getAllHistory = async (
     pageSize: number = 10
 ): Promise<{ list: any[]; totalPages: number }> => {
     try {
-        const history = await HistoryModel.find().sort({ timestamp: -1 });
+        const historyDays = await DailyHistoryModel.find()
+            .sort({ date: -1 })
+            .skip((page - 1) * pageSize)
+            .limit(pageSize);
 
-        const groupedHistory: Record<string, any> = {}; // Object for grouping history
+        const result = await Promise.all(
+            historyDays.map(async (dayHistory) => {
+                const usersInfo = await Promise.all(
+                    dayHistory.users.map(async (userHistory) => {
+                        const user = await getUserByMongoId(userHistory.userId);
+                        return {
+                            user: {
+                                userId: userHistory.userId,
+                                fullName:
+                                    user?.fullName ?? userHistory.fullName,
+                            },
+                            historyItems: userHistory.actions.sort(
+                                (a, b) =>
+                                    b.timestamp.getTime() -
+                                    a.timestamp.getTime()
+                            ), // Sort each user's actions by time
+                        };
+                    })
+                );
 
-        // Group history by date and users
-        history.forEach((item: IHistory) => {
-            const date = item.timestamp.toLocaleDateString('uk-UA', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            });
-            if (!groupedHistory[date]) {
-                groupedHistory[date] = {};
-            }
-            const userIdString = item.userId.toString(); // Convert userId to string
-            if (!groupedHistory[date][userIdString]) {
-                groupedHistory[date][userIdString] = {
-                    user: {
-                        userId: item.userId,
-                        fullName: '', // If user's name is not needed, this can be removed
-                    },
-                    historyItems: [],
+                return {
+                    date: dayHistory.date,
+                    usersInfo,
                 };
-            }
-            groupedHistory[date][userIdString].historyItems.push({
-                action: item.action,
-                oldValue: item.oldValue,
-                newValue: item.newValue,
-                timestamp: item.timestamp,
-            });
-        });
+            })
+        );
 
-        // Get user information and form the final data
-        const result = [];
-        for (const date in groupedHistory) {
-            const usersData = groupedHistory[date];
-            const usersInfo = [];
-            for (const userId in usersData) {
-                const userData = usersData[userId];
-                const user = await getUserByMongoId(userId); // Update getUserByMongoId to accept string parameter
-                if (user) {
-                    userData.user.fullName = user.fullName ?? '';
-                    usersInfo.push(userData);
-                }
-            }
-            result.push({
-                date,
-                usersInfo,
-            });
-        }
+        result.sort(
+            (a, b) =>
+                moment(b.date, 'DD.MM.YYYY').toDate().getTime() -
+                moment(a.date, 'DD.MM.YYYY').toDate().getTime()
+        );
 
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        const slicedResult = result.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(
+            (await DailyHistoryModel.countDocuments()) / pageSize
+        );
 
-        const totalPages = Math.ceil(result.length / pageSize);
-        return { list: slicedResult, totalPages };
+        return { list: result, totalPages };
     } catch (error: any) {
         LOGGER.error('[getAllHistory][error]', {
             metadata: { error: error, stack: error.stack.toString() },
