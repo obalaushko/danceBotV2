@@ -1,7 +1,6 @@
 import moment from 'moment-timezone';
 import { LOGGER } from '../../logger/index.js';
 import { DailyHistoryModel, IDailyHistory } from '../schemas/dailyHistory.js';
-import { IHistory } from '../schemas/history.js';
 import { getUserById, getUserByMongoId } from './users.js';
 
 /**
@@ -10,24 +9,20 @@ import { getUserById, getUserByMongoId } from './users.js';
  * @returns A Promise that resolves to the created history record, or null if an error occurs.
  */
 export const recordHistory = async (historyData: {
-    userId: number; // Telegram user ID (numeric)
+    userId: number;
     action: string;
     oldValue?: any;
     newValue?: any;
-}): Promise<IHistory | IDailyHistory | null> => {
+}): Promise<IDailyHistory | null> => {
     try {
         const { userId, action, oldValue, newValue } = historyData;
-
-        // We get the user by numeric userId (Telegram ID)
         const user = await getUserById(userId);
         if (!user) return null;
 
-        const today = moment.utc().format('DD.MM.YYYY');
+        const today = moment.utc().startOf('day').toDate();
 
-        // We are looking for a `DailyHistory` entry for the current day
         let dailyHistory = await DailyHistoryModel.findOne({ date: today });
 
-        //If there is no record, create a new one
         if (!dailyHistory) {
             dailyHistory = new DailyHistoryModel({
                 date: today,
@@ -78,9 +73,7 @@ export const recordHistory = async (historyData: {
 
         return dailyHistory;
     } catch (error: any) {
-        LOGGER.error('[recordHistory][error]', {
-            metadata: { error: error, stack: error.stack.toString() },
-        });
+        LOGGER.error('[recordHistory][error]', { error });
         return null;
     }
 };
@@ -91,7 +84,7 @@ export const recordHistory = async (historyData: {
  * @returns A promise that resolves to an array of user history objects.
  */
 export const getUserHistory = async (
-    userId: number, // Telegram ID
+    userId: number,
     page: number = 1,
     pageSize: number = 10
 ): Promise<{ list: any[]; totalPages: number }> => {
@@ -106,25 +99,19 @@ export const getUserHistory = async (
             .skip((page - 1) * pageSize)
             .limit(pageSize);
 
-        const result = history
-            .map((dayHistory) => {
-                const userActions = dayHistory.users.find(
-                    (u) => u.userId.toString() === user._id.toString()
-                );
-                return {
-                    date: dayHistory.date,
-                    user: {
-                        userId: user._id,
-                        fullName: user.fullName,
-                    },
-                    historyItems: userActions ? userActions.actions : [],
-                };
-            })
-            .sort(
-                (a, b) =>
-                    moment(b.date, 'DD.MM.YYYY').toDate().getTime() -
-                    moment(a.date, 'DD.MM.YYYY').toDate().getTime()
+        const result = history.map((dayHistory) => {
+            const userActions = dayHistory.users.find(
+                (u) => u.userId.toString() === user._id.toString()
             );
+            return {
+                date: moment(dayHistory.date).format('DD.MM.YYYY'),
+                user: {
+                    userId: user._id,
+                    fullName: user.fullName,
+                },
+                historyItems: userActions ? userActions.actions : [],
+            };
+        });
 
         const totalPages = Math.ceil(
             (await DailyHistoryModel.countDocuments({
@@ -133,9 +120,7 @@ export const getUserHistory = async (
         );
         return { list: result, totalPages };
     } catch (error: any) {
-        LOGGER.error('[getUserHistory][error]', {
-            metadata: { error: error, stack: error.stack.toString() },
-        });
+        LOGGER.error('[getUserHistory][error]', { error });
         return { list: [], totalPages: 0 };
     }
 };
@@ -171,22 +156,16 @@ export const getAllHistory = async (
                                 (a, b) =>
                                     b.timestamp.getTime() -
                                     a.timestamp.getTime()
-                            ), // Sort each user's actions by time
+                            ),
                         };
                     })
                 );
 
                 return {
-                    date: dayHistory.date,
+                    date: moment(dayHistory.date).format('DD.MM.YYYY'),
                     usersInfo,
                 };
             })
-        );
-
-        result.sort(
-            (a, b) =>
-                moment(b.date, 'DD.MM.YYYY').toDate().getTime() -
-                moment(a.date, 'DD.MM.YYYY').toDate().getTime()
         );
 
         const totalPages = Math.ceil(

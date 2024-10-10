@@ -1,6 +1,9 @@
 import moment from 'moment-timezone';
 import { Document, Schema, Model, model } from 'mongoose';
 
+/**
+ * @deprecated
+ */
 export interface IHistory extends Document {
     userId: Schema.Types.ObjectId;
     action: string;
@@ -27,7 +30,9 @@ const HistorySchema: Schema = new Schema<IHistory>({
         default: () => moment.utc().toDate(),
     },
 });
-
+/**
+ * @deprecated
+ */
 export const HistoryModel: Model<IHistory> = model<IHistory>(
     'History',
     HistorySchema

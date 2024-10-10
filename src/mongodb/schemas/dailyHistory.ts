@@ -1,6 +1,5 @@
-import { Document, Schema, Model, model } from 'mongoose';
 import moment from 'moment-timezone';
-
+import { Document, Schema, Model, model } from 'mongoose';
 interface IAction {
     action: string;
     oldValue?: any;
@@ -15,7 +14,7 @@ interface IUserHistory {
 }
 
 export interface IDailyHistory extends Document {
-    date: string;
+    date: Date;
     users: IUserHistory[];
 }
 
@@ -33,7 +32,7 @@ const UserHistorySchema = new Schema<IUserHistory>({
 });
 
 const DailyHistorySchema: Schema = new Schema<IDailyHistory>({
-    date: { type: String, required: true, index: true },
+    date: { type: Date, required: true, index: true },
     users: [UserHistorySchema],
 });
 
