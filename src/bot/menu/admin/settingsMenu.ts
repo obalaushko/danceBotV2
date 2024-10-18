@@ -56,7 +56,7 @@ mailingMenu.register(confirmMailingMenu);
 export const settingsMenu = new Menu('settingsMenu', {
     onMenuOutdated: MSG.onMenuOutdated,
 })
-    .webApp(MSG.buttons.settings.users, ENV_VARIABLES.URL + 'settings')
+    .webApp(MSG.buttons.settings.users, ENV_VARIABLES.URL + 'users')
     .webApp(MSG.buttons.settings.history, ENV_VARIABLES.URL + 'history')
     // .row()
     // .text(MSG.buttons.settings.mailing.main, async (ctx) => {
