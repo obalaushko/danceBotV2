@@ -51,6 +51,7 @@ export const ENV_VARIABLES = {
     URL: ENVS.WEB_APP_URL || '',
     GROUP_ID: Number(ENVS.GROUP_ID) || 0,
     LOGTAIL_TOKEN: ENVS.LOGTAIL_TOKEN || '',
+    LOGGER_TELEGRAM_GROUP: Number(ENVS.LOGGER_TELEGRAM_GROUP) || 0,
     DB: ENVS.MONGO_DB || 'mongodb://',
     DB_USER: ENVS.MONGO_DB_USER || '',
     DB_PASSWORD: encodeURIComponent(ENVS.MONGO_DB_PASSWORD || ''),

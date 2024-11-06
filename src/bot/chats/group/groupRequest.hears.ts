@@ -1,4 +1,4 @@
-import { ENV_VARIABLES, ROLES } from '../../../constants/global.js';
+import { ROLES } from '../../../constants/global.js';
 import { MSG } from '../../../constants/messages.js';
 import { LOGGER } from '../../../logger/index.js';
 import { updateUsersToInactive } from '../../../mongodb/operations/index.js';
@@ -106,14 +106,25 @@ export const groupRequestHears = () => {
     groupChat.on(':new_chat_members:me', async (ctx) => {
         try {
             const chatInfo = await ctx.getChat();
-
-            if (chatInfo.id !== ENV_VARIABLES.GROUP_ID) {
-                await ctx.api.leaveChat(chatInfo.id);
-            }
+            LOGGER.info('Connect in new group,', { metadata: chatInfo });
         } catch (err) {
             LOGGER.error('Error in message:new_chat_members:me', {
                 metadata: err,
             });
         }
     });
+
+    // groupChat.on(':new_chat_members:me', async (ctx) => {
+    //     try {
+    //         const chatInfo = await ctx.getChat();
+
+    //         if (chatInfo.id !== ENV_VARIABLES.GROUP_ID) {
+    //             await ctx.api.leaveChat(chatInfo.id);
+    //         }
+    //     } catch (err) {
+    //         LOGGER.error('Error in message:new_chat_members:me', {
+    //             metadata: err,
+    //         });
+    //     }
+    // });
 };

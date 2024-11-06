@@ -8,6 +8,8 @@ import {
     Logger as WinstonLogger,
 } from 'winston';
 
+import TelegramLogger from 'winston-telegram';
+
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';
 
@@ -31,6 +33,28 @@ const consoleFormat = printf(
     }
 );
 
+const telegramTransport = new TelegramLogger({
+    token: ENV_VARIABLES.TOKEN,
+    chatId: ENV_VARIABLES.LOGGER_TELEGRAM_GROUP, //https://api.telegram.org/<BOT_TOKEN>/getUpdates
+    disableNotification: true,
+    batchingDelay: 1000,
+    parseMode: 'HTML',
+    formatMessage: (info) => {
+        try {
+            const level = info.level;
+            const emoji = level === 'info' ? '🔆' : level === 'warn' ? '⚠️' : '❌';
+            const output = `<b>${emoji} [${level.toUpperCase()}]</b>`;
+            return `${output} ${info.message}: <pre>${
+                info.metadata ? JSON.stringify(info.metadata, null, 2) : ''
+            }</pre>`;
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(`[error] ${err}`);
+            return `[${info.level}] ${err}`;
+        }
+    },
+});
+
 const loggerOptions: LoggerOptions = {
     transports: [
         new transports.File({
@@ -44,6 +68,7 @@ const logger: WinstonLogger = createLogger(loggerOptions);
 
 if (ENV_VARIABLES.MODE === 'production') {
     try {
+        logger.add(telegramTransport);
         logger.add(new LogtailTransport(logtail, { level: 'debug' })); // https://logs.betterstack.com/team/218160/tail
     } catch (err) {
         // eslint-disable-next-line no-console
