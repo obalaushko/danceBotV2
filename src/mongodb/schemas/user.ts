@@ -24,7 +24,7 @@ export const userSchema: Schema = new Schema<IUser>({
     username: {
         type: String,
         required: false,
-        unique: true,
+        unique: false,
     },
     role: {
         type: String,
