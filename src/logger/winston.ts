@@ -42,7 +42,8 @@ const telegramTransport = new TelegramLogger({
     formatMessage: (info) => {
         try {
             const level = info.level;
-            const emoji = level === 'info' ? '🔆' : level === 'warn' ? '⚠️' : '❌';
+            const emoji =
+                level === 'info' ? '🔆' : level === 'warn' ? '⚠️' : '❌';
             const output = `<b>${emoji} [${level.toUpperCase()}]</b>`;
             return `${output} ${info.message}: <pre>${
                 info.metadata ? JSON.stringify(info.metadata, null, 2) : ''
